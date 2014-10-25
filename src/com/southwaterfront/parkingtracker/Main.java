@@ -1,27 +1,39 @@
 package com.southwaterfront.parkingtracker;
 
-import com.googlecode.tesseract.android.TessBaseAPI;
-
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class Main extends Activity {
+import com.googlecode.tesseract.android.TessBaseAPI;
+import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
 
+public class Main extends Activity {
+	
+	private static final String LOG_TAG = "Main";
+	
+	private static Context MAIN_CONTEXT = null;
+	
+	public static Context getMainContext() {
+		return MAIN_CONTEXT;
+	}
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		MAIN_CONTEXT = this.getApplicationContext();
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
+		AssetManager.assetSanityCheck();
+		
 		TessBaseAPI baseApi = new TessBaseAPI();
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Tess/";
+		String path = AssetManager.getEnglishLanguageDataDir();
 		try {
 			baseApi.init(path, "eng");
 		} catch (Exception e) {
-			Log.e("Tess", e.getMessage());
+			Log.e(LOG_TAG, e.getMessage());
 		}
 	}
 
