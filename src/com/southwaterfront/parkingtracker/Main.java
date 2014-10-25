@@ -1,7 +1,6 @@
 package com.southwaterfront.parkingtracker;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -14,22 +13,18 @@ public class Main extends Activity {
 	
 	private static final String LOG_TAG = "Main";
 	
-	private static Context MAIN_CONTEXT = null;
-	
-	public static Context getMainContext() {
-		return MAIN_CONTEXT;
-	}
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		MAIN_CONTEXT = this.getApplicationContext();
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		AssetManager.assetSanityCheck();
+		AssetManager.init(this.getApplicationContext());
+		AssetManager assetManager = AssetManager.getInstance();
+		
+		assetManager.assetSanityCheck();
 		
 		TessBaseAPI baseApi = new TessBaseAPI();
-		String path = AssetManager.getEnglishLanguageDataDir();
+		String path = assetManager.getEnglishLanguageDataDir();
 		try {
 			baseApi.init(path, "eng");
 		} catch (Exception e) {

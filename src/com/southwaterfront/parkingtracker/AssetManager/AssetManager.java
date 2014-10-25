@@ -18,48 +18,110 @@ import com.southwaterfront.parkingtracker.Main;
  * That is, all assets internal and external will be abstracted through
  * this manager.
  * 
+ * This is a singleton class, only one instance will exist throughout the 
+ * vm and is accessible by first calling {@link AssetManager#init(Context)} 
+ * one time and then {@link AssetManager#getInstance()} to get the instance.
+ * 
  * @author Vitaliy Gavrilov
  *
  */
 public class AssetManager {
 
-	public static final int MAX_CACHE_SIZE_BYTES = 41943040;
+	private static AssetManager instance;
 	
-	private static final String LOG_TAG = "AssetManager";
+	private final String LOG_TAG = "AssetManager";
+	
+	public static final int MAX_CACHE_SIZE_BYTES = 41943040;
 
-	private static final Context mainContext = Main.getMainContext();
+	private final Context mainContext;
 
-	private static final android.content.res.AssetManager androidAssetManager = mainContext.getAssets();
+	private final android.content.res.AssetManager androidAssetManager;
 
-	public static final File CACHE_DIR = mainContext.getCacheDir();
+	private final File cacheDir;
 
-	private static final String englishDirectory = "eng";
+	private final String englishDirectory = "eng";
 
-	private static final String tessDataFolder = "tessdata";
+	private final String tessDataFolder = "tessdata";
 
-	public static final File INTERNAL_FILE_DIR = mainContext.getFilesDir();
+	private final File internalFileDir;
 
-	private static final String EXTERNAL_STORAGE_DIR_NAME = "ParkingTracker";
+	private final String externalStorageDirFileName = "ParkingTracker";
 
-	public static final File EXTERNAL_FILE_DIR = new File(Environment.getExternalStorageDirectory(), EXTERNAL_STORAGE_DIR_NAME);
+	private final File externalFileDir;
 
-	private static String englishLanguageDataDirectory = null;
-
-	static {
-		if (!EXTERNAL_FILE_DIR.exists())
-			EXTERNAL_FILE_DIR.mkdir();
+	private String englishLanguageDataDirectory;
+	
+	/**
+	 * Make constructor private to disallow outside instantiation
+	 * of this class
+	 */
+	private AssetManager() {
+		throw new IllegalArgumentException("Cannot use empty constructor");
+	}
+	
+	/**
+	 * Private constructor called when {@link #init(Context)} is called.
+	 * This sets all of the necessary fields in the singleton.
+	 * 
+	 * @param mainContext
+	 */
+	private AssetManager(Context mainContext) {
+		this.mainContext = mainContext;
+		this.androidAssetManager = this.mainContext.getAssets();
+		this.cacheDir = this.mainContext.getCacheDir();
+		this.internalFileDir = this.mainContext.getFilesDir();
+		this.externalFileDir = new File(Environment.getExternalStorageDirectory(), externalStorageDirFileName);
+		if (!this.externalFileDir.exists())
+			this.externalFileDir.mkdir();
+		this.englishLanguageDataDirectory = null;
+	}
+	
+	public File getInternalFileDir() {
+		return this.internalFileDir;
+	}
+	
+	public File getCacheDir() {
+		return this.cacheDir;
+	}
+	
+	public File getExternalFileDir() {
+		return this.externalFileDir;
+	}
+	
+	/**
+	 * Initializes the AssetManager with a {@link Context}, 
+	 * intended to be the context of the {@link Main} Activity.
+	 * 
+	 * @param mainContext
+	 */
+	public static void init(Context mainContext) {
+		if (mainContext == null)
+			throw new IllegalArgumentException("The main context cannot be null");
+		if (instance == null)
+			instance = new AssetManager(mainContext);
+	}
+	
+	/**
+	 * Getter method for the singleton instance of the {@link AssetManager}
+	 * 
+	 * @return The AssetManager
+	 */
+	public static AssetManager getInstance() {
+		if (instance == null)
+			throw new IllegalStateException("The AssetManager has not yet been initialized");
+		return instance;
 	}
 
 	/**
 	 * This method is used to do sanity checks on all data upon the initialization
 	 * of this app
 	 */
-	public static void assetSanityCheck() {
+	public void assetSanityCheck() {
 		tessdataSanity();
 	}
 
-	private static void tessdataSanity() {
-		File engFolder = new File(INTERNAL_FILE_DIR, englishDirectory);
+	private void tessdataSanity() {
+		File engFolder = new File(internalFileDir, englishDirectory);
 		if (!engFolder.exists()) {
 			Log.i(LOG_TAG, "English language definition folder does not exist");
 			engFolder.mkdir();
@@ -74,7 +136,7 @@ public class AssetManager {
 		Log.i(LOG_TAG, "Directory of tessdata directory for TessBaseAPI is " + englishLanguageDataDirectory);
 	}
 
-	private static void moveTessdatatoInternalStorage(File tessdata) {
+	private void moveTessdatatoInternalStorage(File tessdata) {
 		String[] files = null;
 		try {
 			files = androidAssetManager.list(tessDataFolder);
@@ -99,7 +161,7 @@ public class AssetManager {
 		}      
 	}
 
-	private static void copyFile(InputStream in, OutputStream out) throws IOException {
+	private void copyFile(InputStream in, OutputStream out) throws IOException {
 		byte[] buffer = new byte[4096];
 		int read;
 		while((read = in.read(buffer)) != -1)
@@ -107,9 +169,9 @@ public class AssetManager {
 		out.flush();
 	}
 
-	public static String getEnglishLanguageDataDir() {
+	public String getEnglishLanguageDataDir() {
 		if (englishLanguageDataDirectory == null)
-			throw new UnsupportedOperationException("The directory has not been initialized");
+			throw new IllegalStateException("The directory has not been initialized");
 		return englishLanguageDataDirectory;
 	}
 
