@@ -109,7 +109,7 @@ public class AssetManager {
 	public static AssetManager getInstance() {
 		if (instance == null)
 			throw new IllegalStateException("The AssetManager has not yet been initialized");
-		return instance;
+		return AssetManager.instance;
 	}
 
 	/**

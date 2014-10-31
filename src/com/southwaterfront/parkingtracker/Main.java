@@ -2,11 +2,9 @@ package com.southwaterfront.parkingtracker;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.googlecode.tesseract.android.TessBaseAPI;
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
 
 public class Main extends Activity {
@@ -23,13 +21,6 @@ public class Main extends Activity {
 		
 		assetManager.assetSanityCheck();
 		
-		TessBaseAPI baseApi = new TessBaseAPI();
-		String path = assetManager.getEnglishLanguageDataDir();
-		try {
-			baseApi.init(path, "eng");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, e.getMessage());
-		}
 	}
 
 	@Override
