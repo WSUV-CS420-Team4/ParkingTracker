@@ -20,7 +20,7 @@ public class Main extends Activity {
 		AssetManager assetManager = AssetManager.getInstance();
 		
 		assetManager.assetSanityCheck();
-		
+
 	}
 
 	@Override
