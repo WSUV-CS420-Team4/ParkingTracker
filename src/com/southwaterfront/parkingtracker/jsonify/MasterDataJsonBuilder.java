@@ -1,5 +1,6 @@
 package com.southwaterfront.parkingtracker.jsonify;
-import java.io.UnsupportedEncodingException;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -8,6 +9,8 @@ import javax.json.JsonArrayBuilder;
 import javax.json.JsonBuilderFactory;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonGeneratorFactory;
 
 /**
  * The class is to be used to build the final {#link {@link JsonObject}
@@ -30,8 +33,12 @@ import javax.json.JsonObjectBuilder;
  *
  */
 public class MasterDataJsonBuilder {
+	
+	@SuppressWarnings("unused")
+	private static final String LOG_TAG = "MasterDataJsonBuilder";
 
-	private static final JsonBuilderFactory jsonFactory = Json.createBuilderFactory(null);
+	private static final JsonBuilderFactory 	builderFactory = Json.createBuilderFactory(null);
+	private static final JsonGeneratorFactory generatorFactory = Json.createGeneratorFactory(null);
 	
 	private final JsonObjectBuilder objectBuilder;
 	private final JsonArrayBuilder blockFaceArrayBuilder;
@@ -43,13 +50,13 @@ public class MasterDataJsonBuilder {
 	private SimpleDateFormat dateFormat;
 
 	public MasterDataJsonBuilder() {
-		this.objectBuilder = jsonFactory.createObjectBuilder();
-		this.blockFaceArrayBuilder = jsonFactory.createArrayBuilder();
+		this.objectBuilder = builderFactory.createObjectBuilder();
+		this.blockFaceArrayBuilder = builderFactory.createArrayBuilder();
 		this.currentStallBuilder = null;
 		this.currentBlockFaceBuilder = null;
 		this.object = null;
 
-		this.dateFormat = new SimpleDateFormat(JsonConstants.DATA_TIME_FORMAT);
+		this.dateFormat = new SimpleDateFormat(Jsonify.DATA_TIME_FORMAT);
 	}
 
 	/**
@@ -70,14 +77,14 @@ public class MasterDataJsonBuilder {
 			throw new IllegalArgumentException("Arguments cannot be null");
 		
 		if (this.currentBlockFaceBuilder != null) {
-			this.currentBlockFaceBuilder.add(JsonConstants.STALLS_ARRAY_ID, this.currentStallsArrayBuilder);
+			this.currentBlockFaceBuilder.add(Jsonify.STALLS_ARRAY_ID, this.currentStallsArrayBuilder);
 			this.blockFaceArrayBuilder.add(this.currentBlockFaceBuilder);
 		}
 		
-		this.currentBlockFaceBuilder = jsonFactory.createObjectBuilder();
-		this.currentStallsArrayBuilder = jsonFactory.createArrayBuilder();
-		this.currentBlockFaceBuilder.add(JsonConstants.BLOCK_ID, block);
-		this.currentBlockFaceBuilder.add(JsonConstants.FACE_ID, face);
+		this.currentBlockFaceBuilder = builderFactory.createObjectBuilder();
+		this.currentStallsArrayBuilder = builderFactory.createArrayBuilder();
+		this.currentBlockFaceBuilder.add(Jsonify.BLOCK_ID, block);
+		this.currentBlockFaceBuilder.add(Jsonify.FACE_ID, face);
 	}
 	
 	/**
@@ -99,7 +106,7 @@ public class MasterDataJsonBuilder {
 			throw new IllegalArgumentException("Block face cannot be null");
 		
 		if (this.currentBlockFaceBuilder != null) {
-			this.currentBlockFaceBuilder.add(JsonConstants.STALLS_ARRAY_ID, this.currentStallsArrayBuilder);
+			this.currentBlockFaceBuilder.add(Jsonify.STALLS_ARRAY_ID, this.currentStallsArrayBuilder);
 			this.blockFaceArrayBuilder.add(this.currentBlockFaceBuilder);
 		}
 		
@@ -128,22 +135,22 @@ public class MasterDataJsonBuilder {
 		if (currentStallsArrayBuilder == null)
 			throw new IllegalStateException("Cannot add a stall without a block face");
 
-		this.currentStallBuilder = jsonFactory.createObjectBuilder();
-		this.currentStallBuilder.add(JsonConstants.PLATE_ID, plate);
+		this.currentStallBuilder = builderFactory.createObjectBuilder();
+		this.currentStallBuilder.add(Jsonify.PLATE_ID, plate);
 
 		String dtStamp = this.dateFormat.format(time);
-		this.currentStallBuilder.add(JsonConstants.TIME_ID, dtStamp);
+		this.currentStallBuilder.add(Jsonify.TIME_ID, dtStamp);
 
 		if (attr != null) {
 			StringBuilder builder = new StringBuilder();
 			for (int i = 0; i < attr.length; i++) {
 				builder.append(attr[i]);
 				if (i < attr.length - 1)
-					builder.append(JsonConstants.STRING_DELIMITER);
+					builder.append(Jsonify.STRING_DELIMITER);
 			}
-			this.currentStallBuilder.add(JsonConstants.ATTR_ID, builder.toString());
+			this.currentStallBuilder.add(Jsonify.ATTR_ID, builder.toString());
 		} else {
-			this.currentStallBuilder.addNull(JsonConstants.ATTR_ID);
+			this.currentStallBuilder.addNull(Jsonify.ATTR_ID);
 		}
 		this.currentStallsArrayBuilder.add(this.currentStallBuilder);
 	}
@@ -162,10 +169,10 @@ public class MasterDataJsonBuilder {
 			return this.object;
 		
 		if (this.currentBlockFaceBuilder != null) {
-			this.currentBlockFaceBuilder.add(JsonConstants.STALLS_ARRAY_ID, this.currentStallsArrayBuilder);
+			this.currentBlockFaceBuilder.add(Jsonify.STALLS_ARRAY_ID, this.currentStallsArrayBuilder);
 			this.blockFaceArrayBuilder.add(this.currentBlockFaceBuilder);
 		}
-		this.objectBuilder.add(JsonConstants.BLOCKFACES_ARRAY_ID, blockFaceArrayBuilder);
+		this.objectBuilder.add(Jsonify.BLOCKFACES_ARRAY_ID, blockFaceArrayBuilder);
 		
 		this.object = objectBuilder.build();
 		return this.object;
@@ -188,19 +195,19 @@ public class MasterDataJsonBuilder {
 	 * JsonObject. The byte encoding will be that of {@value MasterDataJsonBuilder#BYTE_ENCODING}.
 	 * An {@link IllegalStateException} is thrown if the data is not 
 	 * finalized with {@link #buildObject()}.
+	 * <br>
+	 * RFC 4627 compliant
 	 * 
 	 * @return Byte representation of the created JsonObject.
 	 */
 	public byte[] getJsonObjectBytes() {
 		if (this.object == null)
 			throw new IllegalStateException("Object not created, call buildObject first");
-		byte[] bytes;
-
-		try {
-			bytes = this.object.toString().getBytes(JsonConstants.BYTE_ENCODING);
-		} catch (UnsupportedEncodingException e) {
-			return null;
-		}
+		
+		ByteArrayOutputStream out = new ByteArrayOutputStream(512);
+		writeToStream(out);
+		
+		byte[] bytes = out.toByteArray();
 
 		return bytes;
 	}
@@ -213,5 +220,23 @@ public class MasterDataJsonBuilder {
 	public boolean isBuilt() {
 		return this.object != null;
 	}
-
+	
+	/**
+	 * Writes the object byte representation to the given output stream.
+	 * If the object has not been built yet, {@link IllegalStateException} is
+	 * throw.
+	 * 
+	 * @param out Output stream to write to
+	 */
+	public void writeToStream(OutputStream out) {
+		if (this.object == null)
+			throw new IllegalStateException("Cannot write object to stream because JsonObject has not been built");
+		
+		JsonGenerator generator = MasterDataJsonBuilder.generatorFactory.createGenerator(out);
+		
+		generator.write(this.object);
+		generator.flush();
+		generator.close();
+	}
+	
 }
