@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
@@ -12,6 +13,9 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonGeneratorFactory;
+
+import com.southwaterfront.parkingtracker.data.BlockFace;
+import com.southwaterfront.parkingtracker.data.ParkingStall;
 
 /**
  * This class is a builder for one {@link JsonObject} holding parking data
@@ -26,6 +30,7 @@ import javax.json.stream.JsonGeneratorFactory;
  */
 public class BlockFaceJsonBuilder {
 	
+	@SuppressWarnings("unused")
 	private static final String LOG_TAG = "BlockFaceJsonBuilder";
 
 	private static final JsonBuilderFactory 	jsonFactory = Json.createBuilderFactory(null);
@@ -48,6 +53,52 @@ public class BlockFaceJsonBuilder {
 		
 		this.objectBuilder.add(Jsonify.BLOCK_ID, block);
 		this.objectBuilder.add(Jsonify.FACE_ID, face);
+	}
+	
+	/**
+	 * Builds a JsonObject from a {@link BlockFace}
+	 * 
+	 * @param blockFace Block face to use
+	 * @return Built JsonObject
+	 */
+	public static JsonObject buildObjectFromBlockFace(BlockFace blockFace) {
+		if (blockFace == null)
+			throw new IllegalArgumentException("Block face cannot be null");
+		
+		JsonObject object = null;
+		
+		BlockFaceJsonBuilder builder = new BlockFaceJsonBuilder(blockFace.block, blockFace.face);
+		
+		builder.addStalls(blockFace.getParkingStalls());
+		
+		object = builder.buildObject();
+		
+		return object;
+	}
+	
+	/**
+	 * Add a list of stalls
+	 * 
+	 * @param stalls List of stalls
+	 */
+	public void addStalls(List<ParkingStall> stalls) {
+		if (stalls == null)
+			throw new IllegalArgumentException("Stalls cannot be null");
+		
+		for (ParkingStall stall : stalls)
+			addStall(stall.plate, stall.dTStamp, stall.attr);
+	}
+	
+	/**
+	 * Add a stall to this block face
+	 * 
+	 * @param stall Parking stall to add, non null
+	 */
+	public void addStall(ParkingStall stall) {
+		if (stall == null)
+			throw new IllegalArgumentException("Stall cannot be null");
+		
+		addStall(stall.plate, stall.dTStamp, stall.attr);
 	}
 	
 	/**

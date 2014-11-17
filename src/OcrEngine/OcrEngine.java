@@ -2,6 +2,7 @@ package OcrEngine;
 
 import java.io.File;
 
+import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.util.Log;
 
@@ -24,7 +25,7 @@ public class OcrEngine {
 	
 	private final String englishLangID = "eng";
 	
-	private final String whiteListChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	private final String whiteListChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-";
 	
 	private static final OcrEngine instance = new OcrEngine();
 	
@@ -59,7 +60,7 @@ public class OcrEngine {
 	}
 	
 	/**
-	 * Runs the {@link TessBaseAPI} engine to produce a character
+	 * Runs the {@link TessBaseAPI} engine to produce a String
 	 * result from the image
 	 * 
 	 * @param image File containing the image to be processed
@@ -71,6 +72,33 @@ public class OcrEngine {
 			throw new IllegalArgumentException("Image file must exist and be readable");
 		
 		this.tess.setImage(image);
+		
+		if (rect != null)
+			this.tess.setRectangle(rect);
+		
+		String result = this.tess.getUTF8Text();
+		
+		this.tess.clear();
+		
+		return result;
+	}
+	
+	/**
+	 * Runs the {@link TessBaseAPI} engine to produce a String
+	 * result from the image given in {@link Bitmap} form. The user is
+	 * responsible for passing a valid Bitmap. The only supported encoding
+	 * is {@link Bitmap.Config#ARGB_8888}. Attempting to use a different encoding
+	 * will result in a {@link RuntimeException}.
+	 * 
+	 * @param bmp Bitmap of image
+	 * @param rect Rectangle defining processing area in image
+	 * @return Recognized text
+	 */
+	public String runOcr(Bitmap bmp, Rect rect) {
+		if (bmp == null)
+			throw new IllegalArgumentException("Bitmap cannot be null");
+		
+		this.tess.setImage(bmp);
 		
 		if (rect != null)
 			this.tess.setRectangle(rect);

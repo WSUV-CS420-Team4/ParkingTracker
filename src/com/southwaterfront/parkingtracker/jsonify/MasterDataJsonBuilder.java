@@ -3,6 +3,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
@@ -11,6 +12,9 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonGeneratorFactory;
+
+import com.southwaterfront.parkingtracker.data.BlockFace;
+import com.southwaterfront.parkingtracker.data.ParkingStall;
 
 /**
  * The class is to be used to build the final {#link {@link JsonObject}
@@ -21,6 +25,10 @@ import javax.json.stream.JsonGeneratorFactory;
  * current block face. In so, the process is meant to be iterative through each stall per block.
  * It is also possible to build the master JsonObject from JsonObjects containing a single block 
  * faces using {@link #addBlockFace(JsonObject)}.
+ * <br>
+ * The iterative process can be tedious, if the data is already organized into {@link BlockFace} objects,
+ * simply calling {@link MasterDataJsonBuilder#buildObjectFromBlockFaces(List)} can be used. Or the object
+ * can be built by building individual block face objects using {@link #addBlockFace(BlockFace)}.
  * <br>
  * When all of the data is collected, {@link #buildObject()} is called to build the collective
  * JsonObject. The object can then be gotten as a {@link JsonObject} or a series of bytes. It is
@@ -57,6 +65,30 @@ public class MasterDataJsonBuilder {
 		this.object = null;
 
 		this.dateFormat = new SimpleDateFormat(Jsonify.DATA_TIME_FORMAT);
+	}
+	
+	/**
+	 * Convenience method to build JsonObject from a list of {@link BlockFace} 
+	 * objects. If the whole data already exists as a group of block faces, this
+	 * is an easy way to get a JsonObject of all of the data.
+	 * 
+	 * @param elems List of {@link BlockFace} objects to jsonify
+	 * @return JsonObject containing all block faces
+	 */
+	public static JsonObject buildObjectFromBlockFaces(List<BlockFace> elems) {
+		if (elems == null) 
+			throw new IllegalArgumentException("List of block faces cannot be null");
+		
+		JsonObject object = null;
+		
+		MasterDataJsonBuilder builder = new MasterDataJsonBuilder();
+		
+		for (BlockFace face : elems)
+			builder.addBlockFace(face);
+		
+		object = builder.buildObject();
+		
+		return object;
 	}
 
 	/**
@@ -114,6 +146,51 @@ public class MasterDataJsonBuilder {
 		
 		this.currentBlockFaceBuilder = null;
 		this.currentStallsArrayBuilder = null;
+	}
+	
+	/**
+	 * This is a way to add a block face to the object from a
+	 * {@link BlockFace} object to the current build. Using this method completes
+	 * the previous block that was being built and adds the new one. There 
+	 * is no ability to add stalls to this block face so before {@link #addStall(String, Date, String[])}
+	 * is called again, {@link #startBlockFace(String, String)} is required again.
+	 * 
+	 * @param blockFace Block face to add to JsonObject
+	 */
+	public void addBlockFace(BlockFace blockFace) {
+		if (this.object != null)
+			return;
+		if (blockFace == null)
+			throw new IllegalArgumentException("Block face cannot be null");
+		
+		startBlockFace(blockFace.block, blockFace.face);
+		
+		for (ParkingStall stall : blockFace.getParkingStalls())
+			addStall(stall.plate, stall.dTStamp, stall.attr);
+		
+		this.currentBlockFaceBuilder.add(Jsonify.STALLS_ARRAY_ID, this.currentStallsArrayBuilder);
+		this.blockFaceArrayBuilder.add(this.currentBlockFaceBuilder);
+		
+		this.currentBlockFaceBuilder = null;
+		this.currentStallsArrayBuilder = null;
+	}
+	
+	/**
+	 * Adds a stall to the current block face in the JsonObject. If
+	 * a block face has not been created, an {@link IllegalStateException}
+	 * will be thrown.
+	 * <br>
+	 * If the JsonObject is already built no work will be done.
+	 * 
+	 * @param stall Parking stall to add
+	 */
+	public void addStall(ParkingStall stall) {
+		if (this.object != null)
+			return;
+		if (stall == null)
+			throw new IllegalArgumentException("Stall cannot be null");
+		
+		addStall(stall.plate, stall.dTStamp, stall.attr);
 	}
 
 	/**
