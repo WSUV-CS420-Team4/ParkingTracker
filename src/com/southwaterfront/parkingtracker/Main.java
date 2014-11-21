@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import OcrEngine.OcrEngine;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -18,6 +19,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
 
@@ -107,6 +110,29 @@ public class Main extends Activity {
 
 	    Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
 	    imageView.setImageBitmap(bitmap);
+	    /*
+	    int[] pixels  = new int[bitmap.getHeight()*bitmap.getWidth()];
+	    bitmap.getPixels(pixels, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
+	    
+	    for(int i = 0; i < pixels.length; i++) {
+	    	int pixel = pixels[i];
+	    	if (((pixel >>> 0) & 255) < 200)
+	    		pixels[i] = 0x00FFFFFF;
+	    }
+	    
+	    bitmap = Bitmap.createBitmap(pixels, bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+	    imageView.setImageBitmap(bitmap);
+	    */
+	    OcrEngine o = OcrEngine.getInstance();
+	    String result = o.runOcr(bitmap, null);
+	    result = result.substring(0, result.length() > 30 ? 30 : result.length());
+	    
+	    int duration = Toast.LENGTH_LONG;
+
+	    Toast toast = Toast.makeText(getBaseContext(), result, duration);
+	    toast.show();
+	    TextView view = (TextView) findViewById(R.id.textView2);
+	    view.setText(result);
 	}
 	// -------------------------------------------------------------------------------------------------
 	

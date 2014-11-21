@@ -34,7 +34,7 @@ public final class Jsonify {
 	/**
 	 * Date time format string for {@link SimpleDateFormat}
 	 */
-	public static final String DATA_TIME_FORMAT = "EEE, dd MMM yyy HH:mm:ss Z";
+	public static final String DATA_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
 
 	public static final String BYTE_ENCODING = "UTF-8";
 	
