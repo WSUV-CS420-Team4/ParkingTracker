@@ -8,7 +8,7 @@ import javax.json.JsonObject;
 
 import android.util.Log;
 
-import com.southwaterfront.parkingtracker.persist.PersistentTask.Result;
+import com.southwaterfront.parkingtracker.persist.PersistenceTask.Result;
 
 /**
  * This is a worker that deals with data on disk.
@@ -36,9 +36,9 @@ public class PersistenceWorker implements Runnable {
 
 	private static final String ERROR_DELETE_UNKNOWN = "The file could not be deleted because of an unknown error";
 
-	private final BlockingQueue<PersistentTask> tasks;
+	private final BlockingQueue<PersistenceTask> tasks;
 
-	public PersistenceWorker(BlockingQueue<PersistentTask> tasks) {
+	public PersistenceWorker(BlockingQueue<PersistenceTask> tasks) {
 		this.tasks = tasks;
 	}
 
@@ -46,7 +46,7 @@ public class PersistenceWorker implements Runnable {
 	public void run() {
 		while (true) {
 			try {
-				PersistentTask taskWrapper = tasks.take();
+				PersistenceTask taskWrapper = tasks.take();
 
 				switch (taskWrapper.task) {
 				case APPEND:
@@ -72,7 +72,7 @@ public class PersistenceWorker implements Runnable {
 		}
 	}
 
-	private void writeData(PersistentTask taskWrapper, boolean append) {
+	private void writeData(PersistenceTask taskWrapper, boolean append) {
 		Object data = taskWrapper.data;
 		File file = taskWrapper.file;
 
@@ -115,7 +115,7 @@ public class PersistenceWorker implements Runnable {
 		}
 	}
 
-	private void delete(PersistentTask taskWrapper) {
+	private void delete(PersistenceTask taskWrapper) {
 		File file = taskWrapper.file;
 
 		validateDeleteFile(file, taskWrapper);
@@ -134,7 +134,7 @@ public class PersistenceWorker implements Runnable {
 		setTaskSuccess(taskWrapper);
 	}
 
-	private void deleteFile(File file, PersistentTask t) {
+	private void deleteFile(File file, PersistenceTask t) {
 		try {
 			boolean success = file.delete();
 
@@ -148,15 +148,14 @@ public class PersistenceWorker implements Runnable {
 		
 	}
 
-	private void deleteDirectory(File dir, PersistentTask t) {
+	private void deleteDirectory(File dir, PersistenceTask t) {
 		if (!dir.isDirectory())
 			return;
 		
 		for (File file : dir.listFiles()) {
-			if (file.isDirectory()) {
+			if (file.isDirectory())
 				deleteDirectory(file, t);
-				deleteFile(file, t);
-			} else if (file.isFile())
+			else if (file.isFile())
 				deleteFile(file, t);
 			
 			if (t.getResult() == Result.FAIL)
@@ -166,7 +165,7 @@ public class PersistenceWorker implements Runnable {
 		deleteFile(dir, t);
 	}
 
-	private void validateDeleteFile(File file, PersistentTask t) {
+	private void validateDeleteFile(File file, PersistenceTask t) {
 		if (!file.exists()) {
 			setTaskFailure(t, ERROR_DELETE_NONE);
 		}
@@ -176,7 +175,7 @@ public class PersistenceWorker implements Runnable {
 		}
 	}
 
-	private void validateWriteFile(File file, PersistentTask t, boolean append) {
+	private void validateWriteFile(File file, PersistenceTask t, boolean append) {
 		if (file.isDirectory()) {
 			Log.i(LOG_TAG, "Could not write file " + file.getAbsolutePath());
 			setTaskFailure(t, ERROR_WRITE_DIR);
@@ -207,11 +206,11 @@ public class PersistenceWorker implements Runnable {
 
 	}
 
-	private void setTaskFailure(PersistentTask t, String message) {
+	private void setTaskFailure(PersistenceTask t, String message) {
 		t.setResult(Result.FAIL, message);
 	}
 
-	private void setTaskSuccess(PersistentTask t) {
+	private void setTaskSuccess(PersistenceTask t) {
 		t.setResult(Result.SUCCESS, null);
 	}
 

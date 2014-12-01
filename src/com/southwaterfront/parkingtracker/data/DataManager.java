@@ -21,9 +21,9 @@ import android.util.Log;
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
 import com.southwaterfront.parkingtracker.jsonify.BlockFaceJsonBuilder;
 import com.southwaterfront.parkingtracker.persist.PersistenceWorker;
-import com.southwaterfront.parkingtracker.persist.PersistentTask;
-import com.southwaterfront.parkingtracker.persist.PersistentTask.Result;
-import com.southwaterfront.parkingtracker.persist.PersistentTask.Task;
+import com.southwaterfront.parkingtracker.persist.PersistenceTask;
+import com.southwaterfront.parkingtracker.persist.PersistenceTask.Result;
+import com.southwaterfront.parkingtracker.persist.PersistenceTask.Task;
 
 /**
  * This singleton will be used to manage the collected data. This
@@ -55,7 +55,7 @@ public class DataManager {
 
 	private Session currentSession;
 
-	private final BlockingQueue<PersistentTask> persistenceTasks;
+	private final BlockingQueue<PersistenceTask> persistenceTasks;
 
 	private final Thread persistenceThread;
 
@@ -74,7 +74,7 @@ public class DataManager {
 	 *
 	 */
 	public class Session implements Comparable<Session> {
-		private static final String LOG_TAG = "Session";
+		private final String LOG_TAG;
 
 		public final String SESSION_ID;
 		public final Date		createTime;
@@ -86,9 +86,10 @@ public class DataManager {
 		public Session(Date createTime, File cacheFolder) {
 			if (createTime == null || cacheFolder == null)
 				throw new IllegalArgumentException("Arguments cannot be null");
-
+			
 			this.createTime = createTime;
 			this.SESSION_ID = dateFormat.format(this.createTime);
+			this.LOG_TAG = "Session " + this.SESSION_ID;
 			this.cacheFolder = cacheFolder;
 			this.loadTime = new Date(System.currentTimeMillis());
 
@@ -100,6 +101,7 @@ public class DataManager {
 				throw new IllegalArgumentException("Arguments cannot be null");
 
 			this.SESSION_ID = createTime;
+			this.LOG_TAG = "Session " + this.SESSION_ID;
 			try {
 				this.createTime = dateFormat.parse(createTime);
 			} catch (ParseException e) {
@@ -162,7 +164,7 @@ public class DataManager {
 
 						File file = new File(this.session.cacheFolder, fileName);
 
-						PersistentTask task = writeToFile(obj, file);
+						PersistenceTask task = writeToFile(obj, file);
 						
 						Result result = task.waitOnResult();
 						
@@ -201,7 +203,7 @@ public class DataManager {
 		this.sessions = new TreeSet<Session>();
 		this.dateFormat = new SimpleDateFormat(FILE_NAME_FORMAT);
 
-		this.persistenceTasks = new LinkedBlockingQueue<PersistentTask>();
+		this.persistenceTasks = new LinkedBlockingQueue<PersistenceTask>();
 		PersistenceWorker worker = new PersistenceWorker(this.persistenceTasks);
 		this.persistenceThread = new Thread(worker);
 		this.persistenceThread.setDaemon(true);
@@ -343,14 +345,21 @@ public class DataManager {
 		return this.sessions.remove(session);
 	}
 
-	private PersistentTask deleteFile(File file) {
-		PersistentTask task = new PersistentTask(null, file, Task.DELETE);
+	/**
+	 * Asynchronous file deletion
+	 * 
+	 * @param file File to delete
+	 * @return The task being worked on, see {@link PersistenceTask} for
+	 * more information on how to check the result
+	 */
+	public PersistenceTask deleteFile(File file) {
+		PersistenceTask task = new PersistenceTask(null, file, Task.DELETE);
 		this.persistenceTasks.add(task);
 		return task;
 	}
 
-	private PersistentTask writeToFile(Object data, File file) {
-		PersistentTask task = new PersistentTask(data, file, Task.WRITE);
+	public PersistenceTask writeToFile(Object data, File file) {
+		PersistenceTask task = new PersistenceTask(data, file, Task.WRITE);
 		this.persistenceTasks.add(task);
 		return task;
 	}
@@ -359,7 +368,10 @@ public class DataManager {
 	 * This call stores the block face. It deals with all necessary persistence,
 	 * session adherence, and encapsulation. The data processing is sent to a worker
 	 * thread so it is safe to call this on the UI thread.
-	 * 
+	 * <br>
+	 * Within a single {@link Session}, a BlockFace representing one physical location
+	 * may be added once. Adding two different objects for a single block face has unspecified
+	 * results, but is likely just to use the most recent object for the final data build.
 	 * 
 	 * @param face BlockFace to add to data
 	 */

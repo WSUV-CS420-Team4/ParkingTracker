@@ -61,5 +61,27 @@ public final class BlockFace {
 	public List<ParkingStall> getParkingStalls() {
 		return Collections.unmodifiableList(this.stalls);
 	}
+	
+	/**
+	 * Two block faces are equal if and only if the block and face
+	 * names are case insensitive lexicographically equivalent.
+	 */
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof BlockFace) {
+			BlockFace o = (BlockFace) other;
+			return this.block.equalsIgnoreCase(o.block) && this.face.equalsIgnoreCase(o.face);
+		} else
+			return false;
+	}
+	
+	/**
+	 * The hash code is the XOR of the hashes of the block
+	 * and face names
+	 */
+	@Override
+	public int hashCode() {
+		return this.block.hashCode() ^ this.face.hashCode();
+	}
 
 }

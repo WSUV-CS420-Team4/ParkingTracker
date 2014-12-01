@@ -7,16 +7,43 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Defines a task to be done by a {@link PersistenceWorker}.
+ * <br>
+ * The tasks are defined by enum in {@link PersistenceTask.Task}, 
+ * just as the results in {@link PersistenceTask.Result}. To get the result,
+ * call {@link #getResult()}. This will be in progress if not done, or success or fail. If
+ * it is a failure there may be an error message which is retrieved by {@link #getErrorMessage()}.
+ * To synchronously wait until the task is done use {@link #waitOnResult()} which will return the result
+ * when the task is done.
+ * <br>
+ * Note that setting the result is publicly available, however doing so will negate the actual result 
+ * from being set.
  * 
  * @author Vitaily Gavrilov
  *
  */
-public class PersistentTask {
+public class PersistenceTask {
 
+	/**
+	 * Available tasks
+	 */
 	public static enum Task {
-		WRITE, APPEND, DELETE
+		/**
+		 * Write to a file
+		 */
+		WRITE, 
+		/**
+		 * Append to a file
+		 */
+		APPEND, 
+		/**
+		 * Delete a file
+		 */
+		DELETE
 	}
 
+	/**
+	 * Result types
+	 */
 	public static enum Result {
 		IN_PROGRESS, SUCCESS, FAIL
 	}
@@ -35,7 +62,7 @@ public class PersistentTask {
 
 	private final Condition finished;
 
-	public PersistentTask(Object data, File file, Task task) {
+	public PersistenceTask(Object data, File file, Task task) {
 		if (file == null || task == null)
 			throw new IllegalArgumentException("File and task cannot be null");
 		if ((task == Task.APPEND || task == Task.WRITE) && data == null)

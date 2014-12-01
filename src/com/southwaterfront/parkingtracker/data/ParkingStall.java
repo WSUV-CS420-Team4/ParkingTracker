@@ -9,6 +9,8 @@ import java.util.Date;
  *
  */
 public final class ParkingStall {
+	
+	public static final ParkingStall EmptyStall = new ParkingStall("", new Date(), null);
 
 	public final String	 	plate;
 	public final Date 		dTStamp;
@@ -21,6 +23,15 @@ public final class ParkingStall {
 		this.plate = plate;
 		this.dTStamp = time;
 		this.attr = attr;
+	}
+	
+	/**
+	 * Getter for empty stall object
+	 * 
+	 * @return The empty stall
+	 */
+	public static ParkingStall getEmptyStall() {
+		return ParkingStall.EmptyStall;
 	}
 	
 }
