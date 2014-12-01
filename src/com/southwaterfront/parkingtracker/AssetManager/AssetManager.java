@@ -169,10 +169,24 @@ public class AssetManager {
 		out.flush();
 	}
 
+	/**
+	 * Getter for directory needed for OCR engine
+	 * 
+	 * @return The directory of the english language data
+	 */
 	public String getEnglishLanguageDataDir() {
 		if (englishLanguageDataDirectory == null)
 			throw new IllegalStateException("The directory has not been initialized");
 		return englishLanguageDataDirectory;
+	}
+	
+	/**
+	 * Getter for main activity context
+	 * 
+	 * @return The context
+	 */
+	public Context getMainContext() {
+		return this.mainContext;
 	}
 
 }

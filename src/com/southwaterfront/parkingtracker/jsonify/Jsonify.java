@@ -8,8 +8,8 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonReaderFactory;
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonGeneratorFactory;
+import javax.json.JsonWriter;
+import javax.json.JsonWriterFactory;
 
 /**
  * Simply a class to hold constants need by other Json related classes and to
@@ -39,7 +39,7 @@ public final class Jsonify {
 	public static final String BYTE_ENCODING = "UTF-8";
 	
 	private static final JsonReaderFactory readerFactory = Json.createReaderFactory(null);
-	private static final JsonGeneratorFactory generatorFactory = Json.createGeneratorFactory(null);
+	private static final JsonWriterFactory writerFactory = Json.createWriterFactory(null);
 	
 	/**
 	 * This class cannot be instantiated
@@ -49,7 +49,7 @@ public final class Jsonify {
 	}
 	
 	/**
-	 * Creates a JsonObject from the InputStream. An internal error
+	 * Creates a JsonObject from the InputStream. An internal exception
 	 * will be thrown if it does not parse to a JsonObject.
 	 * <br>
 	 * RFC 4627 compliant
@@ -61,11 +61,13 @@ public final class Jsonify {
 		if (in == null)
 			throw new IllegalArgumentException("Arguments cannot be null");
 		
-		JsonReader reader = readerFactory.createReader(in);
+		JsonReader reader = null;
+		
+		synchronized (readerFactory) {
+			reader = readerFactory.createReader(in);
+		}
 		
 		JsonObject result = reader.readObject();
-		
-		reader.close();
 		
 		return result;
 	}
@@ -78,15 +80,18 @@ public final class Jsonify {
 	 * @param object JsonObject to send to stream
 	 * @param out Stream to write to
 	 */
-	public static void writeJsonObjecttoStream(JsonObject object, OutputStream out) {
+	public static void writeJsonObjectToStream(JsonObject object, OutputStream out) {
 		if (object == null || out == null)
 			throw new IllegalArgumentException("Arguments cannot be null");
 		
-		JsonGenerator generator = generatorFactory.createGenerator(out);
+		JsonWriter writer = null;
 		
-		generator.write(object);
-		generator.flush();
-		generator.close();
+		synchronized (writerFactory) {
+			writer = writerFactory.createWriter(out);
+		}
+		
+		writer.write(object);
+		writer.close();
 	}
 	
 }

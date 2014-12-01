@@ -80,7 +80,15 @@ public class Persistor {
 			// Impossible!!!
 		}
 		
-		Jsonify.writeJsonObjecttoStream(obj, out);
+		Jsonify.writeJsonObjectToStream(obj, out);
+		
+		Log.i(LOG_TAG, "Successfully wrote a JsonObject to " + f.getAbsolutePath());
+		
+		try {
+			out.close();
+		} catch (IOException e) {
+			Log.e(LOG_TAG, "OutputStream could not close", e);
+		}
 	}
 	
 	private static void writeBytes(File f, byte[] bytes, int start, int end, boolean append) {
@@ -101,8 +109,10 @@ public class Persistor {
 			out.write(bytes, start, end);
 			out.flush();
 			out.close();
+			
+			Log.i(LOG_TAG, "Successfully wrote " + bytes.length + " bytes to " + f.getAbsolutePath());
 		} catch (IOException e) {
-			Log.e(LOG_TAG, "Write of file " + f.getName() +  " to " + f.getAbsolutePath() + " failed", e);
+			Log.e(LOG_TAG, "Write of file to " + f.getAbsolutePath() + " failed", e);
 		}
 	}
 	

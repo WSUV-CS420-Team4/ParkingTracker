@@ -1,0 +1,218 @@
+package com.southwaterfront.parkingtracker.persist;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.BlockingQueue;
+
+import javax.json.JsonObject;
+
+import android.util.Log;
+
+import com.southwaterfront.parkingtracker.persist.PersistentTask.Result;
+
+/**
+ * This is a worker that deals with data on disk.
+ * 
+ * @author Vitaliy Gavrilov
+ *
+ */
+public class PersistenceWorker implements Runnable {
+
+	private static final String LOG_TAG = "PersistenceWorker";
+
+	private static final String ERROR_CREATE_FILE = "The file could not be created for the write task";
+
+	private static final String ERROR_WRITE_FILE = "The data could not be written to because access was denied";
+	
+	private static final String ERROR_WRITE_NOT_EMPTY = "The file was not written to because it is not empty";
+
+	private static final String ERROR_WRITE_DIR = "The data cannot be written because the file is a directory";
+
+	private static final String ERROR_DATA_TYPE = "The data could not be written because it was neither a byte array or JsonObject";
+
+	private static final String ERROR_DELETE_FILE = "The file could not be deleted because access was denied";
+
+	private static final String ERROR_DELETE_NONE = "The file could not be deleted because it did not exist";
+
+	private static final String ERROR_DELETE_UNKNOWN = "The file could not be deleted because of an unknown error";
+
+	private final BlockingQueue<PersistentTask> tasks;
+
+	public PersistenceWorker(BlockingQueue<PersistentTask> tasks) {
+		this.tasks = tasks;
+	}
+
+	@Override
+	public void run() {
+		while (true) {
+			try {
+				PersistentTask taskWrapper = tasks.take();
+
+				switch (taskWrapper.task) {
+				case APPEND:
+					writeData(taskWrapper, true);
+					break;
+				case DELETE:
+					delete(taskWrapper);
+					break;
+				case WRITE:
+					writeData(taskWrapper, false);
+					break;
+				default:
+					break;
+
+				}
+				Log.i(LOG_TAG, "Task " + taskWrapper.task + " on file " + taskWrapper.file.getAbsolutePath() +" completed with result " + taskWrapper.getResult() + "\t Error message: " + taskWrapper.getErrorMessage());
+			} catch (InterruptedException e) {
+				Log.i(LOG_TAG, "PersistanceWorker was interrupted", e);
+				throw new RuntimeException(e);
+			}
+
+
+		}
+	}
+
+	private void writeData(PersistentTask taskWrapper, boolean append) {
+		Object data = taskWrapper.data;
+		File file = taskWrapper.file;
+
+		if (data instanceof byte[]) {
+			byte[] bytes = (byte[]) data;
+
+			validateWriteFile(file, taskWrapper, append);
+
+			if (taskWrapper.getResult() == Result.FAIL)
+				return;
+
+			try {
+				if (append)
+					Persistor.appendToFile(file, bytes);
+				else
+					Persistor.writeToFile(file, bytes);
+			} catch (Exception e) {
+				setTaskFailure(taskWrapper, e.getMessage());
+			}
+			setTaskSuccess(taskWrapper);
+		} else if (data instanceof JsonObject) {
+			JsonObject obj = (JsonObject) data;
+
+			validateWriteFile(file, taskWrapper, append);
+
+			if (taskWrapper.getResult() == Result.FAIL)
+				return;
+
+			try {
+				if (append)
+					Persistor.appendToFile(file, obj);
+				else
+					Persistor.writeToFile(file, obj);
+			} catch (Exception e) {
+				setTaskFailure(taskWrapper, e.getMessage());
+			}
+			setTaskSuccess(taskWrapper);
+		} else {
+			setTaskFailure(taskWrapper, ERROR_DATA_TYPE);
+		}
+	}
+
+	private void delete(PersistentTask taskWrapper) {
+		File file = taskWrapper.file;
+
+		validateDeleteFile(file, taskWrapper);
+
+		if (taskWrapper.getResult() == Result.FAIL)
+			return;
+
+		if (file.isFile())
+			deleteFile(file, taskWrapper);
+		else if (file.isDirectory())
+			deleteDirectory(file, taskWrapper);
+		
+		if (taskWrapper.getResult() == Result.FAIL)
+			return;
+		
+		setTaskSuccess(taskWrapper);
+	}
+
+	private void deleteFile(File file, PersistentTask t) {
+		try {
+			boolean success = file.delete();
+
+			if (!success)
+				setTaskFailure(t, ERROR_DELETE_UNKNOWN);
+			else
+				Log.i(LOG_TAG, "Successfully deleted " + file.getAbsolutePath());
+		} catch (Exception e) {
+			setTaskFailure(t, e.getMessage());
+		} 
+		
+	}
+
+	private void deleteDirectory(File dir, PersistentTask t) {
+		if (!dir.isDirectory())
+			return;
+		
+		for (File file : dir.listFiles()) {
+			if (file.isDirectory()) {
+				deleteDirectory(file, t);
+				deleteFile(file, t);
+			} else if (file.isFile())
+				deleteFile(file, t);
+			
+			if (t.getResult() == Result.FAIL)
+				return;
+		}
+		
+		deleteFile(dir, t);
+	}
+
+	private void validateDeleteFile(File file, PersistentTask t) {
+		if (!file.exists()) {
+			setTaskFailure(t, ERROR_DELETE_NONE);
+		}
+
+		if (!file.canWrite()) {
+			setTaskFailure(t, ERROR_DELETE_FILE);
+		}
+	}
+
+	private void validateWriteFile(File file, PersistentTask t, boolean append) {
+		if (file.isDirectory()) {
+			Log.i(LOG_TAG, "Could not write file " + file.getAbsolutePath());
+			setTaskFailure(t, ERROR_WRITE_DIR);
+			return;
+		}
+
+		if (!file.exists()) {
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				Log.i(LOG_TAG, "Could not create file " + file.getAbsolutePath(), e);
+				setTaskFailure(t, ERROR_CREATE_FILE);
+				return;
+			}
+		}
+
+		if (!file.canWrite()) {
+			Log.i(LOG_TAG, "Cannot write to file " + file.getAbsolutePath());
+			setTaskFailure(t, ERROR_WRITE_FILE);
+			return;
+		}
+		
+		if (!append && file.length() > 0) {
+			Log.i(LOG_TAG, "Cannot write to file " + file.getAbsolutePath());
+			setTaskFailure(t, ERROR_WRITE_NOT_EMPTY);
+			return;
+		}
+
+	}
+
+	private void setTaskFailure(PersistentTask t, String message) {
+		t.setResult(Result.FAIL, message);
+	}
+
+	private void setTaskSuccess(PersistentTask t) {
+		t.setResult(Result.SUCCESS, null);
+	}
+
+}
