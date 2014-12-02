@@ -6,9 +6,9 @@ import java.util.concurrent.BlockingQueue;
 
 import javax.json.JsonObject;
 
-import android.util.Log;
+import com.southwaterfront.parkingtracker.data.Result;
 
-import com.southwaterfront.parkingtracker.persist.PersistenceTask.Result;
+import android.util.Log;
 
 /**
  * This is a worker that deals with data on disk.
@@ -168,11 +168,11 @@ public class PersistenceWorker implements Runnable {
 	private void validateDeleteFile(File file, PersistenceTask t) {
 		if (!file.exists()) {
 			setTaskFailure(t, ERROR_DELETE_NONE);
+			return;
 		}
 
-		if (!file.canWrite()) {
+		if (!file.canWrite())
 			setTaskFailure(t, ERROR_DELETE_FILE);
-		}
 	}
 
 	private void validateWriteFile(File file, PersistenceTask t, boolean append) {

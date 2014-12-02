@@ -19,11 +19,9 @@ import javax.json.JsonObject;
 import android.util.Log;
 
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
-import com.southwaterfront.parkingtracker.jsonify.BlockFaceJsonBuilder;
 import com.southwaterfront.parkingtracker.persist.PersistenceWorker;
 import com.southwaterfront.parkingtracker.persist.PersistenceTask;
-import com.southwaterfront.parkingtracker.persist.PersistenceTask.Result;
-import com.southwaterfront.parkingtracker.persist.PersistenceTask.Task;
+import com.southwaterfront.parkingtracker.persist.PersistenceTask.Tasks;
 
 /**
  * This singleton will be used to manage the collected data. This
@@ -36,6 +34,8 @@ import com.southwaterfront.parkingtracker.persist.PersistenceTask.Task;
 public class DataManager {
 
 	private static final String LOG_TAG = "DataManager";
+	
+	public static final String MASTER_DATA_FILE_NAME = "master_data";
 
 	private final String DATA_CACHE_DIR_NAME = "Parking_Data";
 
@@ -62,7 +62,7 @@ public class DataManager {
 	/**
 	 * Update both every time current session changes
 	 */
-	private BlockingQueue<BlockFace> dataTasks;
+	private BlockingQueue<DataTask> dataTasks;
 
 	private Thread dataThread;
 
@@ -86,7 +86,7 @@ public class DataManager {
 		public Session(Date createTime, File cacheFolder) {
 			if (createTime == null || cacheFolder == null)
 				throw new IllegalArgumentException("Arguments cannot be null");
-			
+
 			this.createTime = createTime;
 			this.SESSION_ID = dateFormat.format(this.createTime);
 			this.LOG_TAG = "Session " + this.SESSION_ID;
@@ -117,67 +117,6 @@ public class DataManager {
 		@Override
 		public int compareTo(Session another) {
 			return this.createTime.compareTo(another.createTime);
-		}
-
-	}
-
-	/**
-	 * Internally used data worker to process the data on a separate thread
-	 * 
-	 * @author Vitaliy Gavrilov
-	 *
-	 */
-	private class DataWorker implements Runnable {
-		private String LOG_TAG;
-
-		private final Session session;
-
-		private final BlockingQueue<BlockFace> tasks;
-
-		public boolean running;
-
-		public DataWorker(Session sess, BlockingQueue<BlockFace> tasks) {
-			this.LOG_TAG = "DataWorker " + sess.SESSION_ID;
-			this.session = sess;
-			this.tasks = tasks;
-			running = true;
-		}
-
-		@Override
-		public void run() {
-			while (running || tasks.size() != 0) {
-				BlockFace face = null;
-				try {
-					face = tasks.take();
-				} catch (InterruptedException e) {
-					running = false;
-					continue;
-				} finally {
-					if (face != null) {
-						Log.i(LOG_TAG, "Adding block face " + face.block + " " + face.face + " to session " + session.SESSION_ID);
-						
-						this.session.blockFaces.add(face);
-
-						JsonObject obj = BlockFaceJsonBuilder.buildObjectFromBlockFace(face);
-
-						String fileName = createBlockFaceFileName(face);
-
-						File file = new File(this.session.cacheFolder, fileName);
-
-						PersistenceTask task = writeToFile(obj, file);
-						
-						Result result = task.waitOnResult();
-						
-						if (result == Result.FAIL) {
-							String text = "Writing file " + fileName + " to internal cache failed with error message: " + task.getErrorMessage();
-							
-							Log.i(LOG_TAG, text);
-						}
-					}
-				}
-				Log.i(LOG_TAG, "Worker for " + session.SESSION_ID + " interrupted and finished");
-			}
-
 		}
 
 	}
@@ -216,10 +155,9 @@ public class DataManager {
 			startNewSession();
 		} else {
 			this.currentSession = this.sessions.first();
+			setNewDataWorker();
 		}
 
-		// Set after current session has been set
-		setNewDataWorker();
 	}
 
 	private void loadSessions() {
@@ -281,11 +219,15 @@ public class DataManager {
 		if (this.dataThread != null)
 			this.dataThread.interrupt();
 
-		this.dataTasks = new LinkedBlockingQueue<BlockFace>();
-		DataWorker dataWorker = new DataWorker(this.currentSession, this.dataTasks);
+		this.dataTasks = new LinkedBlockingQueue<DataTask>();
+		DataWorker dataWorker = new DataWorker(this, this.currentSession, this.dataTasks);
 		this.dataThread = new Thread(dataWorker);
 		this.dataThread.setDaemon(true);
 		this.dataThread.start();
+	}
+
+	String createBlockFaceFileName(BlockFace face) {
+		return face.block + FILE_NAME_DELIMITER + face.face;
 	}
 
 	/**
@@ -326,7 +268,7 @@ public class DataManager {
 			if (sess != this.currentSession)
 				toRemove.add(sess);
 		}
-		
+
 		for (Session sess : toRemove)
 			removeSession(sess);
 	}
@@ -349,17 +291,25 @@ public class DataManager {
 	 * Asynchronous file deletion
 	 * 
 	 * @param file File to delete
-	 * @return The task being worked on, see {@link PersistenceTask} for
+	 * @return The task being worked on, see {@link Task} for
 	 * more information on how to check the result
 	 */
-	public PersistenceTask deleteFile(File file) {
-		PersistenceTask task = new PersistenceTask(null, file, Task.DELETE);
+	public Task deleteFile(File file) {
+		PersistenceTask task = new PersistenceTask(null, file, Tasks.DELETE);
 		this.persistenceTasks.add(task);
 		return task;
 	}
 
-	public PersistenceTask writeToFile(Object data, File file) {
-		PersistenceTask task = new PersistenceTask(data, file, Task.WRITE);
+	/**
+	 * Asynchronous file write
+	 * 
+	 * @param data Data to write, byte[] and {@link JsonObject} supported
+	 * @param file File to write to
+	 * @return The task being worked on, see {@link Task} for
+	 * more information on how to check the result
+	 */
+	public Task writeToFile(Object data, File file) {
+		PersistenceTask task = new PersistenceTask(data, file, Tasks.WRITE);
 		this.persistenceTasks.add(task);
 		return task;
 	}
@@ -374,16 +324,41 @@ public class DataManager {
 	 * results, but is likely just to use the most recent object for the final data build.
 	 * 
 	 * @param face BlockFace to add to data
+	 * @param callBack A callback that can be used 
 	 */
-	public void addBlockFace(BlockFace face) {
+	public void saveBlockFace(BlockFace face, CallBack callBack) {
 		if (face == null)
 			return;
 
-		this.dataTasks.add(face);
+		DataTask task = new DataTask(face, callBack, DataTask.Tasks.STORE_FACE);
+
+		this.dataTasks.add(task);
 	}
 
-	private String createBlockFaceFileName(BlockFace face) {
-		return face.block + FILE_NAME_DELIMITER + face.face;
+	/**
+	 * Uploads the current session data to the server
+	 * 
+	 * @param callBack A callback that will be called upon
+	 * task completion
+	 */
+	public void uploadSessionData(CallBack callBack) {
+		uploadSessionData(this.currentSession, callBack);
+	}
+
+	/**
+	 * Uploads session data to the server. The session must be non null
+	 * and from the available sessions.
+	 * 
+	 * @param sess Session to use
+	 * @param callBack A callback that will be called upon
+	 * task completion
+	 */
+	public void uploadSessionData(Session sess, CallBack callBack) {
+		if (sess == null || !this.sessions.contains(sess))
+			throw new IllegalArgumentException("The session cannot be null and must be a valid session from the manager");
+
+		DataTask task = new DataTask(sess, callBack, DataTask.Tasks.UPLOAD_DATA);
+		this.dataTasks.add(task);
 	}
 
 }
