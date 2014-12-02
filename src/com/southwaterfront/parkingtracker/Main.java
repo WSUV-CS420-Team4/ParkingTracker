@@ -24,9 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
-import com.southwaterfront.parkingtracker.data.BlockFace;
 import com.southwaterfront.parkingtracker.data.DataManager;
-import com.southwaterfront.parkingtracker.data.ParkingStall;
 
 public class Main extends Activity {
 
@@ -147,11 +145,11 @@ public class Main extends Activity {
 
 		AssetManager.init(this.getApplicationContext());
 		AssetManager assetManager = AssetManager.getInstance();
+		assetManager.assetSanityCheck();
+
 		DataManager dataManager = DataManager.getInstance();
 		Log.i(LOG_TAG, "Session start time " + dataManager.getSessionName());
 
-
-		assetManager.assetSanityCheck();
 		
 		// Temp Button init location
 		final Button button = (Button) findViewById(R.id.button1);
