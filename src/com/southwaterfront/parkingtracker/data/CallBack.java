@@ -11,6 +11,6 @@ public interface CallBack {
 	/**
 	 * Single call method
 	 */
-	public void call(Result result);
+	public void call(Task task);
 	
 }

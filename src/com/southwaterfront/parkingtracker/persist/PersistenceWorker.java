@@ -140,8 +140,6 @@ public class PersistenceWorker implements Runnable {
 
 			if (!success)
 				setTaskFailure(t, ERROR_DELETE_UNKNOWN);
-			else
-				Log.i(LOG_TAG, "Successfully deleted " + file.getAbsolutePath());
 		} catch (Exception e) {
 			setTaskFailure(t, e.getMessage());
 		} 

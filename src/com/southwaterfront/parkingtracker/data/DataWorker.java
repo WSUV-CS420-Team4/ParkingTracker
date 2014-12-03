@@ -11,6 +11,8 @@ import javax.json.JsonObject;
 
 import android.util.Log;
 
+import com.southwaterfront.parkingtracker.client.HttpClient;
+import com.southwaterfront.parkingtracker.client.HttpClient.RequestFailedException;
 import com.southwaterfront.parkingtracker.data.DataManager.Session;
 import com.southwaterfront.parkingtracker.jsonify.BlockFaceJsonBuilder;
 import com.southwaterfront.parkingtracker.jsonify.Jsonify;
@@ -36,7 +38,7 @@ class DataWorker implements Runnable {
 
 	private final BlockingQueue<DataTask> tasks;
 
-	public boolean running;
+	private boolean running;
 
 	public DataWorker(DataManager dataManager, Session sess, BlockingQueue<DataTask> tasks) {
 		this.dataManager = dataManager;
@@ -60,9 +62,11 @@ class DataWorker implements Runnable {
 					switch (task.type) {
 					case STORE_FACE:
 						storeFace(task);
+						Log.i(LOG_TAG, "Completed store face task for session " + this.session);
 						break;
 					case UPLOAD_DATA:
 						uploadData(task);
+						Log.i(LOG_TAG, "Completed upload task with result " + task.getResult() + " on session " + task.obj);
 						break;
 					default:
 						break;
@@ -70,8 +74,7 @@ class DataWorker implements Runnable {
 
 					CallBack callBack = task.callBack;
 					if (callBack != null) {
-						Result result = task.getResult();
-						callBack.call(result);
+						callBack.call(task);
 					}
 				}
 			}
@@ -93,9 +96,6 @@ class DataWorker implements Runnable {
 		Result perResult = perTask.waitOnResult();
 
 		task.setResult(perResult, perTask.getErrorMessage());
-
-		Log.i(LOG_TAG, "Data task result: " + perResult + " Saving block face " + obj);
-
 	}
 
 	private void uploadData(DataTask task) {
@@ -129,9 +129,17 @@ class DataWorker implements Runnable {
 			if (task.getResult() == Result.FAIL)
 				return;
 		}
+		
+		try {
+			HttpClient.sendPostRequest(masterObject);
+		} catch (RequestFailedException e) {
+			Log.e(LOG_TAG, "Failed to post data", e);
+			task.setResult(Result.FAIL, "Failed posting data to server");
+			return;
+		}
 
-		// TODO insert server upload task
-
+		dataManager.removeSession(sess);
+		
 		task.setResult(Result.SUCCESS, null);
 	}
 	
@@ -193,6 +201,10 @@ class DataWorker implements Runnable {
 		if (jsonObjs.isEmpty())
 			return null;
 		return jsonObjs;
+	}
+	
+	public void induceStop() {
+		this.running = false;
 	}
 
 }

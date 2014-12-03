@@ -29,6 +29,7 @@ import com.southwaterfront.parkingtracker.data.CallBack;
 import com.southwaterfront.parkingtracker.data.DataManager;
 import com.southwaterfront.parkingtracker.data.ParkingStall;
 import com.southwaterfront.parkingtracker.data.Result;
+import com.southwaterfront.parkingtracker.data.Task;
 
 public class Main extends Activity {
 
@@ -147,25 +148,49 @@ public class Main extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		/**
+		 * Always leave the next 5 lines in the main on create in this order
+		 */
 		AssetManager.init(this.getApplicationContext());
 		AssetManager assetManager = AssetManager.getInstance();
 		assetManager.assetSanityCheck();
-
 		DataManager dataManager = DataManager.getInstance();
 		Log.i(LOG_TAG, "Session start time " + dataManager.getSessionName());
 		
+		/**
+		 * Create a block face or a few
+		 */
 		BlockFace face = new BlockFace("A", "1");
-		face.addStall(new ParkingStall("AAA", new Date(System.currentTimeMillis()), null));
-		face.addStall(new ParkingStall("ABA", new Date(System.currentTimeMillis()), null));
+		/**
+		 * Each time a user takes picture add get the text from OcrEngine method
+		 * runOcr() then add the text to a parking stall and at it to a block face
+		 */
+		face.addStall(new ParkingStall("AFDSKJ", new Date(System.currentTimeMillis()), null));
+		face.addStall(new ParkingStall("LKA", new Date(System.currentTimeMillis()), null));
 		face.addStall(ParkingStall.EmptyStall);
-		face.addStall(new ParkingStall("BAA", new Date(System.currentTimeMillis()), null));
-		face.addStall(new ParkingStall("AAB", new Date(System.currentTimeMillis()), null));
+		face.addStall(new ParkingStall("LASDF", new Date(System.currentTimeMillis()), null));
+		face.addStall(new ParkingStall("ALKFAAB", new Date(System.currentTimeMillis()), null));
 
+		/**
+		 * When user clicks upload, save the current block face
+		 * then upload. These are examples with callbacks that are called
+		 * when job is done
+		 */
 		dataManager.saveBlockFace(face, new CallBack() {
 
 			@Override
-			public void call(Result result) {
+			public void call(Task task) {
 				Log.i("CallBack", "THE CALLBACK WORKED");
+			}
+			
+		});
+		
+		dataManager.uploadSessionData(new CallBack() {
+
+			@Override
+			public void call(Task task) {
+				Log.i(LOG_TAG, "Upload was a " + task.getResult());
+				
 			}
 			
 		});

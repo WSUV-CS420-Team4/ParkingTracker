@@ -1,6 +1,7 @@
 package com.southwaterfront.parkingtracker.data;
 
 import java.io.File;
+import java.lang.Thread.State;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -34,7 +35,7 @@ import com.southwaterfront.parkingtracker.persist.PersistenceTask.Tasks;
 public class DataManager {
 
 	private static final String LOG_TAG = "DataManager";
-	
+
 	public static final String MASTER_DATA_FILE_NAME = "master_data";
 
 	private final String DATA_CACHE_DIR_NAME = "Parking_Data";
@@ -63,6 +64,8 @@ public class DataManager {
 	 * Update both every time current session changes
 	 */
 	private BlockingQueue<DataTask> dataTasks;
+
+	private DataWorker dataWorker;
 
 	private Thread dataThread;
 
@@ -117,6 +120,11 @@ public class DataManager {
 		@Override
 		public int compareTo(Session another) {
 			return this.createTime.compareTo(another.createTime);
+		}
+
+		@Override
+		public String toString() {
+			return this.SESSION_ID;
 		}
 
 	}
@@ -216,11 +224,17 @@ public class DataManager {
 	}
 
 	private void setNewDataWorker() {
-		if (this.dataThread != null)
-			this.dataThread.interrupt();
+		if (this.dataThread != null) {
+			this.dataWorker.induceStop();
+			if (this.dataThread != Thread.currentThread()) {
+				State state = this.dataThread.getState();
+				if (state == State.BLOCKED || state == State.WAITING)
+					this.dataThread.interrupt();
+			}
+		}
 
 		this.dataTasks = new LinkedBlockingQueue<DataTask>();
-		DataWorker dataWorker = new DataWorker(this, this.currentSession, this.dataTasks);
+		this.dataWorker = new DataWorker(this, this.currentSession, this.dataTasks);
 		this.dataThread = new Thread(dataWorker);
 		this.dataThread.setDaemon(true);
 		this.dataThread.start();
@@ -283,7 +297,16 @@ public class DataManager {
 		File cacheDir = session.cacheFolder;
 		Log.i(LOG_TAG, "Removing cache folder " + cacheDir + " created at " + session.SESSION_ID);
 
-		deleteFile(cacheDir);
+		Task cacheDel = deleteFile(cacheDir);
+
+		if (session == this.currentSession) {
+			Result cacheResult = cacheDel.waitOnResult();
+			if (cacheResult == Result.SUCCESS)
+				startNewSession();
+			else
+				return false;
+		}
+
 		return this.sessions.remove(session);
 	}
 
