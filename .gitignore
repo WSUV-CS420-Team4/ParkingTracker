@@ -7,7 +7,6 @@
 
 # Java class files
 *.class
-*.classpath
 
 # Generated files
 bin/
@@ -25,5 +24,3 @@ proguard/
 
 # Log Files
 *.log
-
-project.properties
