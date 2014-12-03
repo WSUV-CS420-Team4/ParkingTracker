@@ -90,6 +90,29 @@ public class MasterDataJsonBuilder {
 		
 		return object;
 	}
+	
+	/**
+	 * Convenience method to build the master JsonObject from build block face
+	 * JsonObjects
+	 * 
+	 * @param elems List of JsonObjects to build with
+	 * @return Build JsonObject
+	 */
+	public static JsonObject buildObjectFromBlockFaceObjects(List<JsonObject> elems) {
+		if (elems == null) 
+			throw new IllegalArgumentException("List of block faces cannot be null");
+		
+		JsonObject object = null;
+		
+		MasterDataJsonBuilder builder = new MasterDataJsonBuilder();
+		
+		for (JsonObject face : elems)
+			builder.addBlockFace(face);
+		
+		object = builder.buildObject();
+		
+		return object;
+	}
 
 	/**
 	 * Creates a block face in the final JsonObject. This is meant
@@ -211,6 +234,12 @@ public class MasterDataJsonBuilder {
 			throw new IllegalArgumentException("Both plate and time are required");
 		if (currentStallsArrayBuilder == null)
 			throw new IllegalStateException("Cannot add a stall without a block face");
+		
+		if (plate.equals(ParkingStall.EmptyStall.plate)) {
+			this.currentStallBuilder = builderFactory.createObjectBuilder();
+			this.currentStallsArrayBuilder.add(this.currentStallBuilder);
+			return;
+		}
 
 		this.currentStallBuilder = builderFactory.createObjectBuilder();
 		this.currentStallBuilder.add(Jsonify.PLATE_ID, plate);
