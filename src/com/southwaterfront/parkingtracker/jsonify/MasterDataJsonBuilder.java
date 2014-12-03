@@ -234,6 +234,12 @@ public class MasterDataJsonBuilder {
 			throw new IllegalArgumentException("Both plate and time are required");
 		if (currentStallsArrayBuilder == null)
 			throw new IllegalStateException("Cannot add a stall without a block face");
+		
+		if (plate.equals(ParkingStall.EmptyStall.plate)) {
+			this.currentStallBuilder = builderFactory.createObjectBuilder();
+			this.currentStallsArrayBuilder.add(this.currentStallBuilder);
+			return;
+		}
 
 		this.currentStallBuilder = builderFactory.createObjectBuilder();
 		this.currentStallBuilder.add(Jsonify.PLATE_ID, plate);

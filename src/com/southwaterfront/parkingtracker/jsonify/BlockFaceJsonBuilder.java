@@ -115,6 +115,12 @@ public class BlockFaceJsonBuilder {
 			return;
 		if (plate == null || time == null)
 			throw new IllegalArgumentException("Both plate and time are required");
+		
+		if (plate.equals(ParkingStall.EmptyStall.plate)) {
+			this.currentStallBuilder = jsonFactory.createObjectBuilder();
+			this.stallsArrayBuilder.add(this.currentStallBuilder);
+			return;
+		}
 
 		this.currentStallBuilder = jsonFactory.createObjectBuilder();
 		this.currentStallBuilder.add(Jsonify.PLATE_ID, plate);

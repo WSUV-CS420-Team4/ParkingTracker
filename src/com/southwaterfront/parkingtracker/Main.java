@@ -24,7 +24,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
+import com.southwaterfront.parkingtracker.data.BlockFace;
+import com.southwaterfront.parkingtracker.data.CallBack;
 import com.southwaterfront.parkingtracker.data.DataManager;
+import com.southwaterfront.parkingtracker.data.ParkingStall;
+import com.southwaterfront.parkingtracker.data.Result;
 
 public class Main extends Activity {
 
@@ -149,7 +153,22 @@ public class Main extends Activity {
 
 		DataManager dataManager = DataManager.getInstance();
 		Log.i(LOG_TAG, "Session start time " + dataManager.getSessionName());
+		
+		BlockFace face = new BlockFace("A", "1");
+		face.addStall(new ParkingStall("AAA", new Date(System.currentTimeMillis()), null));
+		face.addStall(new ParkingStall("ABA", new Date(System.currentTimeMillis()), null));
+		face.addStall(ParkingStall.EmptyStall);
+		face.addStall(new ParkingStall("BAA", new Date(System.currentTimeMillis()), null));
+		face.addStall(new ParkingStall("AAB", new Date(System.currentTimeMillis()), null));
 
+		dataManager.saveBlockFace(face, new CallBack() {
+
+			@Override
+			public void call(Result result) {
+				Log.i("CallBack", "THE CALLBACK WORKED");
+			}
+			
+		});
 		
 		// Temp Button init location
 		final Button button = (Button) findViewById(R.id.button1);

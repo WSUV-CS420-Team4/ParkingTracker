@@ -27,6 +27,10 @@ class DataWorker implements Runnable {
 	private final DataManager dataManager;
 
 	private String LOG_TAG;
+	
+	private static final String ERROR_FILES = "There is no collectable data to upload";
+	
+	private static final String ERROR_MASTER_CORRUPT = "The master data file with the upload data is corrupt";
 
 	private final Session session;
 
@@ -78,8 +82,6 @@ class DataWorker implements Runnable {
 	private void storeFace(DataTask task) {
 		BlockFace face = (BlockFace) task.obj;
 
-		Log.i(LOG_TAG, "Adding block face " + face.block + " " + face.face + " to session " + session.SESSION_ID);
-
 		this.session.blockFaces.add(face);
 
 		JsonObject obj = BlockFaceJsonBuilder.buildObjectFromBlockFace(face);
@@ -91,6 +93,9 @@ class DataWorker implements Runnable {
 		Result perResult = perTask.waitOnResult();
 
 		task.setResult(perResult, perTask.getErrorMessage());
+
+		Log.i(LOG_TAG, "Data task result: " + perResult + " Saving block face " + obj);
+
 	}
 
 	private void uploadData(DataTask task) {
@@ -103,27 +108,72 @@ class DataWorker implements Runnable {
 		if (!cacheDir.isDirectory())
 			throw new IllegalStateException("How is the cache not a directory?");
 
-		List<JsonObject> objs = buildFileJsonObjects(cacheDir);
-		JsonObject masterObject = MasterDataJsonBuilder.buildObjectFromBlockFaceObjects(objs);
-		
-		// TODO insert server upload task
-		
 		File masterDataFile = new File(cacheDir, DataManager.MASTER_DATA_FILE_NAME);
-		Task saveTask = dataManager.writeToFile(masterObject, masterDataFile);
-		Result saveResult = saveTask.waitOnResult();
-		if (saveResult == Result.SUCCESS) {
-			for (File f : cacheDir.listFiles()) {
-				if (f.getName() != DataManager.MASTER_DATA_FILE_NAME)
-					dataManager.deleteFile(f);
+		JsonObject masterObject;
+		if (masterDataFile.exists()) {
+			FileInputStream in = null;
+			try {
+				in = new FileInputStream(masterDataFile);
+				masterObject = Jsonify.createJsonObjectFromStream(in);
+			} catch (Exception e) {
+				task.setResult(Result.FAIL, ERROR_MASTER_CORRUPT);
+				return;
+			} finally {
+				try {
+					in.close();
+				} catch (Exception e) {
+				}
 			}
+		} else {
+			masterObject = createMasterObjectFromFiles(task, cacheDir, masterDataFile);
+			if (task.getResult() == Result.FAIL)
+				return;
 		}
-		
+
+		// TODO insert server upload task
+
 		task.setResult(Result.SUCCESS, null);
 	}
 	
+	private JsonObject createMasterObjectFromFiles(DataTask task, File cacheDir, File masterDataFile) {
+		List<JsonObject> objs = buildFileJsonObjects(cacheDir);
+		if (objs == null) {
+			task.setResult(Result.FAIL, ERROR_FILES);
+			return null;
+		}
+		
+		JsonObject masterObject = MasterDataJsonBuilder.buildObjectFromBlockFaceObjects(objs);
+		
+		Task saveTask = dataManager.writeToFile(masterObject, masterDataFile);
+		Result saveResult = saveTask.waitOnResult();
+		if (saveResult == Result.SUCCESS)
+			deleteDirFiles(cacheDir);
+		
+		return masterObject;
+	}
+
+	/**
+	 * Except {@link DataManager#MASTER_DATA_FILE_NAME}
+	 * 
+	 * @param dir Directory
+	 */
+	private void deleteDirFiles(File dir) {
+		for (File f : dir.listFiles()) {
+			if (!f.getName().equals(DataManager.MASTER_DATA_FILE_NAME))
+				dataManager.deleteFile(f);
+		}
+	}
+
 	private List<JsonObject> buildFileJsonObjects(File cacheDir) {
 		LinkedList<JsonObject> jsonObjs = new LinkedList<JsonObject>();
-		for (File f : cacheDir.listFiles()) {
+		File[] files = cacheDir.listFiles();
+		if (files.length == 0)
+			return null;
+		
+		for (File f : files) {
+			if (f.getName().equals(DataManager.MASTER_DATA_FILE_NAME))
+				continue;
+
 			FileInputStream in = null;
 			try {
 				in = new FileInputStream(f);
@@ -140,6 +190,8 @@ class DataWorker implements Runnable {
 				}
 			}
 		}
+		if (jsonObjs.isEmpty())
+			return null;
 		return jsonObjs;
 	}
 
