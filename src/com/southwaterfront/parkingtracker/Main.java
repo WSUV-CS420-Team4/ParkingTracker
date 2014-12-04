@@ -203,6 +203,16 @@ public class Main extends Activity {
             	dispatchTakePictureIntent2(); 	
             }
         });
+        
+
+        // Temp Button init location
+ 		final Button button2 = (Button) findViewById(R.id.button2);
+         button.setOnClickListener(new View.OnClickListener() {
+             public void onClick(View v) {
+                // Perform action on click
+             	//TODO	
+             }
+         });
 		
 	}
 

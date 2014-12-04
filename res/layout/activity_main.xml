@@ -8,18 +8,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.phototest.MainActivity" >
 
-    <ImageView
-        android:id="@+id/imageView1"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:layout_below="@+id/button1"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="25dp"
-        android:adjustViewBounds="false"
-        android:contentDescription="Picture Goes Here"
-        android:minHeight="300dp"
-        android:minWidth="300dp" />
-
     <Button
         android:id="@+id/button1"
         android:layout_width="wrap_content"
@@ -39,5 +27,25 @@
         android:layout_marginTop="25dp"
         android:text="OCR Demo App"
         android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_below="@+id/button1"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="false"
+        android:contentDescription="Picture Goes Here"
+        android:minHeight="250dp"
+        android:minWidth="250dp" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/button1"
+        android:layout_alignRight="@+id/button1"
+        android:layout_below="@+id/button1"
+        android:text="Upload" />
 
 </RelativeLayout>
