@@ -11,6 +11,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.southwaterfront.parkingtracker.Main;
+import com.southwaterfront.parkingtracker.data.DataManager;
 
 /**
  * This is a play on the Android AssetManager, however, this
@@ -51,6 +52,10 @@ public class AssetManager {
 
 	private String englishLanguageDataDirectory;
 	
+	private final File imageCacheDir;
+	
+	private final String IMAGE_CACHE_DIR_NAME = "imageCache";
+	
 	/**
 	 * Make constructor private to disallow outside instantiation
 	 * of this class
@@ -74,6 +79,9 @@ public class AssetManager {
 		if (!this.externalFileDir.exists())
 			this.externalFileDir.mkdir();
 		this.englishLanguageDataDirectory = null;
+		this.imageCacheDir = new File(this.cacheDir, this.IMAGE_CACHE_DIR_NAME);
+		if (!this.imageCacheDir.exists())
+			this.imageCacheDir.mkdir();
 	}
 	
 	public File getInternalFileDir() {
@@ -189,4 +197,21 @@ public class AssetManager {
 		return this.mainContext;
 	}
 
+	/**
+	 * Get the directory for the image cache
+	 * @return Directory
+	 */
+	public File getImageCacheDir() {
+		return this.imageCacheDir;
+	}
+	
+	/**
+	 * Clears the image cache dir
+	 */
+	public void clearImageCache() {
+		DataManager data = DataManager.getInstance();
+		for (File f : this.imageCacheDir.listFiles())
+			data.deleteFile(f);
+	}
+	
 }

@@ -3,7 +3,7 @@ package OcrEngine;
 /**
  * Callback interface for the {@link OcrEngine}
  * 
- * @author vitogavrilov
+ * @author Vitaliy Gavrilov
  *
  */
 public interface OcrCallBack {
