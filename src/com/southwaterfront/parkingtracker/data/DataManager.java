@@ -154,6 +154,7 @@ public class DataManager {
 		PersistenceWorker worker = new PersistenceWorker(this.persistenceTasks);
 		this.persistenceThread = new Thread(worker);
 		this.persistenceThread.setDaemon(true);
+		this.persistenceThread.setName("Persistence Thread");
 		this.persistenceThread.start();
 
 
@@ -173,7 +174,8 @@ public class DataManager {
 			if (f.isDirectory()) {
 				if (f.isFile() || f.list().length == 0) {
 					Log.i(LOG_TAG, "Found file " + f.getName() + " in data cache folder that has no data, deleting");
-					deleteFile(f);
+					Task task = deleteFile(f);
+					task.waitOnResult();
 				} else {
 					Session sess;
 					try {
@@ -228,7 +230,7 @@ public class DataManager {
 			this.dataWorker.induceStop();
 			if (this.dataThread != Thread.currentThread()) {
 				State state = this.dataThread.getState();
-				if (state == State.BLOCKED || state == State.WAITING)
+				if (state == State.BLOCKED)
 					this.dataThread.interrupt();
 			}
 		}
@@ -237,6 +239,7 @@ public class DataManager {
 		this.dataWorker = new DataWorker(this, this.currentSession, this.dataTasks);
 		this.dataThread = new Thread(dataWorker);
 		this.dataThread.setDaemon(true);
+		this.dataThread.setName("Data Worker for " + this.currentSession);
 		this.dataThread.start();
 	}
 

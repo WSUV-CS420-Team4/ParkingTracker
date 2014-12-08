@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import OcrEngine.OcrCallBack;
 import OcrEngine.OcrEngine;
 import android.app.Activity;
 import android.content.Intent;
@@ -21,14 +22,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
 import com.southwaterfront.parkingtracker.data.BlockFace;
 import com.southwaterfront.parkingtracker.data.CallBack;
 import com.southwaterfront.parkingtracker.data.DataManager;
 import com.southwaterfront.parkingtracker.data.ParkingStall;
-import com.southwaterfront.parkingtracker.data.Result;
 import com.southwaterfront.parkingtracker.data.Task;
 
 public class Main extends Activity {
@@ -38,110 +37,122 @@ public class Main extends Activity {
 	// -------------------------------------------------------------------------------------------------
 	// Temp placement of code
 	// -------------------------------------------------------------------------------------------------
-	
+
 	static final int REQUEST_TAKE_PHOTO = 2;
 	String mCurrentPhotoPath;
-	
-	private File createImageFile() throws IOException {
-	    // Create an image file name
-	    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-	    String imageFileName = "IMG_" + timeStamp + "_";
-	    File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-	    File image = File.createTempFile(
-	        imageFileName,  /* prefix */
-	        ".jpg",         /* suffix */
-	        storageDir      /* directory */
-	    );
 
-	    // Save a file: path for use with ACTION_VIEW intents
-	    //mCurrentPhotoPath = "file:" + image.getAbsolutePath();
-	    mCurrentPhotoPath = image.getAbsolutePath();
-	    return image;
+	private AssetManager assets;
+	private DataManager data;
+	private BlockFace face;
+	private OcrEngine ocrEngine;
+	TextView textView;
+
+	private File createImageFile() throws IOException {
+		// Create an image file name
+		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+		String imageFileName = "IMG_" + timeStamp + "_";
+		File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+		File image = File.createTempFile(
+				imageFileName,  /* prefix */
+				".jpg",         /* suffix */
+				storageDir      /* directory */
+				);
+
+		// Save a file: path for use with ACTION_VIEW intents
+		//mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+		mCurrentPhotoPath = image.getAbsolutePath();
+		return image;
 	}
-	
+
 	private void dispatchTakePictureIntent2(){
 		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-	    // Ensure that there's a camera activity to handle the intent
-	    if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-	        // Create the File where the photo should go
-	        File photoFile = null;
-	        try {
-	            photoFile = createImageFile();
-	        } catch (IOException ex) {
-	            // Error occurred while creating the File
-	        }
-	        // Continue only if the File was successfully created
-	        if (photoFile != null) {
-	            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-	                    Uri.fromFile(photoFile));
-	            startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-	        }
-	    }
+		// Ensure that there's a camera activity to handle the intent
+		if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+			// Create the File where the photo should go
+			File photoFile = null;
+			try {
+				photoFile = createImageFile();
+			} catch (IOException ex) {
+				// Error occurred while creating the File
+			}
+			// Continue only if the File was successfully created
+			if (photoFile != null) {
+				takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+						Uri.fromFile(photoFile));
+				startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+			}
+		}
 	}
-	
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-	    if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-	        //galleryAddPic();
-	        setPic();
-	    }
+		if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+			//galleryAddPic();
+			setPic();
+		}
 	}
-	
+
 	private void setPic() {
 		final ImageView imageView = (ImageView)  findViewById(R.id.imageView1);
-		
-	    // Get the dimensions of the View
-	    int targetW = imageView.getWidth();
-	    int targetH = imageView.getHeight();
 
-	    // Get the dimensions of the bitmap
-	    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-	    bmOptions.inJustDecodeBounds = true;
-	    BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-	    int photoW = bmOptions.outWidth;
-	    int photoH = bmOptions.outHeight;
+		// Get the dimensions of the View
+		int targetW = imageView.getWidth();
+		int targetH = imageView.getHeight();
 
-	    
-	    // Determine how much to scale down the image
-	    int scaleFactor;
-	    if (targetW == 0 || targetH == 0){
-	    	scaleFactor = 1;
-	    } else {
-		    scaleFactor = Math.min(photoW/targetW, photoH/targetH);
-	    }
+		// Get the dimensions of the bitmap
+		BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+		bmOptions.inJustDecodeBounds = true;
+		BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+		int photoW = bmOptions.outWidth;
+		int photoH = bmOptions.outHeight;
 
-	    // Decode the image file into a Bitmap sized to fill the View
-	    bmOptions.inJustDecodeBounds = false;
-	    bmOptions.inSampleSize = scaleFactor;
-	    bmOptions.inPurgeable = true;
 
-	    Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-	    imageView.setImageBitmap(bitmap);
-	    /*
-	    int[] pixels  = new int[bitmap.getHeight()*bitmap.getWidth()];
-	    bitmap.getPixels(pixels, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-	    
-	    for(int i = 0; i < pixels.length; i++) {
-	    	int pixel = pixels[i];
-	    	if (((pixel >>> 0) & 255) < 200)
-	    		pixels[i] = 0x00FFFFFF;
-	    }
-	    
-	    bitmap = Bitmap.createBitmap(pixels, bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-	    imageView.setImageBitmap(bitmap);
-	    */
-	    OcrEngine o = OcrEngine.getInstance();
-	    String result = o.runOcr(bitmap, null);
-	    result = result.substring(0, result.length() > 30 ? 30 : result.length());
-	    
-	    int duration = Toast.LENGTH_LONG;
+		// Determine how much to scale down the image
+		int scaleFactor;
+		if (targetW == 0 || targetH == 0){
+			scaleFactor = 1;
+		} else {
+			scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+		}
 
-	    Toast toast = Toast.makeText(getBaseContext(), result, duration);
-	    toast.show();
-	    TextView view = (TextView) findViewById(R.id.textView2);
-	    view.setText(result);
+		// Decode the image file into a Bitmap sized to fill the View
+		bmOptions.inJustDecodeBounds = false;
+		bmOptions.inSampleSize = scaleFactor;
+		bmOptions.inPurgeable = true;
+
+		Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+		imageView.setImageBitmap(bitmap);
+
+		textView.setText("Waiting for OcrEngine");
+		ocrEngine.runOcr(bitmap, null, new OcrCallBack() {
+
+			@Override
+			public void call(final String result) {
+				Main.this.runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						setOcrResult(result);
+					}
+					
+				});
+			}
+			
+		});
+	}
+	
+	private void setOcrResult(String result) {
+		result = result.substring(0, result.length() > 30 ? 30 : result.length());
+		textView.setText(result);
+		face.addStall(new ParkingStall(result, new Date(System.currentTimeMillis()), null));
 	}
 	// -------------------------------------------------------------------------------------------------
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		textView = (TextView) findViewById(R.id.textView2);
+	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -152,58 +163,53 @@ public class Main extends Activity {
 		 * Always leave the next 5 lines in the main on create in this order
 		 */
 		AssetManager.init(this.getApplicationContext());
-		AssetManager assetManager = AssetManager.getInstance();
-		assetManager.assetSanityCheck();
-		DataManager dataManager = DataManager.getInstance();
-		Log.i(LOG_TAG, "Session start time " + dataManager.getSessionName());
-		
-		/**
-		 * Create a block face or a few
-		 */
-		BlockFace face = new BlockFace("A", "1");
-		/**
-		 * Each time a user takes picture add get the text from OcrEngine method
-		 * runOcr() then add the text to a parking stall and at it to a block face
-		 */
-		face.addStall(new ParkingStall("AFDSKJ", new Date(System.currentTimeMillis()), null));
-		face.addStall(new ParkingStall("LKA", new Date(System.currentTimeMillis()), null));
-		face.addStall(ParkingStall.EmptyStall);
-		face.addStall(new ParkingStall("LASDF", new Date(System.currentTimeMillis()), null));
-		face.addStall(new ParkingStall("ALKFAAB", new Date(System.currentTimeMillis()), null));
+		assets = AssetManager.getInstance();
+		assets.assetSanityCheck();
+		data = DataManager.getInstance();
+		Log.i(LOG_TAG, "Session start time " + data.getSessionName());
+		ocrEngine = OcrEngine.getInstance();
 
-		/**
-		 * When user clicks upload, save the current block face
-		 * then upload. These are examples with callbacks that are called
-		 * when job is done
-		 */
-		dataManager.saveBlockFace(face, new CallBack() {
+		face = new BlockFace("3", "A");
 
-			@Override
-			public void call(Task task) {
-				Log.i("CallBack", "THE CALLBACK WORKED");
-			}
-			
-		});
-		
-		dataManager.uploadSessionData(new CallBack() {
-
-			@Override
-			public void call(Task task) {
-				Log.i(LOG_TAG, "Upload was a " + task.getResult());
-				
-			}
-			
-		});
-		
 		// Temp Button init location
 		final Button button = (Button) findViewById(R.id.button1);
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Perform action on click
-            	dispatchTakePictureIntent2(); 	
-            }
-        });
-		
+		button.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				// Perform action on click
+				dispatchTakePictureIntent2(); 	
+			}
+		});
+
+
+		// Temp Button init location
+		final Button button2 = (Button) findViewById(R.id.button2);
+		button2.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				upload();
+			}
+		});
+
+	}
+
+	private void upload() {
+		data.saveBlockFace(face, null);
+		face = new BlockFace("3", "B");
+		data.uploadSessionData(new CallBack() {
+
+			@Override
+			public void call(final Task task) {
+				Main.this.runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						TextView view = (TextView) findViewById(R.id.textView2);
+						view.setText("Result was a " + task.getResult());
+					}
+
+				});
+			}
+
+		});
 	}
 
 	@Override
@@ -225,4 +231,3 @@ public class Main extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 }
-
