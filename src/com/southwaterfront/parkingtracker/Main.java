@@ -200,6 +200,7 @@ public class Main extends Activity {
 	public void onDestroy() {
 		super.onDestroy();
 		data.close();
+		ocrEngine.close();
 	}
 
 	private void upload() {

@@ -185,8 +185,10 @@ public class DataManager implements Closeable {
 			this.currentSession = this.sessions.first();
 			if (this.currentSession.isLocked())
 				startNewSession();
-			else
+			else {
 				setNewDataWorker();
+				Log.i(LOG_TAG, "Using already existing session " + this.currentSession);
+			}
 		}
 		Log.i(LOG_TAG, "The data manager initialized with session " + this.currentSession + " out of " + this.sessions.size() + " available sessions.");
 	}
@@ -455,6 +457,10 @@ public class DataManager implements Closeable {
 					Task t = deleteFile(cacheFolder);
 					t.waitOnResult();
 				}
+				
+				this.persistenceThread.interrupt();
+				this.dataThread.interrupt();
+				this.closed = true;
 			}
 		}
 	}

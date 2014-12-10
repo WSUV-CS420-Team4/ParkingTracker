@@ -1,5 +1,6 @@
 package OcrEngine;
 
+import java.io.Closeable;
 import java.io.File;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -21,7 +22,7 @@ import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
  * @author Vitaliy Gavrilov
  *
  */
-public class OcrEngine {
+public class OcrEngine implements Closeable {
 
 	private final String LOG_TAG = "OcrEngine";
 
@@ -30,6 +31,10 @@ public class OcrEngine {
 	private final String whiteListChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-";
 
 	private static final OcrEngine instance = new OcrEngine();
+
+	private static final String ERROR_CLOSED = "The OcrEngine is closed and cannot be used";
+
+	private boolean closed;
 
 	private final TessBaseAPI tess;
 
@@ -82,7 +87,7 @@ public class OcrEngine {
 							this.tess.setRectangle(rect);
 						String result = this.tess.getUTF8Text();
 						this.tess.clear();
-						
+
 						if (callBack != null)
 							callBack.call(result);
 					}
@@ -94,6 +99,7 @@ public class OcrEngine {
 	}
 
 	private OcrEngine() {
+		this.closed = false;
 		this.tess = new TessBaseAPI();
 		this.assetManager = AssetManager.getInstance();
 		String path = this.assetManager.getEnglishLanguageDataDir();
@@ -168,6 +174,8 @@ public class OcrEngine {
 	 * @param resultCallBack An OcrCallBack to call when done
 	 */
 	public void runOcr(Bitmap bmp, Rect rect, OcrCallBack resultCallBack) {
+		checkNotClosed();
+		
 		if (bmp == null)
 			throw new IllegalArgumentException("Bitmap cannot be null");
 		if (resultCallBack == null)
@@ -175,6 +183,24 @@ public class OcrEngine {
 
 		ImageWrapper i = new ImageWrapper(bmp, rect, resultCallBack);
 		this.imagesTasks.add(i);
+	}
+
+	private void checkNotClosed() {
+		if (this.closed)
+			throw new IllegalStateException(ERROR_CLOSED);
+	}
+
+	/**
+	 * Only call in onDestroy
+	 */
+	@Override
+	public void close() {
+		if (!this.closed) {
+			Log.i(LOG_TAG, "Shutting down TessBaseApi");
+			this.tess.end();
+			this.worker.interrupt();
+			this.closed = true;
+		}
 	}
 
 }
