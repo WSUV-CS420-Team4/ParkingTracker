@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -46,16 +47,19 @@ public class Main extends Activity {
 	private BlockFace face;
 	private OcrEngine ocrEngine;
 	TextView textView;
+	EditText editText;
 
 	private File createImageFile() throws IOException {
 		// Create an image file name
 		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 		String imageFileName = "IMG_" + timeStamp + "_";
 		File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+		//File imagesCache = AssetManager.getInstance().getImageCacheDir();
 		File image = File.createTempFile(
 				imageFileName,  /* prefix */
 				".jpg",         /* suffix */
 				storageDir      /* directory */
+				//imagesCache
 				);
 
 		// Save a file: path for use with ACTION_VIEW intents
@@ -143,7 +147,8 @@ public class Main extends Activity {
 	
 	private void setOcrResult(String result) {
 		result = result.substring(0, result.length() > 30 ? 30 : result.length());
-		textView.setText(result);
+		textView.setText("OCR Demo App");
+		editText.setText(result);
 		face.addStall(new ParkingStall(result, new Date(System.currentTimeMillis()), null));
 	}
 	// -------------------------------------------------------------------------------------------------
@@ -152,6 +157,7 @@ public class Main extends Activity {
 	public void onStart() {
 		super.onStart();
 		textView = (TextView) findViewById(R.id.textView2);
+		editText = (EditText) findViewById(R.id.editText1);
 	}
 	
 	@Override

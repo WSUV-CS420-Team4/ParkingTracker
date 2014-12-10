@@ -9,37 +9,6 @@
     tools:context="com.example.phototest.MainActivity" >
 
     <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView2"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="25dp"
-        android:hint="Click to take picture"
-        android:text="Take Photo" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="25dp"
-        android:text="OCR Demo App"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <ImageView
-        android:id="@+id/imageView1"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:layout_below="@+id/button1"
-        android:layout_centerHorizontal="true"
-        android:adjustViewBounds="false"
-        android:contentDescription="Picture Goes Here"
-        android:minHeight="250dp"
-        android:minWidth="250dp" />
-
-    <Button
         android:id="@+id/button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -47,5 +16,49 @@
         android:layout_alignRight="@+id/button1"
         android:layout_below="@+id/button1"
         android:text="Upload" />
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="false"
+        android:contentDescription="Picture Goes Here"
+        android:minHeight="200dp"
+        android:minWidth="200dp" />
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="18dp"
+        android:hint="Click to take picture"
+        android:text="Take Photo" />
+
+    <EditText
+        android:id="@+id/editText1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/button2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:ems="10"
+        android:text="License Plate Number" >
+
+        <requestFocus />
+    </EditText>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="17dp"
+        android:text="OCR Demo App"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </RelativeLayout>
