@@ -83,7 +83,7 @@ public class DataManager {
 		public final Date		createTime;
 		public final File 	cacheFolder;
 		public final Date 	loadTime;
-
+		public final File		masterDataFile;
 		public final Set<BlockFace> blockFaces;
 
 		public Session(Date createTime, File cacheFolder) {
@@ -97,6 +97,8 @@ public class DataManager {
 			this.loadTime = new Date(System.currentTimeMillis());
 
 			this.blockFaces = new HashSet<BlockFace>();
+
+			this.masterDataFile = new File(this.cacheFolder, DataManager.MASTER_DATA_FILE_NAME);
 		}
 
 		public Session(String createTime, File cacheFolder) {
@@ -115,6 +117,17 @@ public class DataManager {
 			this.loadTime = new Date(System.currentTimeMillis());
 
 			this.blockFaces = new HashSet<BlockFace>();
+
+			this.masterDataFile = new File(this.cacheFolder, DataManager.MASTER_DATA_FILE_NAME);
+		}
+
+		/**
+		 * Gets the state of the session
+		 * 
+		 * @return True if session is locked to writing, false if open
+		 */
+		public boolean isLocked() {
+			return this.masterDataFile.exists();
 		}
 
 		@Override
@@ -153,7 +166,7 @@ public class DataManager {
 		this.persistenceTasks = new LinkedBlockingQueue<PersistenceTask>();
 		PersistenceWorker worker = new PersistenceWorker(this.persistenceTasks);
 		this.persistenceThread = new Thread(worker);
-		this.persistenceThread.setDaemon(true);
+		//this.persistenceThread.setDaemon(true);
 		this.persistenceThread.setName("Persistence Thread");
 		this.persistenceThread.start();
 
@@ -164,18 +177,24 @@ public class DataManager {
 			startNewSession();
 		} else {
 			this.currentSession = this.sessions.first();
-			setNewDataWorker();
+			if (this.currentSession.isLocked())
+				startNewSession();
+			else
+				setNewDataWorker();
 		}
 
 	}
 
 	private void loadSessions() {
 		for (File f : this.dataCacheDir.listFiles()) {
-			if (f.isDirectory()) {
-				if (f.isFile() || f.list().length == 0) {
-					Log.i(LOG_TAG, "Found file " + f.getName() + " in data cache folder that has no data, deleting");
-					Task task = deleteFile(f);
-					task.waitOnResult();
+			if (f.isFile()) {
+				synchronouslyDeleteFile(f);
+			} else {
+				File[] files = f.listFiles();
+				if (files == null || files.length == 0) {
+					synchronouslyDeleteFile(f);
+				} else if (files.length == 1 && files[0].length() == 0) {
+					synchronouslyDeleteFile(f);
 				} else {
 					Session sess;
 					try {
@@ -184,12 +203,19 @@ public class DataManager {
 						Log.i(LOG_TAG, "Attempted to create session from invalid folder, how did this get here?");
 						continue;
 					}
+					if (sess.masterDataFile.exists() && sess.masterDataFile.length() == 0)
+						synchronouslyDeleteFile(f);
 					this.sessions.add(sess);
 					Log.i(LOG_TAG, "Adding session " + sess.SESSION_ID + " to available sessions");
 				}
 			}
-
 		}
+	}
+
+	private void synchronouslyDeleteFile(File f) {
+		Log.i(LOG_TAG, "Found file " + f.getName() + " in data cache folder that has no data, deleting");
+		Task task = deleteFile(f);
+		task.waitOnResult();
 	}
 
 	/**
@@ -238,7 +264,7 @@ public class DataManager {
 		this.dataTasks = new LinkedBlockingQueue<DataTask>();
 		this.dataWorker = new DataWorker(this, this.currentSession, this.dataTasks);
 		this.dataThread = new Thread(dataWorker);
-		this.dataThread.setDaemon(true);
+		//this.dataThread.setDaemon(true);
 		this.dataThread.setName("Data Worker for " + this.currentSession);
 		this.dataThread.start();
 	}

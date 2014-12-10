@@ -32,7 +32,11 @@ class DataWorker implements Runnable {
 	
 	private static final String ERROR_FILES = "There is no collectable data to upload";
 	
+	private static final String ERROR_SESSION_LOCKED = "Unable to complete the task because the session is locked and is in a read-only state";
+	
 	private static final String ERROR_MASTER_CORRUPT = "The master data file with the upload data is corrupt";
+
+	private static final String ERROR_POST = "Failed posting data to server";
 
 	private final Session session;
 
@@ -71,7 +75,7 @@ class DataWorker implements Runnable {
 					default:
 						break;
 					}
-
+					System.gc(); // Break all the rules
 					CallBack callBack = task.callBack;
 					if (callBack != null) {
 						callBack.call(task);
@@ -84,8 +88,13 @@ class DataWorker implements Runnable {
 
 	private void storeFace(DataTask task) {
 		BlockFace face = (BlockFace) task.obj;
+		
+		if (this.session.isLocked()) {
+			task.setResult(Result.FAIL, ERROR_SESSION_LOCKED);
+			return;
+		}
 
-		this.session.blockFaces.add(face);
+		//this.session.blockFaces.add(face);
 
 		JsonObject obj = BlockFaceJsonBuilder.buildObjectFromBlockFace(face);
 
@@ -108,7 +117,7 @@ class DataWorker implements Runnable {
 		if (!cacheDir.isDirectory())
 			throw new IllegalStateException("How is the cache not a directory?");
 
-		File masterDataFile = new File(cacheDir, DataManager.MASTER_DATA_FILE_NAME);
+		File masterDataFile = sess.masterDataFile;
 		JsonObject masterObject;
 		if (masterDataFile.exists()) {
 			FileInputStream in = null;
@@ -134,7 +143,7 @@ class DataWorker implements Runnable {
 			HttpClient.sendPostRequest(masterObject);
 		} catch (RequestFailedException e) {
 			Log.e(LOG_TAG, "Failed to post data", e);
-			task.setResult(Result.FAIL, "Failed posting data to server");
+			task.setResult(Result.FAIL, ERROR_POST);
 			return;
 		}
 

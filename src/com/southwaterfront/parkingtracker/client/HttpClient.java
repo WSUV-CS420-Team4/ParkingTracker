@@ -52,7 +52,7 @@ public class HttpClient {
 			throw new RequestFailedException("The request failed to execute", e);
 		}
 		
-		Log.i(LOG_TAG, "The request response code is " + response.getStatusCode() + " with message " + response.getStatusMessage());
+		Log.i(LOG_TAG, "The POST request response code is " + response.getStatusCode() + " with message " + response.getStatusMessage());
 		
 		if (!response.isSuccessStatusCode())
 			throw new RequestFailedException("The request was not successfull, the response code is " + response.getStatusCode());

@@ -2,6 +2,7 @@ package com.southwaterfront.parkingtracker.jsonify;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -75,7 +76,7 @@ public class MasterDataJsonBuilder {
 	 * @param elems List of {@link BlockFace} objects to jsonify
 	 * @return JsonObject containing all block faces
 	 */
-	public static JsonObject buildObjectFromBlockFaces(List<BlockFace> elems) {
+	public static JsonObject buildObjectFromBlockFaces(Collection<BlockFace> elems) {
 		if (elems == null) 
 			throw new IllegalArgumentException("List of block faces cannot be null");
 		
@@ -98,7 +99,7 @@ public class MasterDataJsonBuilder {
 	 * @param elems List of JsonObjects to build with
 	 * @return Build JsonObject
 	 */
-	public static JsonObject buildObjectFromBlockFaceObjects(List<JsonObject> elems) {
+	public static JsonObject buildObjectFromBlockFaceObjects(Collection<JsonObject> elems) {
 		if (elems == null) 
 			throw new IllegalArgumentException("List of block faces cannot be null");
 		

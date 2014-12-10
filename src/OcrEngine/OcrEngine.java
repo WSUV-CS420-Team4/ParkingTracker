@@ -83,7 +83,8 @@ public class OcrEngine {
 						String result = this.tess.getUTF8Text();
 						this.tess.clear();
 						
-						callBack.call(result);
+						if (callBack != null)
+							callBack.call(result);
 					}
 				}
 			}
@@ -107,7 +108,7 @@ public class OcrEngine {
 		this.imagesTasks = new LinkedBlockingQueue<ImageWrapper>();
 		OcrWorker w = new OcrWorker(this.tess, this.imagesTasks);
 		this.worker = new Thread(w);
-		this.worker.setDaemon(true);
+		//this.worker.setDaemon(true);
 		this.worker.setName("OcrWorker");
 		this.worker.start();
 	}
