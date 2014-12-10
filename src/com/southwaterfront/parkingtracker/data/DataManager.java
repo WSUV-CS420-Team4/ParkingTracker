@@ -1,5 +1,6 @@
 package com.southwaterfront.parkingtracker.data;
 
+import java.io.Closeable;
 import java.io.File;
 import java.lang.Thread.State;
 import java.text.ParseException;
@@ -20,9 +21,9 @@ import javax.json.JsonObject;
 import android.util.Log;
 
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
-import com.southwaterfront.parkingtracker.persist.PersistenceWorker;
 import com.southwaterfront.parkingtracker.persist.PersistenceTask;
 import com.southwaterfront.parkingtracker.persist.PersistenceTask.Tasks;
+import com.southwaterfront.parkingtracker.persist.PersistenceWorker;
 
 /**
  * This singleton will be used to manage the collected data. This
@@ -32,7 +33,7 @@ import com.southwaterfront.parkingtracker.persist.PersistenceTask.Tasks;
  * @author Vitaliy Gavrilov
  *
  */
-public class DataManager {
+public class DataManager implements Closeable {
 
 	private static final String LOG_TAG = "DataManager";
 
@@ -44,7 +45,11 @@ public class DataManager {
 
 	private static final DataManager instance = new DataManager();
 
+	private boolean closed;
+
 	private static final char FILE_NAME_DELIMITER = ' ';
+
+	private static final String ERROR_CLOSED = "The data manager is closed and cannot be operated on";
 
 	private final AssetManager assetManager;
 
@@ -156,6 +161,7 @@ public class DataManager {
 	 */
 	private DataManager() {
 		this.assetManager = AssetManager.getInstance();
+		this.closed = false;
 		File cacheDir = assetManager.getCacheDir();
 		this.dataCacheDir = new File(cacheDir, DATA_CACHE_DIR_NAME);
 		if (!this.dataCacheDir.exists())
@@ -182,19 +188,19 @@ public class DataManager {
 			else
 				setNewDataWorker();
 		}
-
+		Log.i(LOG_TAG, "The data manager initialized with session " + this.currentSession + " out of " + this.sessions.size() + " available sessions.");
 	}
 
 	private void loadSessions() {
 		for (File f : this.dataCacheDir.listFiles()) {
 			if (f.isFile()) {
-				synchronouslyDeleteFile(f);
+				sessLoaderDelHelper(f);
 			} else {
 				File[] files = f.listFiles();
 				if (files == null || files.length == 0) {
-					synchronouslyDeleteFile(f);
+					sessLoaderDelHelper(f);
 				} else if (files.length == 1 && files[0].length() == 0) {
-					synchronouslyDeleteFile(f);
+					sessLoaderDelHelper(f);
 				} else {
 					Session sess;
 					try {
@@ -204,7 +210,7 @@ public class DataManager {
 						continue;
 					}
 					if (sess.masterDataFile.exists() && sess.masterDataFile.length() == 0)
-						synchronouslyDeleteFile(f);
+						sessLoaderDelHelper(f);
 					this.sessions.add(sess);
 					Log.i(LOG_TAG, "Adding session " + sess.SESSION_ID + " to available sessions");
 				}
@@ -212,7 +218,7 @@ public class DataManager {
 		}
 	}
 
-	private void synchronouslyDeleteFile(File f) {
+	private void sessLoaderDelHelper(File f) {
 		Log.i(LOG_TAG, "Found file " + f.getName() + " in data cache folder that has no data, deleting");
 		Task task = deleteFile(f);
 		task.waitOnResult();
@@ -229,6 +235,8 @@ public class DataManager {
 	 * 
 	 */
 	public void startNewSession() {
+		checkNotClosed();
+
 		Date now = new Date(System.currentTimeMillis());
 		String dirName = this.dateFormat.format(now);
 		File dir = new File(this.dataCacheDir, dirName);
@@ -240,9 +248,9 @@ public class DataManager {
 
 		dir.mkdir();
 
-		Log.i(LOG_TAG, "Successfully created session " + dirName);
-
 		Session newSess = new Session(now, dir);
+
+		Log.i(LOG_TAG, "Successfully created new session " + newSess);
 
 		this.sessions.add(newSess);
 
@@ -269,7 +277,7 @@ public class DataManager {
 		this.dataThread.start();
 	}
 
-	String createBlockFaceFileName(BlockFace face) {
+	public String createBlockFaceFileName(BlockFace face) {
 		return face.block + FILE_NAME_DELIMITER + face.face;
 	}
 
@@ -279,6 +287,8 @@ public class DataManager {
 	 * @return Date object
 	 */
 	public Date getSessionStartTime() {
+		checkNotClosed();
+
 		return this.currentSession.createTime;
 	}
 
@@ -289,6 +299,8 @@ public class DataManager {
 	 * @return Session ID
 	 */
 	public String getSessionName() {
+		checkNotClosed();
+
 		return this.currentSession.SESSION_ID;
 	}
 
@@ -299,6 +311,8 @@ public class DataManager {
 	 * @return Set of sessions
 	 */
 	public SortedSet<Session> getAvailableSessions() {
+		checkNotClosed();
+
 		return Collections.unmodifiableSortedSet(this.sessions);
 	}
 
@@ -306,6 +320,8 @@ public class DataManager {
 	 * Removes sessions which are not the current session
 	 */
 	public void removeNonCurrentSessions() {
+		checkNotClosed();
+
 		List<Session> toRemove = new LinkedList<Session>();
 		for (Session sess : this.sessions) {
 			if (sess != this.currentSession)
@@ -323,6 +339,8 @@ public class DataManager {
 	 * @return True if session was removed, false if not
 	 */
 	public boolean removeSession(Session session) {
+		checkNotClosed();
+
 		File cacheDir = session.cacheFolder;
 		Log.i(LOG_TAG, "Removing cache folder " + cacheDir + " created at " + session.SESSION_ID);
 
@@ -379,6 +397,8 @@ public class DataManager {
 	 * @param callBack A callback that can be used 
 	 */
 	public void saveBlockFace(BlockFace face, CallBack callBack) {
+		checkNotClosed();
+
 		if (face == null)
 			return;
 
@@ -406,11 +426,37 @@ public class DataManager {
 	 * task completion
 	 */
 	public void uploadSessionData(Session sess, CallBack callBack) {
+		checkNotClosed();
+
 		if (sess == null || !this.sessions.contains(sess))
 			throw new IllegalArgumentException("The session cannot be null and must be a valid session from the manager");
 
 		DataTask task = new DataTask(sess, callBack, DataTask.Tasks.UPLOAD_DATA);
 		this.dataTasks.add(task);
+	}
+
+	private void checkNotClosed() {
+		if (this.closed)
+			throw new IllegalStateException(ERROR_CLOSED);
+	}
+
+	/**
+	 * Closes the data manager, should only be called in
+	 * Main activity onDestroy()
+	 */
+	@Override
+	public void close() {
+		if (!this.closed) {
+			for (Session s : this.sessions) {
+				File cacheFolder = s.cacheFolder;
+				File[] files = cacheFolder.listFiles();
+				if (files.length == 0) {
+					Log.i(LOG_TAG, "Deleting empty session " + s);
+					Task t = deleteFile(cacheFolder);
+					t.waitOnResult();
+				}
+			}
+		}
 	}
 
 }

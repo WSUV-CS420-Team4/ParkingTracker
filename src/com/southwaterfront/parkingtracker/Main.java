@@ -172,7 +172,6 @@ public class Main extends Activity {
 		assets = AssetManager.getInstance();
 		assets.assetSanityCheck();
 		data = DataManager.getInstance();
-		Log.i(LOG_TAG, "Session start time " + data.getSessionName());
 		ocrEngine = OcrEngine.getInstance();
 
 		face = new BlockFace("3", "A");
@@ -195,6 +194,12 @@ public class Main extends Activity {
 			}
 		});
 
+	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		data.close();
 	}
 
 	private void upload() {
