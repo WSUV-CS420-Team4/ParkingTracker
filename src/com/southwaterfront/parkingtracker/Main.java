@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
 import com.southwaterfront.parkingtracker.data.BlockFace;
@@ -29,6 +30,7 @@ import com.southwaterfront.parkingtracker.data.CallBack;
 import com.southwaterfront.parkingtracker.data.DataManager;
 import com.southwaterfront.parkingtracker.data.ParkingStall;
 import com.southwaterfront.parkingtracker.util.AsyncTask;
+import com.southwaterfront.parkingtracker.util.Utils;
 
 public class Main extends Activity {
 
@@ -157,6 +159,12 @@ public class Main extends Activity {
 		super.onStart();
 		textView = (TextView) findViewById(R.id.textView2);
 		editText = (EditText) findViewById(R.id.editText1);
+		
+		String wifi = "Wifi is ";
+		if (!Utils.isWifiConnected()) wifi += "not ";
+		wifi += "connected";
+		Toast.makeText(getApplicationContext(), wifi,
+			   Toast.LENGTH_LONG).show();
 	}
 	
 	@Override

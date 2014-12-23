@@ -6,6 +6,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.json.JsonObject;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
@@ -35,6 +38,10 @@ public class Utils {
 	
 	private static final File cacheDir;
 	
+	private static final ConnectivityManager connManager;
+	
+	private static final NetworkInfo wifi;
+	
 	static {
 		persistenceTasks = new LinkedBlockingQueue<PersistenceTask>();
 		PersistenceWorker worker = new PersistenceWorker(persistenceTasks);
@@ -49,6 +56,9 @@ public class Utils {
 		
 		cacheSize = getFileSize(cacheDir);
 		Log.i(LOG_TAG, "Initial cache directory size is " + cacheSize);
+		
+		connManager = (ConnectivityManager) assets.getMainContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+		wifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 	}
 	
 	/**
@@ -125,6 +135,17 @@ public class Utils {
 	 * @return True if in, false otherwise
 	 */
 	public static boolean isCacheFile(File f) {
+		if (!f.exists()) return false;
 		return f.getAbsolutePath().startsWith(cacheDirName);
+	}
+	
+	/**
+	 * Convenience method for checking if the phone's
+	 * internet connection is on wifi
+	 * 
+	 * @return True if wifi connected, false if not
+	 */
+	public static boolean isWifiConnected() {
+		return wifi.isConnected();
 	}
 }
