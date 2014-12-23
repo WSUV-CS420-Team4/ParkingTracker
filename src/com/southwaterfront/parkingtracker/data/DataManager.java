@@ -16,14 +16,12 @@ import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import javax.json.JsonObject;
-
 import android.util.Log;
 
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
-import com.southwaterfront.parkingtracker.persist.PersistenceTask;
-import com.southwaterfront.parkingtracker.persist.PersistenceTask.Tasks;
-import com.southwaterfront.parkingtracker.persist.PersistenceWorker;
+import com.southwaterfront.parkingtracker.util.AsyncTask;
+import com.southwaterfront.parkingtracker.util.Result;
+import com.southwaterfront.parkingtracker.util.Utils;
 
 /**
  * This singleton will be used to manage the collected data. This
@@ -60,10 +58,6 @@ public class DataManager implements Closeable {
 	private final SimpleDateFormat dateFormat;
 
 	private Session currentSession;
-
-	private final BlockingQueue<PersistenceTask> persistenceTasks;
-
-	private final Thread persistenceThread;
 
 	/**
 	 * Update both every time current session changes
@@ -168,15 +162,7 @@ public class DataManager implements Closeable {
 			this.dataCacheDir.mkdir();
 		this.sessions = new TreeSet<Session>();
 		this.dateFormat = new SimpleDateFormat(FILE_NAME_FORMAT);
-
-		this.persistenceTasks = new LinkedBlockingQueue<PersistenceTask>();
-		PersistenceWorker worker = new PersistenceWorker(this.persistenceTasks);
-		this.persistenceThread = new Thread(worker);
-		//this.persistenceThread.setDaemon(true);
-		this.persistenceThread.setName("Persistence Thread");
-		this.persistenceThread.start();
-
-
+		
 		loadSessions();
 
 		if (this.sessions.isEmpty()) {
@@ -222,7 +208,7 @@ public class DataManager implements Closeable {
 
 	private void sessLoaderDelHelper(File f) {
 		Log.i(LOG_TAG, "Found file " + f.getName() + " in data cache folder that has no data, deleting");
-		Task task = deleteFile(f);
+		AsyncTask task = Utils.asyncFileDelete(f);
 		task.waitOnResult();
 	}
 
@@ -346,7 +332,7 @@ public class DataManager implements Closeable {
 		File cacheDir = session.cacheFolder;
 		Log.i(LOG_TAG, "Removing cache folder " + cacheDir + " created at " + session.SESSION_ID);
 
-		Task cacheDel = deleteFile(cacheDir);
+		AsyncTask cacheDel = Utils.asyncFileDelete(cacheDir);
 
 		if (session == this.currentSession) {
 			Result cacheResult = cacheDel.waitOnResult();
@@ -357,33 +343,6 @@ public class DataManager implements Closeable {
 		}
 
 		return this.sessions.remove(session);
-	}
-
-	/**
-	 * Asynchronous file deletion
-	 * 
-	 * @param file File to delete
-	 * @return The task being worked on, see {@link Task} for
-	 * more information on how to check the result
-	 */
-	public Task deleteFile(File file) {
-		PersistenceTask task = new PersistenceTask(null, file, Tasks.DELETE);
-		this.persistenceTasks.add(task);
-		return task;
-	}
-
-	/**
-	 * Asynchronous file write
-	 * 
-	 * @param data Data to write, byte[] and {@link JsonObject} supported
-	 * @param file File to write to
-	 * @return The task being worked on, see {@link Task} for
-	 * more information on how to check the result
-	 */
-	public Task writeToFile(Object data, File file) {
-		PersistenceTask task = new PersistenceTask(data, file, Tasks.WRITE);
-		this.persistenceTasks.add(task);
-		return task;
 	}
 
 	/**
@@ -454,11 +413,10 @@ public class DataManager implements Closeable {
 				File[] files = cacheFolder.listFiles();
 				if (files.length == 0) {
 					Log.i(LOG_TAG, "Deleting empty session " + s);
-					Task t = deleteFile(cacheFolder);
+					AsyncTask t = Utils.asyncFileDelete(cacheFolder);
 					t.waitOnResult();
 				}
 				
-				this.persistenceThread.interrupt();
 				this.dataThread.interrupt();
 				this.closed = true;
 			}

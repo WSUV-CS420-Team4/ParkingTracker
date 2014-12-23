@@ -15,7 +15,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,7 +28,7 @@ import com.southwaterfront.parkingtracker.data.BlockFace;
 import com.southwaterfront.parkingtracker.data.CallBack;
 import com.southwaterfront.parkingtracker.data.DataManager;
 import com.southwaterfront.parkingtracker.data.ParkingStall;
-import com.southwaterfront.parkingtracker.data.Task;
+import com.southwaterfront.parkingtracker.util.AsyncTask;
 
 public class Main extends Activity {
 
@@ -209,7 +208,7 @@ public class Main extends Activity {
 		data.uploadSessionData(new CallBack() {
 
 			@Override
-			public void call(final Task task) {
+			public void call(final AsyncTask task) {
 				Main.this.runOnUiThread(new Runnable() {
 
 					@Override

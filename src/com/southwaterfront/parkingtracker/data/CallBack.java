@@ -1,5 +1,7 @@
 package com.southwaterfront.parkingtracker.data;
 
+import com.southwaterfront.parkingtracker.util.AsyncTask;
+
 
 /**
  * Callback interface
@@ -11,6 +13,6 @@ public interface CallBack {
 	/**
 	 * Single call method
 	 */
-	public void call(final Task task);
+	public void call(final AsyncTask task);
 	
 }

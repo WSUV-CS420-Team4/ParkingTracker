@@ -1,6 +1,8 @@
 package com.southwaterfront.parkingtracker.data;
 
 import com.southwaterfront.parkingtracker.data.DataManager.Session;
+import com.southwaterfront.parkingtracker.util.AsyncTask;
+import com.southwaterfront.parkingtracker.util.Result;
 
 /**
  * A task definition that can be used to perform data related tasks
@@ -8,7 +10,7 @@ import com.southwaterfront.parkingtracker.data.DataManager.Session;
  * @author Vitaliy Gavrilov
  *
  */
-public class DataTask extends Task {
+public class DataTask extends AsyncTask {
 	
 	/**
 	 * Available tasks

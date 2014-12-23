@@ -11,7 +11,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.southwaterfront.parkingtracker.Main;
-import com.southwaterfront.parkingtracker.data.DataManager;
+import com.southwaterfront.parkingtracker.util.Utils;
 
 /**
  * This is a play on the Android AssetManager, however, this
@@ -209,9 +209,8 @@ public class AssetManager {
 	 * Clears the image cache dir
 	 */
 	public void clearImageCache() {
-		DataManager data = DataManager.getInstance();
 		for (File f : this.imageCacheDir.listFiles())
-			data.deleteFile(f);
+			Utils.asyncFileDelete(f);
 	}
 	
 }

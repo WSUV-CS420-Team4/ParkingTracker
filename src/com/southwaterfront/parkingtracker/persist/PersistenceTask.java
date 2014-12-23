@@ -2,8 +2,8 @@ package com.southwaterfront.parkingtracker.persist;
 
 import java.io.File;
 
-import com.southwaterfront.parkingtracker.data.Result;
-import com.southwaterfront.parkingtracker.data.Task;
+import com.southwaterfront.parkingtracker.util.AsyncTask;
+import com.southwaterfront.parkingtracker.util.Result;
 
 /**
  * Defines a task to be done by a {@link PersistenceWorker}. Tasks are defined
@@ -12,7 +12,7 @@ import com.southwaterfront.parkingtracker.data.Task;
  * @author Vitaily Gavrilov
  *
  */
-public class PersistenceTask extends Task {
+public class PersistenceTask extends AsyncTask {
 
 	/**
 	 * Available tasks

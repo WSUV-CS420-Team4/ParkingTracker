@@ -6,7 +6,8 @@ import java.util.concurrent.BlockingQueue;
 
 import javax.json.JsonObject;
 
-import com.southwaterfront.parkingtracker.data.Result;
+import com.southwaterfront.parkingtracker.util.Result;
+import com.southwaterfront.parkingtracker.util.Utils;
 
 import android.util.Log;
 
@@ -62,7 +63,7 @@ public class PersistenceWorker implements Runnable {
 					break;
 
 				}
-				Log.i(LOG_TAG, "Task " + taskWrapper.task + " on file " + taskWrapper.file.getAbsolutePath() +" completed with result " + taskWrapper.getResult() + "\t Error message: " + taskWrapper.getErrorMessage());
+				Log.i(LOG_TAG, "Task " + taskWrapper.task + " on file " + taskWrapper.file.getAbsolutePath() +" completed with result " + taskWrapper.getResult() + "\t Error message: " + taskWrapper.getErrorMessage() + "\tThe updated cache size is " + Utils.getCacheSize());
 			} catch (InterruptedException e) {
 				Log.i(LOG_TAG, "PersistanceWorker was interrupted", e);
 				throw new RuntimeException(e);
@@ -136,10 +137,14 @@ public class PersistenceWorker implements Runnable {
 
 	private void deleteFile(File file, PersistenceTask t) {
 		try {
+			long size = file.length();
+			boolean isFile = file.isFile();
 			boolean success = file.delete();
 
 			if (!success)
 				setTaskFailure(t, ERROR_DELETE_UNKNOWN);
+			else if (isFile && Utils.isCacheFile(file))
+				Utils.updateCacheSize(-size);
 		} catch (Exception e) {
 			setTaskFailure(t, e.getMessage());
 		} 

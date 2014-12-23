@@ -17,6 +17,9 @@ import com.southwaterfront.parkingtracker.data.DataManager.Session;
 import com.southwaterfront.parkingtracker.jsonify.BlockFaceJsonBuilder;
 import com.southwaterfront.parkingtracker.jsonify.Jsonify;
 import com.southwaterfront.parkingtracker.jsonify.MasterDataJsonBuilder;
+import com.southwaterfront.parkingtracker.util.AsyncTask;
+import com.southwaterfront.parkingtracker.util.Result;
+import com.southwaterfront.parkingtracker.util.Utils;
 
 /**
  * Internally used data worker to process the data on a separate thread
@@ -101,7 +104,7 @@ class DataWorker implements Runnable {
 		String fileName = this.dataManager.createBlockFaceFileName(face);
 		File file = new File(this.session.cacheFolder, fileName);
 
-		Task perTask = this.dataManager.writeToFile(obj, file);
+		AsyncTask perTask = Utils.asyncFileWrite(obj, file);
 		Result perResult = perTask.waitOnResult();
 
 		task.setResult(perResult, perTask.getErrorMessage());
@@ -161,7 +164,7 @@ class DataWorker implements Runnable {
 		
 		JsonObject masterObject = MasterDataJsonBuilder.buildObjectFromBlockFaceObjects(objs);
 		
-		Task saveTask = dataManager.writeToFile(masterObject, masterDataFile);
+		AsyncTask saveTask = Utils.asyncFileWrite(masterObject, masterDataFile);
 		Result saveResult = saveTask.waitOnResult();
 		if (saveResult == Result.SUCCESS)
 			deleteDirFiles(cacheDir);
@@ -177,7 +180,7 @@ class DataWorker implements Runnable {
 	private void deleteDirFiles(File dir) {
 		for (File f : dir.listFiles()) {
 			if (!f.getName().equals(DataManager.MASTER_DATA_FILE_NAME))
-				dataManager.deleteFile(f);
+				Utils.asyncFileDelete(f);
 		}
 	}
 

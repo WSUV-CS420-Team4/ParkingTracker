@@ -1,4 +1,4 @@
-package com.southwaterfront.parkingtracker.data;
+package com.southwaterfront.parkingtracker.util;
 
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -19,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Vitaliy Gavrilov
  *
  */
-public abstract class Task {
+public abstract class AsyncTask {
 
 	private Result result;
 
@@ -29,7 +29,7 @@ public abstract class Task {
 
 	private final Condition finished;
 	
-	protected Task() {
+	protected AsyncTask() {
 		this.result = Result.IN_PROGRESS;
 		this.lock = new ReentrantLock();
 		this.finished = this.lock.newCondition();

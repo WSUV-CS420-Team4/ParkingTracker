@@ -1,4 +1,4 @@
-package com.southwaterfront.parkingtracker.data;
+package com.southwaterfront.parkingtracker.util;
 
 /**
  * Types of results for a task
