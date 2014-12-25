@@ -8,6 +8,8 @@ import java.util.Date;
 import OcrEngine.OcrCallBack;
 import OcrEngine.OcrEngine;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -49,6 +51,7 @@ public class Main extends Activity {
 	private OcrEngine ocrEngine;
 	TextView textView;
 	EditText editText;
+	AlertDialog.Builder wifiAlert;
 
 	private File createImageFile() throws IOException {
 		// Create an image file name
@@ -160,11 +163,13 @@ public class Main extends Activity {
 		textView = (TextView) findViewById(R.id.textView2);
 		editText = (EditText) findViewById(R.id.editText1);
 		
+		/*
 		String wifi = "Wifi is ";
 		if (!Utils.isWifiConnected()) wifi += "not ";
 		wifi += "connected";
 		Toast.makeText(getApplicationContext(), wifi,
 			   Toast.LENGTH_LONG).show();
+			   */
 	}
 	
 	@Override
@@ -197,9 +202,32 @@ public class Main extends Activity {
 		final Button button2 = (Button) findViewById(R.id.button2);
 		button2.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				upload();
+				if (Utils.isWifiConnected())
+					upload();
+				else
+					wifiAlert.show();
 			}
 		});
+		
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+	    @Override
+	    public void onClick(DialogInterface dialog, int which) {
+	        switch (which){
+	        case DialogInterface.BUTTON_POSITIVE:
+	            upload();
+	            dialog.dismiss();
+	            break;
+
+	        case DialogInterface.BUTTON_NEGATIVE:
+	            dialog.dismiss();
+	            break;
+	        }
+	    }
+	};
+
+	wifiAlert = new AlertDialog.Builder(this);
+	wifiAlert.setMessage("You are not internet connected through wifi. Are you sure you want to continue?").setPositiveButton("Yes", dialogClickListener)
+	    .setNegativeButton("No", dialogClickListener);
 
 	}
 	
