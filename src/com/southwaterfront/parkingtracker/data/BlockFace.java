@@ -27,8 +27,31 @@ public final class BlockFace {
 	}
 
 	/**
+	 * Creates a specified empty block face. The stalls can still be
+	 * edited with {@link BlockFace#setStall(ParkingStall, int)}
+	 * 
+	 * @param block Block name
+	 * @param face Face name
+	 * @param stalls Number of empty stalls to put
+	 * @return Created empty padded block face
+	 */
+	public static BlockFace emptyPaddedBlockFace(String block, String face, int stalls) {
+		if (block == null || face == null)
+			throw new IllegalArgumentException("Arguments cannot be null");
+		if (stalls < 0)
+			throw new IllegalArgumentException("Must have a positive size");
+		BlockFace bF = new BlockFace(block, face);
+		
+		for (int i = 0; i < stalls; i++)
+			bF.stalls.add(ParkingStall.EmptyStall);
+		
+		return bF;
+	}
+	
+	/**
 	 * Add a stall to this block face. Adding a null will
-	 * not throw an exception but will be ignored.
+	 * not throw an exception but will be ignored. This is an
+	 * append add
 	 * 
 	 * @param stall Stall to add
 	 */
@@ -37,6 +60,25 @@ public final class BlockFace {
 			return;
 		
 		this.stalls.add(stall);
+	}
+	
+	/**
+	 * Add a stall at a specified position, 0 indexed.
+	 * Adding a stall at an index past the next position
+	 * will result in a list whose empty spaces are padded
+	 * with {@link ParkingStall#EmptyStall} objects.
+	 * 
+	 * @param stall Stall to add
+	 * @param position Position to place it at
+	 */
+	public void setStall(ParkingStall stall, int position) {
+		if (stall == null || position < 0)
+			return;
+		
+		for (int i = this.stalls.size(); i < position; i++)
+			this.stalls.add(ParkingStall.EmptyStall);
+		
+		this.stalls.set(position, stall);
 	}
 
 	/**
