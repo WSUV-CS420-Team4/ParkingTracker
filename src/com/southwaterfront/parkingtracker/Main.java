@@ -24,7 +24,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
 import com.southwaterfront.parkingtracker.data.BlockFace;
@@ -185,6 +184,7 @@ public class Main extends Activity {
 		assets.assetSanityCheck();
 		data = DataManager.getInstance();
 		ocrEngine = OcrEngine.getInstance();
+		Utils.resetCacheSize();
 
 		face = new BlockFace("3", "A");
 

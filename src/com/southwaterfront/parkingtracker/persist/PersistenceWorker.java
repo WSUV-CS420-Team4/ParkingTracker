@@ -63,7 +63,7 @@ public class PersistenceWorker implements Runnable {
 					break;
 
 				}
-				Log.i(LOG_TAG, "Task " + taskWrapper.task + " on file " + taskWrapper.file.getAbsolutePath() +" completed with result " + taskWrapper.getResult() + "\t Error message: " + taskWrapper.getErrorMessage() + "\tThe updated cache size is " + Utils.getCacheSize());
+				Log.i(LOG_TAG, "Task " + taskWrapper.task + " on file " + taskWrapper.file.getAbsolutePath() +" completed with result " + taskWrapper.getResult() + "\t Error message: " + taskWrapper.getErrorMessage() + "\tThe updated cache size is " + Utils.getCacheSize() + " bytes");
 			} catch (InterruptedException e) {
 				Log.i(LOG_TAG, "PersistanceWorker was interrupted", e);
 				throw new RuntimeException(e);

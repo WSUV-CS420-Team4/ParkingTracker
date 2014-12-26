@@ -79,6 +79,10 @@ public class Utils {
 		return size;
 	}
 	
+	public static void resetCacheSize() {
+		cacheSize = getFileSize(cacheDir);
+	}
+	
 	/**
 	 * Asynchronous file deletion
 	 * 
@@ -135,7 +139,6 @@ public class Utils {
 	 * @return True if in, false otherwise
 	 */
 	public static boolean isCacheFile(File f) {
-		if (!f.exists()) return false;
 		return f.getAbsolutePath().startsWith(cacheDirName);
 	}
 	

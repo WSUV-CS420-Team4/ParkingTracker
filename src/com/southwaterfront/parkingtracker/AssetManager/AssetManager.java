@@ -56,6 +56,8 @@ public class AssetManager {
 	
 	private final String IMAGE_CACHE_DIR_NAME = "imageCache";
 	
+	private final String CACHE_DIR_NAME = "swfPt";
+	
 	/**
 	 * Make constructor private to disallow outside instantiation
 	 * of this class
@@ -73,7 +75,9 @@ public class AssetManager {
 	private AssetManager(Context mainContext) {
 		this.mainContext = mainContext;
 		this.androidAssetManager = this.mainContext.getAssets();
-		this.cacheDir = this.mainContext.getCacheDir();
+		this.cacheDir = new File(this.mainContext.getCacheDir(), this.CACHE_DIR_NAME);
+		if (!this.cacheDir.exists())
+			this.cacheDir.mkdir();
 		this.internalFileDir = this.mainContext.getFilesDir();
 		this.externalFileDir = new File(Environment.getExternalStorageDirectory(), externalStorageDirFileName);
 		if (!this.externalFileDir.exists())
