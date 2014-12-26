@@ -350,9 +350,9 @@ public class DataManager implements Closeable {
 	 * session adherence, and encapsulation. The data processing is sent to a worker
 	 * thread so it is safe to call this on the UI thread.
 	 * <br>
-	 * Within a single {@link Session}, a BlockFace representing one physical location
-	 * may be added once. Adding two different objects for a single block face has unspecified
-	 * results, but is likely just to use the most recent object for the final data build.
+	 * Within a single {@link Session}, it is good practice to add save only one instance of
+	 * a block face representing the same face. If multiple are saved, both will be sent to the server
+	 * upon uploading and the server will resolve the data.
 	 * 
 	 * @param face BlockFace to add to data
 	 * @param callBack A callback that can be used 

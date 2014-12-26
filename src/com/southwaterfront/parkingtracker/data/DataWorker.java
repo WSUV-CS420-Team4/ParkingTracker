@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 
 import javax.json.JsonObject;
@@ -32,11 +33,11 @@ class DataWorker implements Runnable {
 	private final DataManager dataManager;
 
 	private String LOG_TAG;
-	
+
 	private static final String ERROR_FILES = "There is no collectable data to upload";
-	
+
 	private static final String ERROR_SESSION_LOCKED = "Unable to complete the task because the session is locked and is in a read-only state";
-	
+
 	private static final String ERROR_MASTER_CORRUPT = "The master data file with the upload data is corrupt";
 
 	private static final String ERROR_POST = "Failed posting data to server";
@@ -47,11 +48,14 @@ class DataWorker implements Runnable {
 
 	private boolean running;
 
+	private Random rand;
+
 	public DataWorker(DataManager dataManager, Session sess, BlockingQueue<DataTask> tasks) {
 		this.dataManager = dataManager;
 		this.LOG_TAG = "DataWorker " + sess.SESSION_ID;
 		this.session = sess;
 		this.tasks = tasks;
+		this.rand = new Random();
 		running = true;
 	}
 
@@ -91,7 +95,7 @@ class DataWorker implements Runnable {
 
 	private void storeFace(DataTask task) {
 		BlockFace face = (BlockFace) task.obj;
-		
+
 		if (this.session.isLocked()) {
 			task.setResult(Result.FAIL, ERROR_SESSION_LOCKED);
 			return;
@@ -102,11 +106,18 @@ class DataWorker implements Runnable {
 		JsonObject obj = BlockFaceJsonBuilder.buildObjectFromBlockFace(face);
 
 		String fileName = this.dataManager.createBlockFaceFileName(face);
-		File file = new File(this.session.cacheFolder, fileName);
+		String useName = fileName;
 
-		AsyncTask perTask = Utils.asyncFileWrite(obj, file);
-		Result perResult = perTask.waitOnResult();
-
+		AsyncTask perTask = null;
+		Result perResult = Result.FAIL;
+		for (int i = 0; i < 3 && perResult == Result.FAIL; i++) {
+			File file = new File(this.session.cacheFolder, useName);
+			perTask = Utils.asyncFileWrite(obj, file);
+			perResult = perTask.waitOnResult();
+			int nonce = rand.nextInt();
+			useName = fileName + nonce;
+		} 
+		
 		task.setResult(perResult, perTask.getErrorMessage());
 	}
 
@@ -141,7 +152,7 @@ class DataWorker implements Runnable {
 			if (task.getResult() == Result.FAIL)
 				return;
 		}
-		
+
 		try {
 			HttpClient.sendPostRequest(masterObject);
 		} catch (RequestFailedException e) {
@@ -151,24 +162,24 @@ class DataWorker implements Runnable {
 		}
 
 		dataManager.removeSession(sess);
-		
+
 		task.setResult(Result.SUCCESS, null);
 	}
-	
+
 	private JsonObject createMasterObjectFromFiles(DataTask task, File cacheDir, File masterDataFile) {
 		List<JsonObject> objs = buildFileJsonObjects(cacheDir);
 		if (objs == null) {
 			task.setResult(Result.FAIL, ERROR_FILES);
 			return null;
 		}
-		
+
 		JsonObject masterObject = MasterDataJsonBuilder.buildObjectFromBlockFaceObjects(objs);
-		
+
 		AsyncTask saveTask = Utils.asyncFileWrite(masterObject, masterDataFile);
 		Result saveResult = saveTask.waitOnResult();
 		if (saveResult == Result.SUCCESS)
 			deleteDirFiles(cacheDir);
-		
+
 		return masterObject;
 	}
 
@@ -189,7 +200,7 @@ class DataWorker implements Runnable {
 		File[] files = cacheDir.listFiles();
 		if (files.length == 0)
 			return null;
-		
+
 		for (File f : files) {
 			if (f.getName().equals(DataManager.MASTER_DATA_FILE_NAME))
 				continue;
@@ -214,7 +225,7 @@ class DataWorker implements Runnable {
 			return null;
 		return jsonObjs;
 	}
-	
+
 	public void induceStop() {
 		this.running = false;
 	}
