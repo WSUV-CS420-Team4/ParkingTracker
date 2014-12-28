@@ -6,11 +6,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
-import com.southwaterfront.parkingtracker.Main;
 import com.southwaterfront.parkingtracker.util.Utils;
 
 /**
@@ -29,6 +29,8 @@ import com.southwaterfront.parkingtracker.util.Utils;
 public class AssetManager {
 
 	private static AssetManager instance;
+	
+	private final Activity mainActivity;
 	
 	private final String LOG_TAG = "AssetManager";
 	
@@ -67,13 +69,14 @@ public class AssetManager {
 	}
 	
 	/**
-	 * Private constructor called when {@link #init(Context)} is called.
+	 * Private constructor called when {@link #init(Activity)} is called.
 	 * This sets all of the necessary fields in the singleton.
 	 * 
-	 * @param mainContext
+	 * @param main
 	 */
-	private AssetManager(Context mainContext) {
-		this.mainContext = mainContext;
+	private AssetManager(Activity main) {
+		this.mainActivity = main;
+		this.mainContext = this.mainActivity.getApplicationContext();
 		this.androidAssetManager = this.mainContext.getAssets();
 		this.cacheDir = new File(this.mainContext.getCacheDir(), this.CACHE_DIR_NAME);
 		if (!this.cacheDir.exists())
@@ -101,16 +104,16 @@ public class AssetManager {
 	}
 	
 	/**
-	 * Initializes the AssetManager with a {@link Context}, 
-	 * intended to be the context of the {@link Main} Activity.
+	 * Initializes the AssetManager with the {@link Activity}
+	 * that is the main activity of the app
 	 * 
-	 * @param mainContext
+	 * @param main
 	 */
-	public static void init(Context mainContext) {
-		if (mainContext == null)
+	public static void init(Activity main) {
+		if (main == null)
 			throw new IllegalArgumentException("The main context cannot be null");
 		if (instance == null)
-			instance = new AssetManager(mainContext);
+			instance = new AssetManager(main);
 	}
 	
 	/**
@@ -215,6 +218,15 @@ public class AssetManager {
 	public void clearImageCache() {
 		for (File f : this.imageCacheDir.listFiles())
 			Utils.asyncFileDelete(f);
+	}
+	
+	/**
+	 * Getter for main activity of app instance
+	 * 
+	 * @return Main activity
+	 */
+	public Activity getMainActivity() {
+		return this.mainActivity;
 	}
 	
 }

@@ -6,10 +6,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.json.JsonObject;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
 import com.southwaterfront.parkingtracker.persist.PersistenceTask;
@@ -40,7 +42,7 @@ public class Utils {
 	
 	private static final ConnectivityManager connManager;
 	
-	private static final NetworkInfo wifi;
+	private static final Activity main;
 	
 	static {
 		persistenceTasks = new LinkedBlockingQueue<PersistenceTask>();
@@ -58,7 +60,8 @@ public class Utils {
 		Log.i(LOG_TAG, "Initial cache directory size is " + cacheSize);
 		
 		connManager = (ConnectivityManager) assets.getMainContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-		wifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		
+		main = assets.getMainActivity();
 	}
 	
 	/**
@@ -149,6 +152,24 @@ public class Utils {
 	 * @return True if wifi connected, false if not
 	 */
 	public static boolean isWifiConnected() {
-		return wifi.isConnected();
+		NetworkInfo netInfo = connManager.getActiveNetworkInfo();
+		return netInfo != null && netInfo.getType() == ConnectivityManager.TYPE_WIFI;
+	}
+	
+	/**
+	 * Post a long toast to the ui thread
+	 * 
+	 * @param message The message to display
+	 */
+	public static void postLongToast(final String message) {
+		main.runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				Toast.makeText(main, message,
+					   Toast.LENGTH_LONG).show();
+			}
+			
+		});
 	}
 }

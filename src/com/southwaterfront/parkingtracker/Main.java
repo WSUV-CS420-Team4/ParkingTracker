@@ -148,11 +148,13 @@ public class Main extends Activity {
 		});
 	}
 	
+	int stall = 0;
+	
 	private void setOcrResult(String result) {
 		result = result.substring(0, result.length() > 30 ? 30 : result.length());
 		textView.setText("OCR Demo App");
 		editText.setText(result);
-		face.addStall(new ParkingStall(result, new Date(System.currentTimeMillis()), null));
+		face.setStall(new ParkingStall(result, new Date(System.currentTimeMillis()), null), stall++);
 	}
 	// -------------------------------------------------------------------------------------------------
 
@@ -162,13 +164,6 @@ public class Main extends Activity {
 		textView = (TextView) findViewById(R.id.textView2);
 		editText = (EditText) findViewById(R.id.editText1);
 		
-		/*
-		String wifi = "Wifi is ";
-		if (!Utils.isWifiConnected()) wifi += "not ";
-		wifi += "connected";
-		Toast.makeText(getApplicationContext(), wifi,
-			   Toast.LENGTH_LONG).show();
-			   */
 	}
 	
 	@Override
@@ -179,14 +174,14 @@ public class Main extends Activity {
 		/**
 		 * Always leave the next 5 lines in the main on create in this order
 		 */
-		AssetManager.init(this.getApplicationContext());
+		AssetManager.init(this);
 		assets = AssetManager.getInstance();
 		assets.assetSanityCheck();
 		data = DataManager.getInstance();
 		ocrEngine = OcrEngine.getInstance();
 		Utils.resetCacheSize();
 
-		face = new BlockFace("3", "A");
+		face = BlockFace.emptyPaddedBlockFace("1", "C", 14);
 
 		// Temp Button init location
 		final Button button = (Button) findViewById(R.id.button1);
