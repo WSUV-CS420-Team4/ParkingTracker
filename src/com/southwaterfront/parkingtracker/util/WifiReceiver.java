@@ -19,12 +19,13 @@ public class WifiReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		if (Utils.isWifiConnected()) {
-			Log.i(LOG_TAG, "Wifi now connected");
-			Utils.postLongToast("Wifi now connected");
-		} else
-			Log.i(LOG_TAG, "Wifi now disconnected");  
-
+		if(!isInitialStickyBroadcast()) {
+			if (Utils.isWifiConnected()) {
+				Log.i(LOG_TAG, "Wifi now connected");
+				Utils.postLongToast("Wifi now connected");
+			} else
+				Log.i(LOG_TAG, "Wifi now disconnected");  
+		}
 	}
 
 }

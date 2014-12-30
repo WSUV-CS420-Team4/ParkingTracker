@@ -11,8 +11,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -32,6 +34,7 @@ import com.southwaterfront.parkingtracker.data.DataManager;
 import com.southwaterfront.parkingtracker.data.ParkingStall;
 import com.southwaterfront.parkingtracker.util.AsyncTask;
 import com.southwaterfront.parkingtracker.util.Utils;
+import com.southwaterfront.parkingtracker.util.WifiReceiver;
 
 public class Main extends Activity {
 
@@ -51,6 +54,8 @@ public class Main extends Activity {
 	TextView textView;
 	EditText editText;
 	AlertDialog.Builder wifiAlert;
+	WifiReceiver wifiReceiver;
+	IntentFilter wifiFilter;
 
 	private File createImageFile() throws IOException {
 		// Create an image file name
@@ -163,7 +168,14 @@ public class Main extends Activity {
 		super.onStart();
 		textView = (TextView) findViewById(R.id.textView2);
 		editText = (EditText) findViewById(R.id.editText1);
-		
+		this.wifiReceiver = new WifiReceiver();
+		this.registerReceiver(this.wifiReceiver, this.wifiFilter);
+	}
+	
+	@Override
+	public void onStop() {
+		super.onStop();
+		this.unregisterReceiver(this.wifiReceiver);
 	}
 	
 	@Override
@@ -180,6 +192,8 @@ public class Main extends Activity {
 		data = DataManager.getInstance();
 		ocrEngine = OcrEngine.getInstance();
 		Utils.resetCacheSize();
+		wifiFilter = new IntentFilter();
+		wifiFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 
 		face = BlockFace.emptyPaddedBlockFace("1", "C", 14);
 
