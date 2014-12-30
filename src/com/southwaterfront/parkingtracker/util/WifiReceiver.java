@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.util.Log;
 
 import com.southwaterfront.parkingtracker.Main;
@@ -31,19 +32,29 @@ public class WifiReceiver extends BroadcastReceiver {
 	public static final Notification uploadNotification = Notifications.getUploadNotifcation();
 
 	public static final DataManager data = DataManager.getInstance();
+	
+	/**
+	 * This is necessary because {@link ConnectivityManager#CONNECTIVITY_ACTION} doesn't just
+	 * refer to a change in the active connection, so this receiver may be triggered when
+	 * even there is a 3G/4G change. So we need fine grain control over when we trigger
+	 * a notification.
+	 */
+	public static boolean wifiWasConnected = Utils.isWifiConnected();
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		if(!isInitialStickyBroadcast()) {
-			if (Utils.isWifiConnected()) {
+			boolean wifiIsConnected = Utils.isWifiConnected();
+			if (!wifiWasConnected && wifiIsConnected) {
 				if (data.existsUploadableSessions() && !Main.isInForeground) {
 					NotificationManager notManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 					notManager.notify(0, uploadNotification);
 				}
 
 				Log.i(LOG_TAG, "Wifi now connected");
-			} else
-				Log.i(LOG_TAG, "Wifi now disconnected");  
+			} else if (wifiWasConnected && !wifiIsConnected)
+				Log.i(LOG_TAG, "Wifi now disconnected");
+			wifiWasConnected = wifiIsConnected;
 		}
 	}
 
