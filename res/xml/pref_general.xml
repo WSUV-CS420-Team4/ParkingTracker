@@ -1,0 +1,15 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="@string/uploadNotificationSetting"
+        android:summary="@string/pref_description_upload_notification"
+        android:title="@string/pref_title_upload_notification" />
+
+  <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="@string/wifiAlertSetting"
+        android:summary="@string/pref_description_wifi_alert"
+        android:title="@string/pref_title_wifi_alert" />
+
+</PreferenceScreen>

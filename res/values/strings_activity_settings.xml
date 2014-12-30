@@ -1,0 +1,17 @@
+<resources>
+
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+    <string name="pref_title_upload_notification">Upload Notification</string>
+    <string name="pref_description_upload_notification">Show notification when wifi becomes connected and data is available to upload</string>
+
+    <string name="pref_title_wifi_alert">Wifi Alert</string>
+    <string name="pref_description_wifi_alert">Warn when attempting to upload over a non wifi connnection</string>
+
+
+</resources>
