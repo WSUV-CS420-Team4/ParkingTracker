@@ -12,12 +12,14 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -56,6 +58,8 @@ public class Main extends Activity {
 	AlertDialog.Builder wifiAlert;
 	WifiReceiver wifiReceiver;
 	IntentFilter wifiFilter;
+	SharedPreferences prefs;
+	String wifiAlertPrefKey;
 
 	private File createImageFile() throws IOException {
 		// Create an image file name
@@ -146,15 +150,15 @@ public class Main extends Activity {
 					public void run() {
 						setOcrResult(result);
 					}
-					
+
 				});
 			}
-			
+
 		});
 	}
-	
+
 	int stall = 0;
-	
+
 	private void setOcrResult(String result) {
 		result = result.substring(0, result.length() > 30 ? 30 : result.length());
 		textView.setText("OCR Demo App");
@@ -169,26 +173,26 @@ public class Main extends Activity {
 		textView = (TextView) findViewById(R.id.textView2);
 		editText = (EditText) findViewById(R.id.editText1);
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
 		isInForeground = true;
 	}
-	
+
 	@Override
 	public void onPause() {
 		super.onPause();
 		isInForeground = false;
 	}
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
 		/**
-		 * Always leave the next 5 lines in the main on create in this order
+		 * Always leave the next lines of code in onCreate
 		 */
 		AssetManager.init(this);
 		assets = AssetManager.getInstance();
@@ -200,6 +204,9 @@ public class Main extends Activity {
 		wifiFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 		this.wifiReceiver = new WifiReceiver();
 		this.registerReceiver(this.wifiReceiver, this.wifiFilter);
+		prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		wifiAlertPrefKey = getResources().getString(R.string.wifiAlertSetting);
+
 
 		face = BlockFace.emptyPaddedBlockFace("1", "C", 14);
 
@@ -217,33 +224,37 @@ public class Main extends Activity {
 		final Button button2 = (Button) findViewById(R.id.button2);
 		button2.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				if (Utils.isWifiConnected())
+				if (Utils.isWifiConnected() || !wifiAlertEnabled())
 					upload();
 				else
 					wifiAlert.show();
 			}
 		});
-		
+
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-	    @Override
-	    public void onClick(DialogInterface dialog, int which) {
-	        switch (which){
-	        case DialogInterface.BUTTON_POSITIVE:
-	            upload();
-	            dialog.dismiss();
-	            break;
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+				case DialogInterface.BUTTON_POSITIVE:
+					upload();
+					dialog.dismiss();
+					break;
 
-	        case DialogInterface.BUTTON_NEGATIVE:
-	            dialog.dismiss();
-	            break;
-	        }
-	    }
-	};
+				case DialogInterface.BUTTON_NEGATIVE:
+					dialog.dismiss();
+					break;
+				}
+			}
+		};
 
-	wifiAlert = new AlertDialog.Builder(this);
-	wifiAlert.setMessage("You are not internet connected through wifi. Are you sure you want to continue?").setPositiveButton("Yes", dialogClickListener)
-	    .setNegativeButton("No", dialogClickListener);
+		wifiAlert = new AlertDialog.Builder(this);
+		wifiAlert.setMessage("You are not internet connected through wifi. Are you sure you want to continue?").setPositiveButton("Yes", dialogClickListener)
+		.setNegativeButton("No", dialogClickListener);
 
+	}
+
+	private boolean wifiAlertEnabled() {
+		return prefs.getBoolean(wifiAlertPrefKey, true);
 	}
 	
 	@Override
@@ -290,6 +301,8 @@ public class Main extends Activity {
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
+			Intent settings = new Intent(this, Settings.class);
+			startActivity(settings);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

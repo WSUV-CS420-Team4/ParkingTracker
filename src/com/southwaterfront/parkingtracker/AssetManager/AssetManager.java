@@ -8,6 +8,7 @@ import java.io.OutputStream;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Environment;
 import android.util.Log;
 
@@ -227,6 +228,15 @@ public class AssetManager {
 	 */
 	public Activity getMainActivity() {
 		return this.mainActivity;
+	}
+	
+	/**
+	 * Getter for main resources
+	 * 
+	 * @return The resources
+	 */
+	public Resources getAppResources() {
+		return this.mainContext.getResources();
 	}
 	
 }
