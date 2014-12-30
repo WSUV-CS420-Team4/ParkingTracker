@@ -400,6 +400,21 @@ public class DataManager implements Closeable {
 		if (this.closed)
 			throw new IllegalStateException(ERROR_CLOSED);
 	}
+	
+	/**
+	 * Method to check if there are available sessions to upload, determined
+	 * by the existence of a session that has a block face saved.
+	 * 
+	 * @return True if uploaded session exists, false otherwise
+	 */
+	public boolean existsUploadableSessions() {
+		for (Session s : this.sessions) {
+			String[] files = s.cacheFolder.list();
+			if (s.isLocked() || (files != null && files.length > 0))
+				return true;
+		}
+		return false;
+	}
 
 	/**
 	 * Closes the data manager, should only be called in

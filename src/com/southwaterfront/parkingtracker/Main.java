@@ -43,7 +43,7 @@ public class Main extends Activity {
 	// -------------------------------------------------------------------------------------------------
 	// Temp placement of code
 	// -------------------------------------------------------------------------------------------------
-
+	public static boolean isInForeground = false;
 	static final int REQUEST_TAKE_PHOTO = 2;
 	String mCurrentPhotoPath;
 
@@ -168,14 +168,18 @@ public class Main extends Activity {
 		super.onStart();
 		textView = (TextView) findViewById(R.id.textView2);
 		editText = (EditText) findViewById(R.id.editText1);
-		this.wifiReceiver = new WifiReceiver();
-		this.registerReceiver(this.wifiReceiver, this.wifiFilter);
 	}
 	
 	@Override
-	public void onStop() {
-		super.onStop();
-		this.unregisterReceiver(this.wifiReceiver);
+	public void onResume() {
+		super.onResume();
+		isInForeground = true;
+	}
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		isInForeground = false;
 	}
 	
 	@Override
@@ -194,6 +198,8 @@ public class Main extends Activity {
 		Utils.resetCacheSize();
 		wifiFilter = new IntentFilter();
 		wifiFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+		this.wifiReceiver = new WifiReceiver();
+		this.registerReceiver(this.wifiReceiver, this.wifiFilter);
 
 		face = BlockFace.emptyPaddedBlockFace("1", "C", 14);
 
@@ -243,6 +249,7 @@ public class Main extends Activity {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		this.unregisterReceiver(this.wifiReceiver);
 		data.close();
 		ocrEngine.close();
 	}
