@@ -30,49 +30,55 @@ import com.southwaterfront.parkingtracker.notification.Notifications;
  * @author Vitaliy Gavrilov
  *
  */
-public class WifiReceiver extends BroadcastReceiver {
+public class WifiStateUploadableDataReceiver extends BroadcastReceiver {
 
-	public static final String LOG_TAG = "WifiReceiver";
+	public final String LOG_TAG = "WifiReceiver";
 
-	public static final Notification uploadNotification = Notifications.getUploadNotifcation();
+	public final Notification uploadNotification;
 
-	public static final DataManager data = DataManager.getInstance();
+	public final DataManager data;
+
+	public final SharedPreferences pref;
+
+	public final String uploadNotificationSettingKey;
 	
-	public static final SharedPreferences pref;
-	
-	public static final String uploadNotificationSettingKey;
-	
-	static {
-		AssetManager assets = AssetManager.getInstance();
-		pref = PreferenceManager.getDefaultSharedPreferences(assets.getMainContext());
-		Resources r = assets.getAppResources();
-		uploadNotificationSettingKey = r.getString(R.string.uploadNotificationSetting);
-	}
-	
+	public NotificationManager notificationManager;
+
 	/**
 	 * This is necessary because {@link ConnectivityManager#CONNECTIVITY_ACTION} doesn't just
 	 * refer to a change in the active connection, so this receiver may be triggered when
 	 * even there is a 3G/4G change. So we need fine grain control over when we trigger
 	 * a notification.
 	 */
-	public static boolean wifiWasConnected = Utils.isWifiConnected();
+	public boolean wifiWasConnected = Utils.isWifiConnected();
 
+	public WifiStateUploadableDataReceiver() {
+		uploadNotification = Notifications.getUploadNotifcation();
+		data = DataManager.getInstance();
+		
+		AssetManager assets = AssetManager.getInstance();
+		Context context = assets.getMainContext();
+		
+		pref = PreferenceManager.getDefaultSharedPreferences(context);
+		Resources r = assets.getAppResources();
+		uploadNotificationSettingKey = r.getString(R.string.uploadNotificationSetting);
+		notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+	}
+	
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		boolean uploadSettingSet = pref.getBoolean(uploadNotificationSettingKey, true);
+		boolean wifiIsConnected = Utils.isWifiConnected();
 		if(!isInitialStickyBroadcast() && uploadSettingSet) {
-			boolean wifiIsConnected = Utils.isWifiConnected();
 			if (!wifiWasConnected && wifiIsConnected) {
-				if (data.existsUploadableSessions() && !Main.isInForeground) {
-					NotificationManager notManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-					notManager.notify(0, uploadNotification);
-				}
+				if (data.existsUploadableSessions() && !Main.isInForeground)
+					notificationManager.notify(0, uploadNotification);
 
 				Log.i(LOG_TAG, "Wifi now connected");
 			} else if (wifiWasConnected && !wifiIsConnected)
 				Log.i(LOG_TAG, "Wifi now disconnected");
-			wifiWasConnected = wifiIsConnected;
 		}
+		wifiWasConnected = wifiIsConnected;
 	}
 
 }

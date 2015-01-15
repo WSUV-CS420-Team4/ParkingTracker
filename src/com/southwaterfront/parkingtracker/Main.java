@@ -36,7 +36,7 @@ import com.southwaterfront.parkingtracker.data.DataManager;
 import com.southwaterfront.parkingtracker.data.ParkingStall;
 import com.southwaterfront.parkingtracker.util.AsyncTask;
 import com.southwaterfront.parkingtracker.util.Utils;
-import com.southwaterfront.parkingtracker.util.WifiReceiver;
+import com.southwaterfront.parkingtracker.util.WifiStateUploadableDataReceiver;
 
 public class Main extends Activity {
 
@@ -56,7 +56,7 @@ public class Main extends Activity {
 	TextView textView;
 	EditText editText;
 	AlertDialog.Builder wifiAlert;
-	WifiReceiver wifiReceiver;
+	WifiStateUploadableDataReceiver wifiReceiver;
 	IntentFilter wifiFilter;
 	SharedPreferences prefs;
 	String wifiAlertPrefKey;
@@ -202,7 +202,7 @@ public class Main extends Activity {
 		Utils.resetCacheSize();
 		wifiFilter = new IntentFilter();
 		wifiFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-		this.wifiReceiver = new WifiReceiver();
+		this.wifiReceiver = new WifiStateUploadableDataReceiver();
 		this.registerReceiver(this.wifiReceiver, this.wifiFilter);
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		wifiAlertPrefKey = getResources().getString(R.string.wifiAlertSetting);
