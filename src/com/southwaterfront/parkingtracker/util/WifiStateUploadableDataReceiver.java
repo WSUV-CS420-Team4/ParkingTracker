@@ -32,17 +32,17 @@ import com.southwaterfront.parkingtracker.notification.Notifications;
  */
 public class WifiStateUploadableDataReceiver extends BroadcastReceiver {
 
-	public final String LOG_TAG = "WifiReceiver";
+	private final String LOG_TAG = "WifiReceiver";
 
-	public final Notification uploadNotification;
+	private final Notification uploadNotification;
 
-	public final DataManager data;
+	private final DataManager data;
 
-	public final SharedPreferences pref;
+	private final SharedPreferences pref;
 
-	public final String uploadNotificationSettingKey;
+	private final String uploadNotificationSettingKey;
 	
-	public NotificationManager notificationManager;
+	private final NotificationManager notificationManager;
 
 	/**
 	 * This is necessary because {@link ConnectivityManager#CONNECTIVITY_ACTION} doesn't just
@@ -50,7 +50,7 @@ public class WifiStateUploadableDataReceiver extends BroadcastReceiver {
 	 * even there is a 3G/4G change. So we need fine grain control over when we trigger
 	 * a notification.
 	 */
-	public boolean wifiWasConnected = Utils.isWifiConnected();
+	private boolean wifiWasConnected = Utils.isWifiConnected();
 
 	public WifiStateUploadableDataReceiver() {
 		uploadNotification = Notifications.getUploadNotifcation();

@@ -30,6 +30,10 @@ public final class Jsonify {
 	public static final String PLATE_ID = "plate";
 	public static final String TIME_ID = "time";
 	public static final String ATTR_ID = "attr";
+	
+	public static final String RESULTS_ARRAY_ID = "results";
+	public static final String CANDIDATE_ARRAY_ID = "candidates";
+	//public static final String PLATE_ID = "plate";
 
 	/**
 	 * Date time format string for {@link SimpleDateFormat}

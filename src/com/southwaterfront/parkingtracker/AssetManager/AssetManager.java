@@ -1,5 +1,6 @@
 package com.southwaterfront.parkingtracker.AssetManager;
 
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -30,11 +31,11 @@ import com.southwaterfront.parkingtracker.util.Utils;
 public class AssetManager {
 
 	private static AssetManager instance;
-	
+
 	private final Activity mainActivity;
-	
+
 	private final String LOG_TAG = "AssetManager";
-	
+
 	public static final int MAX_CACHE_SIZE_BYTES = 41943040;
 
 	private final Context mainContext;
@@ -43,24 +44,24 @@ public class AssetManager {
 
 	private final File cacheDir;
 
-	private final String englishDirectory = "eng";
-
-	private final String tessDataFolder = "tessdata";
-
 	private final File internalFileDir;
 
 	private final String externalStorageDirFileName = "ParkingTracker";
 
 	private final File externalFileDir;
 
-	private String englishLanguageDataDirectory;
-	
 	private final File imageCacheDir;
-	
+
 	private final String IMAGE_CACHE_DIR_NAME = "imageCache";
-	
+
 	private final String CACHE_DIR_NAME = "swfPt";
 	
+	private final String alprRuntimeFolder = "runtime_data";
+	
+	private final String configFileName = "openalpr.conf";
+	
+	private final File alprConfigFile;
+
 	/**
 	 * Make constructor private to disallow outside instantiation
 	 * of this class
@@ -68,7 +69,7 @@ public class AssetManager {
 	private AssetManager() {
 		throw new IllegalArgumentException("Cannot use empty constructor");
 	}
-	
+
 	/**
 	 * Private constructor called when {@link #init(Activity)} is called.
 	 * This sets all of the necessary fields in the singleton.
@@ -86,22 +87,26 @@ public class AssetManager {
 		this.externalFileDir = new File(Environment.getExternalStorageDirectory(), externalStorageDirFileName);
 		if (!this.externalFileDir.exists())
 			this.externalFileDir.mkdir();
-		this.englishLanguageDataDirectory = null;
 		this.imageCacheDir = new File(this.cacheDir, this.IMAGE_CACHE_DIR_NAME);
 		if (!this.imageCacheDir.exists())
 			this.imageCacheDir.mkdir();
+		this.alprConfigFile = new File(this.internalFileDir + File.separator + this.alprRuntimeFolder + File.separator + this.configFileName);
 	}
-	
+
 	public File getInternalFileDir() {
 		return this.internalFileDir;
 	}
-	
+
 	public File getCacheDir() {
 		return this.cacheDir;
 	}
-	
+
 	public File getExternalFileDir() {
 		return this.externalFileDir;
+	}
+
+	public File getAlprConfigFile() {
+		return this.alprConfigFile;
 	}
 	
 	/**
@@ -116,7 +121,7 @@ public class AssetManager {
 		if (instance == null)
 			instance = new AssetManager(main);
 	}
-	
+
 	/**
 	 * Getter method for the singleton instance of the {@link AssetManager}
 	 * 
@@ -133,48 +138,13 @@ public class AssetManager {
 	 * of this app
 	 */
 	public void assetSanityCheck() {
-		tessdataSanity();
+		openAlprSanity();
 	}
-
-	private void tessdataSanity() {
-		File engFolder = new File(internalFileDir, englishDirectory);
-		if (!engFolder.exists()) {
-			Log.i(LOG_TAG, "English language definition folder does not exist");
-			engFolder.mkdir();
-		}
-		File tessdata = new File(engFolder, tessDataFolder);
-		if (!tessdata.exists()) {
-			Log.i(LOG_TAG, "Tessdata folder does not exist");
-			tessdata.mkdir();
-			moveTessdatatoInternalStorage(tessdata);
-		}
-		englishLanguageDataDirectory = engFolder.getAbsolutePath();
-		Log.i(LOG_TAG, "Directory of tessdata directory for TessBaseAPI is " + englishLanguageDataDirectory);
-	}
-
-	private void moveTessdatatoInternalStorage(File tessdata) {
-		String[] files = null;
-		try {
-			files = androidAssetManager.list(tessDataFolder);
-		} catch (IOException e) {
-			Log.e(LOG_TAG, "Failed to get asset file list.", e);
-		}
-		for(String filename : files) {
-			InputStream in = null;
-			OutputStream out = null;
-			try {
-				in = androidAssetManager.open(tessDataFolder + File.separator + filename);
-				File outFile = new File(tessdata, filename);
-				if (!outFile.exists())
-					outFile.createNewFile();
-				out = new FileOutputStream(outFile);
-				copyFile(in, out);
-				in.close();
-				out.close();
-			} catch(IOException e) {
-				Log.e(LOG_TAG, "Failed to copy asset file: " + filename, e);
-			}       
-		}      
+	
+	private void openAlprSanity() {
+		String runtimeDataDir = internalFileDir.getAbsolutePath() + File.separatorChar + this.alprRuntimeFolder;
+		copyAlprAssetFolder(this.alprRuntimeFolder,
+				runtimeDataDir);
 	}
 
 	private void copyFile(InputStream in, OutputStream out) throws IOException {
@@ -185,17 +155,6 @@ public class AssetManager {
 		out.flush();
 	}
 
-	/**
-	 * Getter for directory needed for OCR engine
-	 * 
-	 * @return The directory of the english language data
-	 */
-	public String getEnglishLanguageDataDir() {
-		if (englishLanguageDataDirectory == null)
-			throw new IllegalStateException("The directory has not been initialized");
-		return englishLanguageDataDirectory;
-	}
-	
 	/**
 	 * Getter for main activity context
 	 * 
@@ -212,7 +171,7 @@ public class AssetManager {
 	public File getImageCacheDir() {
 		return this.imageCacheDir;
 	}
-	
+
 	/**
 	 * Clears the image cache dir
 	 */
@@ -220,7 +179,7 @@ public class AssetManager {
 		for (File f : this.imageCacheDir.listFiles())
 			Utils.asyncFileDelete(f);
 	}
-	
+
 	/**
 	 * Getter for main activity of app instance
 	 * 
@@ -229,7 +188,7 @@ public class AssetManager {
 	public Activity getMainActivity() {
 		return this.mainActivity;
 	}
-	
+
 	/**
 	 * Getter for main resources
 	 * 
@@ -238,5 +197,48 @@ public class AssetManager {
 	public Resources getAppResources() {
 		return this.mainContext.getResources();
 	}
-	
+
+	private boolean copyAlprAssetFolder(String fromAssetPath, String toPath) {
+		try {
+			String[] files = androidAssetManager.list(fromAssetPath);
+			new File(toPath).mkdirs();
+			boolean res = true;
+			for (String file : files)
+				if (file.contains("."))
+					res &= copyAsset(fromAssetPath + "/" + file,
+							toPath + "/" + file);
+				else
+					res &= copyAlprAssetFolder(fromAssetPath + "/" + file,
+							toPath + "/" + file);
+			return res;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	private boolean copyAsset(String fromAssetPath, String toPath) {
+		InputStream in = null;
+		OutputStream out = null;
+		try {
+			in = androidAssetManager.open(fromAssetPath);
+			File f = new File(toPath);
+			if (!f.exists())
+					f.createNewFile();
+			else
+				return true;
+			out = new FileOutputStream(toPath);
+			copyFile(in, out);
+			in.close();
+			in = null;
+			out.flush();
+			out.close();
+			out = null;
+			return true;
+		} catch(Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
 }

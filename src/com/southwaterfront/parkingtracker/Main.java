@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import OcrEngine.OcrCallBack;
-import OcrEngine.OcrEngine;
+import alpr.AlprEngine;
+import alpr.AlprCallBack;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -52,7 +52,7 @@ public class Main extends Activity {
 	private AssetManager assets;
 	private DataManager data;
 	private BlockFace face;
-	private OcrEngine ocrEngine;
+	private AlprEngine ocrEngine;
 	TextView textView;
 	EditText editText;
 	AlertDialog.Builder wifiAlert;
@@ -60,6 +60,7 @@ public class Main extends Activity {
 	IntentFilter wifiFilter;
 	SharedPreferences prefs;
 	String wifiAlertPrefKey;
+	File photoFile;
 
 	private File createImageFile() throws IOException {
 		// Create an image file name
@@ -85,7 +86,7 @@ public class Main extends Activity {
 		// Ensure that there's a camera activity to handle the intent
 		if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
 			// Create the File where the photo should go
-			File photoFile = null;
+			photoFile = null;
 			try {
 				photoFile = createImageFile();
 			} catch (IOException ex) {
@@ -140,10 +141,10 @@ public class Main extends Activity {
 		imageView.setImageBitmap(bitmap);
 
 		textView.setText("Waiting for OcrEngine");
-		ocrEngine.runOcr(bitmap, null, new OcrCallBack() {
+		ocrEngine.runOcr(photoFile, new AlprCallBack() {
 
 			@Override
-			public void call(final String result) {
+			public void call(final String[] result) {
 				Main.this.runOnUiThread(new Runnable() {
 
 					@Override
@@ -159,11 +160,18 @@ public class Main extends Activity {
 
 	int stall = 0;
 
-	private void setOcrResult(String result) {
-		result = result.substring(0, result.length() > 30 ? 30 : result.length());
+	private void setOcrResult(String[] result) {
+		String viewString = "";
+		if (result != null) {
+			int i = 0;
+			for (; i < result.length - 1; i++)
+				viewString += result[i] + "\n";
+			viewString += result[i];
+		}
 		textView.setText("OCR Demo App");
-		editText.setText(result);
-		face.setStall(new ParkingStall(result, new Date(System.currentTimeMillis()), null), stall++);
+		editText.setText(viewString);
+		if (result != null)
+			face.setStall(new ParkingStall(result[0], new Date(System.currentTimeMillis()), null), stall++);
 	}
 	// -------------------------------------------------------------------------------------------------
 
@@ -198,7 +206,7 @@ public class Main extends Activity {
 		assets = AssetManager.getInstance();
 		assets.assetSanityCheck();
 		data = DataManager.getInstance();
-		ocrEngine = OcrEngine.getInstance();
+		ocrEngine = AlprEngine.getInstance();
 		Utils.resetCacheSize();
 		wifiFilter = new IntentFilter();
 		wifiFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
@@ -256,7 +264,7 @@ public class Main extends Activity {
 	private boolean wifiAlertEnabled() {
 		return prefs.getBoolean(wifiAlertPrefKey, true);
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();

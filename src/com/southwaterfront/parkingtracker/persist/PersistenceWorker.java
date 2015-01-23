@@ -6,10 +6,10 @@ import java.util.concurrent.BlockingQueue;
 
 import javax.json.JsonObject;
 
+import android.util.Log;
+
 import com.southwaterfront.parkingtracker.util.Result;
 import com.southwaterfront.parkingtracker.util.Utils;
-
-import android.util.Log;
 
 /**
  * This is a worker that deals with data on disk.
