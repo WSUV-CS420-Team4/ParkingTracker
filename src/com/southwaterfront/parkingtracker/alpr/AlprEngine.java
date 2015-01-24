@@ -1,4 +1,4 @@
-package alpr;
+package com.southwaterfront.parkingtracker.alpr;
 
 import java.io.Closeable;
 import java.io.File;
@@ -41,7 +41,7 @@ public class AlprEngine implements Closeable {
 	
 	private final String configFilePath;
 	
-	private int numResults;
+	private volatile int numResults;
 
 	private static class TaskWrapper {
 		public final String imagePath;
@@ -77,7 +77,7 @@ public class AlprEngine implements Closeable {
 					if (w != null) {
 						String path = w.imagePath;
 						AlprCallBack callBack = w.callBack;
-						String alprResult = this.alpr.recognizeWithCountryRegionNConfig("us", "or", path, configFilePath, numResults);
+						String alprResult = this.alpr.recognizeWithCountryRegionNConfig("us", "", path, configFilePath, numResults);
 						String[] result = AlprParser.parseAlprResult(alprResult);
 						if (callBack != null)
 							callBack.call(result);

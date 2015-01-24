@@ -8,7 +8,8 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
-import alpr.AlprEngine;
+import com.southwaterfront.parkingtracker.alpr.AlprEngine;
+
 import android.util.Log;
 
 /**

@@ -1,4 +1,4 @@
-package alpr;
+package com.southwaterfront.parkingtracker.alpr;
 
 /**
  * Callback interface for the {@link AlprEngine}

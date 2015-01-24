@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import alpr.AlprEngine;
-import alpr.AlprCallBack;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -30,6 +28,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
+import com.southwaterfront.parkingtracker.alpr.AlprCallBack;
+import com.southwaterfront.parkingtracker.alpr.AlprEngine;
 import com.southwaterfront.parkingtracker.data.BlockFace;
 import com.southwaterfront.parkingtracker.data.CallBack;
 import com.southwaterfront.parkingtracker.data.DataManager;
