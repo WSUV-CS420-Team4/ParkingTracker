@@ -30,7 +30,7 @@ public class AlprParser {
 		try {
 			obj = Jsonify.createJsonObjectFromStream(in);
 		} catch (Exception e) {
-			Log.e(LOG_TAG, "Parsing json object failed", e);
+			Log.e(LOG_TAG, "Parsing json object failed: " + message, e);
 			return null;
 		} finally {
 			try {

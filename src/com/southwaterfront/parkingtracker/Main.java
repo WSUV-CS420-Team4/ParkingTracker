@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -194,14 +195,7 @@ public class Main extends Activity {
 		isInForeground = false;
 	}
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-
-		/**
-		 * Always leave the next lines of code in onCreate
-		 */
+	private void onCreateAppInit() {
 		AssetManager.init(this);
 		assets = AssetManager.getInstance();
 		assets.assetSanityCheck();
@@ -214,6 +208,19 @@ public class Main extends Activity {
 		this.registerReceiver(this.wifiReceiver, this.wifiFilter);
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		wifiAlertPrefKey = getResources().getString(R.string.wifiAlertSetting);
+		
+		Log.i(LOG_TAG, "App initialized successfully");
+	}
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+
+		/**
+		 * Leave this method call
+		 */
+		onCreateAppInit();
 
 
 		face = BlockFace.emptyPaddedBlockFace("1", "C", 14);
@@ -268,6 +275,10 @@ public class Main extends Activity {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		onDestroyAppClose();
+	}
+	
+	private void onDestroyAppClose() {
 		this.unregisterReceiver(this.wifiReceiver);
 		data.close();
 		ocrEngine.close();

@@ -55,11 +55,11 @@ public class AssetManager {
 	private final String IMAGE_CACHE_DIR_NAME = "imageCache";
 
 	private final String CACHE_DIR_NAME = "swfPt";
-	
+
 	private final String alprRuntimeFolder = "runtime_data";
-	
+
 	private final String configFileName = "openalpr.conf";
-	
+
 	private final File alprConfigFile;
 
 	/**
@@ -108,7 +108,7 @@ public class AssetManager {
 	public File getAlprConfigFile() {
 		return this.alprConfigFile;
 	}
-	
+
 	/**
 	 * Initializes the AssetManager with the {@link Activity}
 	 * that is the main activity of the app
@@ -140,11 +140,12 @@ public class AssetManager {
 	public void assetSanityCheck() {
 		openAlprSanity();
 	}
-	
+
 	private void openAlprSanity() {
 		String runtimeDataDir = internalFileDir.getAbsolutePath() + File.separatorChar + this.alprRuntimeFolder;
-		copyAlprAssetFolder(this.alprRuntimeFolder,
-				runtimeDataDir);
+		if (!new File(runtimeDataDir).exists())
+			copyAlprAssetFolder(this.alprRuntimeFolder,
+					runtimeDataDir);
 	}
 
 	private void copyFile(InputStream in, OutputStream out) throws IOException {
@@ -205,14 +206,14 @@ public class AssetManager {
 			boolean res = true;
 			for (String file : files)
 				if (file.contains("."))
-					res &= copyAsset(fromAssetPath + "/" + file,
-							toPath + "/" + file);
+					res &= copyAsset(fromAssetPath + File.separator + file,
+							toPath + File.separator + file);
 				else
-					res &= copyAlprAssetFolder(fromAssetPath + "/" + file,
-							toPath + "/" + file);
+					res &= copyAlprAssetFolder(fromAssetPath + File.separator + file,
+							toPath + File.separator + file);
 			return res;
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.e(LOG_TAG, e.getMessage(), e);
 			return false;
 		}
 	}
@@ -221,12 +222,12 @@ public class AssetManager {
 		InputStream in = null;
 		OutputStream out = null;
 		try {
-			in = androidAssetManager.open(fromAssetPath);
 			File f = new File(toPath);
 			if (!f.exists())
-					f.createNewFile();
+				f.createNewFile();
 			else
 				return true;
+			in = androidAssetManager.open(fromAssetPath);
 			out = new FileOutputStream(toPath);
 			copyFile(in, out);
 			in.close();
@@ -236,7 +237,7 @@ public class AssetManager {
 			out = null;
 			return true;
 		} catch(Exception e) {
-			e.printStackTrace();
+			Log.e(LOG_TAG, e.getMessage(), e);
 			return false;
 		}
 	}
