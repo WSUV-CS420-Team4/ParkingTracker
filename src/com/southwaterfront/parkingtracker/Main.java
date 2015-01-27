@@ -10,14 +10,12 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
@@ -35,6 +33,7 @@ import com.southwaterfront.parkingtracker.data.BlockFace;
 import com.southwaterfront.parkingtracker.data.CallBack;
 import com.southwaterfront.parkingtracker.data.DataManager;
 import com.southwaterfront.parkingtracker.data.ParkingStall;
+import com.southwaterfront.parkingtracker.prefs.ParkingTrackerPreferences;
 import com.southwaterfront.parkingtracker.util.AsyncTask;
 import com.southwaterfront.parkingtracker.util.Utils;
 import com.southwaterfront.parkingtracker.util.WifiStateUploadableDataReceiver;
@@ -59,8 +58,6 @@ public class Main extends Activity {
 	AlertDialog.Builder wifiAlert;
 	WifiStateUploadableDataReceiver wifiReceiver;
 	IntentFilter wifiFilter;
-	SharedPreferences prefs;
-	String wifiAlertPrefKey;
 	File photoFile;
 
 	private File createImageFile() throws IOException {
@@ -206,8 +203,6 @@ public class Main extends Activity {
 		wifiFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 		this.wifiReceiver = new WifiStateUploadableDataReceiver();
 		this.registerReceiver(this.wifiReceiver, this.wifiFilter);
-		prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		wifiAlertPrefKey = getResources().getString(R.string.wifiAlertSetting);
 		
 		Log.i(LOG_TAG, "App initialized successfully");
 	}
@@ -239,7 +234,7 @@ public class Main extends Activity {
 		final Button button2 = (Button) findViewById(R.id.button2);
 		button2.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				if (Utils.isWifiConnected() || !wifiAlertEnabled())
+				if (Utils.isWifiConnected() || !ParkingTrackerPreferences.getNonWifiConnectionNotificationSetting())
 					upload();
 				else
 					wifiAlert.show();
@@ -266,10 +261,6 @@ public class Main extends Activity {
 		wifiAlert.setMessage("You are not internet connected through wifi. Are you sure you want to continue?").setPositiveButton("Yes", dialogClickListener)
 		.setNegativeButton("No", dialogClickListener);
 
-	}
-
-	private boolean wifiAlertEnabled() {
-		return prefs.getBoolean(wifiAlertPrefKey, true);
 	}
 
 	@Override
