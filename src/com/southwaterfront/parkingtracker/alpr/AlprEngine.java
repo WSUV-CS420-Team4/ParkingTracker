@@ -55,6 +55,7 @@ public class AlprEngine implements Closeable {
 
 	private class AlprWorker implements Runnable {
 		private static final String LOG_TAG = "AlprWorker";
+		//private static final String resultPlateNotFound = "License Plate not recognized";
 		private final Alpr alpr;
 		private final BlockingQueue<TaskWrapper> images;
 
@@ -78,7 +79,11 @@ public class AlprEngine implements Closeable {
 						String path = w.imagePath;
 						AlprCallBack callBack = w.callBack;
 						String alprResult = this.alpr.recognizeWithCountryRegionNConfig("us", "", path, configFilePath, numResults);
-						String[] result = AlprParser.parseAlprResult(alprResult);
+						String[] result;
+						if (alprResult == null || alprResult.equals("")) // No license plate found in pic
+							result = null;
+						else
+							result = AlprParser.parseAlprResult(alprResult);
 						if (callBack != null)
 							callBack.call(result);
 					}
@@ -132,11 +137,6 @@ public class AlprEngine implements Closeable {
 		if (results > 0)
 			this.numResults = results;
 	}
-	
-	/*
-	private void configTess() {
-		this.tess.setVariable(TessBaseAPI.VAR_CHAR_WHITELIST, whiteListChars);
-	}*/
 
 	/**
 	 * Runs the {@link TessBaseAPI} engine to produce a String
