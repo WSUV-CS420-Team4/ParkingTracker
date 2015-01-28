@@ -1,9 +1,30 @@
-ParkingTracker
-==============
+![South Waterfront](http://www.southwaterfront.com/images/swcr-logo.png)
 
-An android application for tracking parking usage within a neighborhood.
+# Parking Tracker Web Application
 
+[Android](https://github.com/WSUV-CS420-Team4/ParkingTracker)
 
-To build you must use the https://github.com/rmtheis/tess-two TessTwo library. Follow their instructions but make sure you have Android NDK r9d and not r10b. Making sure ndk-build, android, and ant are all on the PATH enviroment variable will help get everything installed. After you build TessTwo, set it as a library in eclipse and then link it to your ParkingTracker app as a library.
+[Web API](https://github.com/WSUV-CS420-Team4/ParkingTrackerApi)
 
-You will be required to have the Android-14 sdk as well as the google play services library.
+[Docs](https://github.com/WSUV-CS420-Team4/ParkingTrackerDocs)
+
+ParkingTracker is an Android application designed to automate parking tracking in a neighborhood. It is specifically built for South WaterFront Community Relations. The app is able to read license plates from pictures, map that to the parking slot and appropriately send the data at the user's discretion.
+
+Sponsor: [South Waterfront](http://www.southwaterfront.com/)
+
+## Authors
+
+- Vito
+- Joel
+- Bob
+- Jason
+
+## Current Status
+
+The automatic license plate reader engine is up and running, and the UI and data collection are being developed.
+
+## Build/Install
+
+- Clone the repo
+- Create a project.properties file in project folder, include a reference to the Google Play Services library
+and set an API target, preferably 14 or up
