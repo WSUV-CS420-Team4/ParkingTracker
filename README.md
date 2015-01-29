@@ -2,7 +2,7 @@
 
 # Parking Tracker Web Application
 
-[Android](https://github.com/WSUV-CS420-Team4/ParkingTracker)
+[Web](https://github.com/WSUV-CS420-Team4/ParkingTrackerWeb)
 
 [Web API](https://github.com/WSUV-CS420-Team4/ParkingTrackerApi)
 
