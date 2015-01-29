@@ -28,3 +28,15 @@ The automatic license plate reader engine is up and running, and the UI and data
 - Clone the repo
 - Create a project.properties file in project folder, include a reference to the Google Play Services library
 and set an API target, preferably 14 or up
+
+## Known Bugs / Caveats
+
+- ...
+
+## TODO
+
+- Complete Known Bugs / Caveats List
+- App Settings
+- Web App Login
+- Special Case Parking Exceptions
+- Interface V2
