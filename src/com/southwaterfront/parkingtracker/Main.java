@@ -3,7 +3,9 @@ package com.southwaterfront.parkingtracker;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -18,12 +20,19 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
@@ -37,6 +46,8 @@ import com.southwaterfront.parkingtracker.prefs.ParkingTrackerPreferences;
 import com.southwaterfront.parkingtracker.util.AsyncTask;
 import com.southwaterfront.parkingtracker.util.Utils;
 import com.southwaterfront.parkingtracker.util.WifiStateUploadableDataReceiver;
+
+import org.w3c.dom.Text;
 
 public class Main extends Activity {
 
@@ -59,6 +70,15 @@ public class Main extends Activity {
 	WifiStateUploadableDataReceiver wifiReceiver;
 	IntentFilter wifiFilter;
 	File photoFile;
+
+    List<String> licensePlates = new ArrayList<String>();
+    ArrayAdapter<String> arrayAdapter;
+
+    TextView plateNo;
+    View popupLayout;
+    PopupWindow popupWindow;
+    ListView listView;
+    Button okay;
 
 	private File createImageFile() throws IOException {
 		// Create an image file name
@@ -160,16 +180,31 @@ public class Main extends Activity {
 
 	private void setOcrResult(String[] result) {
 		String viewString = "";
+        licensePlates.clear();
 		if (result != null) {
 			int i = 0;
 			for (; i < result.length - 1; i++)
 				viewString += result[i] + "\n";
 			viewString += result[i];
+            for (int j = 0; j < result.length; j++) {
+                licensePlates.add( result[j] );
+            }
 		}
 		textView.setText("OCR Demo App");
 		editText.setText(viewString);
-		if (result != null)
-			face.setStall(new ParkingStall(result[0], new Date(System.currentTimeMillis()), null), stall++);
+		if (result != null) {
+            face.setStall(new ParkingStall(result[0], new Date(System.currentTimeMillis()), null), stall++);
+
+            /*String tempt[] = new String[licensePlates.size()];
+            tempt = licensePlates.toArray(tempt);*/
+            arrayAdapter = new ArrayAdapter<String>(Main.this, android.R.layout.simple_list_item_1, licensePlates );
+            arrayAdapter.setDropDownViewResource(R.layout.popup);
+
+            Log.i("List", "licensePlates: " + licensePlates.size());
+            listView.setAdapter(arrayAdapter);
+
+            popupWindow.showAtLocation(popupLayout, Gravity.CENTER, 0, 0);
+        }
 	}
 	// -------------------------------------------------------------------------------------------------
 
@@ -206,7 +241,39 @@ public class Main extends Activity {
 		
 		Log.i(LOG_TAG, "App initialized successfully");
 	}
-	
+
+    private void popupInit() {
+
+        LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(this.LAYOUT_INFLATER_SERVICE);
+        popupLayout = layoutInflater.inflate(R.layout.popup, null);
+
+        popupWindow = new PopupWindow(popupLayout, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        popupWindow.setContentView(popupLayout);
+        popupWindow.setFocusable(true);
+
+        listView = (ListView) popupLayout.findViewById(R.id.listView);
+
+        listView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.i("ListView", "You clicked Item: " + id + " at position:" + position);
+                editText.setText( (String) parent.getItemAtPosition(position) );
+                plateNo.setText( (String) parent.getItemAtPosition(position) );
+            }
+        });
+
+        okay = (Button) popupLayout.findViewById(R.id.okay);
+
+        okay.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                popupWindow.dismiss();
+            }
+        });
+
+        plateNo = (TextView) popupLayout.findViewById(R.id.textView);
+
+    }
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -216,6 +283,8 @@ public class Main extends Activity {
 		 * Leave this method call
 		 */
 		onCreateAppInit();
+
+        popupInit();
 
 
 		face = BlockFace.emptyPaddedBlockFace("1", "C", 14);
@@ -234,8 +303,9 @@ public class Main extends Activity {
 		final Button button2 = (Button) findViewById(R.id.button2);
 		button2.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				if (Utils.isWifiConnected() || !ParkingTrackerPreferences.getNonWifiConnectionNotificationSetting())
-					upload();
+                if (Utils.isWifiConnected() || !ParkingTrackerPreferences.getNonWifiConnectionNotificationSetting()) {
+                    upload();
+                }
 				else
 					wifiAlert.show();
 			}
