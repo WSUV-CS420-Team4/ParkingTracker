@@ -34,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
 import com.southwaterfront.parkingtracker.alpr.AlprCallBack;
@@ -204,6 +205,8 @@ public class Main extends Activity {
             listView.setAdapter(arrayAdapter);
 
             popupWindow.showAtLocation(popupLayout, Gravity.CENTER, 0, 0);
+
+            Toast.makeText(Main.this, licensePlates.size() + " Results", Toast.LENGTH_LONG).show();
         }
 	}
 	// -------------------------------------------------------------------------------------------------
@@ -258,7 +261,7 @@ public class Main extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.i("ListView", "You clicked Item: " + id + " at position:" + position);
                 editText.setText( (String) parent.getItemAtPosition(position) );
-                plateNo.setText( (String) parent.getItemAtPosition(position) );
+                plateNo.setText((String) parent.getItemAtPosition(position));
             }
         });
 
