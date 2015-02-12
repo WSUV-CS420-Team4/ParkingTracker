@@ -26,6 +26,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -65,8 +66,7 @@ public class Main extends Activity {
 	private DataManager data;
 	private BlockFace face;
 	private AlprEngine ocrEngine;
-	TextView textView;
-	EditText editText;
+	TextView textViewNotification;
 	AlertDialog.Builder wifiAlert;
 	WifiStateUploadableDataReceiver wifiReceiver;
 	IntentFilter wifiFilter;
@@ -113,8 +113,7 @@ public class Main extends Activity {
 			}
 			// Continue only if the File was successfully created
 			if (photoFile != null) {
-				takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-						Uri.fromFile(photoFile));
+				takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
 				startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
 			}
 		}
@@ -129,7 +128,8 @@ public class Main extends Activity {
 	}
 
 	private void setPic() {
-		final ImageView imageView = (ImageView)  findViewById(R.id.imageView1);
+        // No longer need to set pic
+		/*final ImageView imageView = (ImageView)  findViewById(R.id.imageView1);
 
 		// Get the dimensions of the View
 		int targetW = imageView.getWidth();
@@ -157,9 +157,9 @@ public class Main extends Activity {
 		bmOptions.inPurgeable = true;
 
 		Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-		imageView.setImageBitmap(bitmap);
+		imageView.setImageBitmap(bitmap);*/
 
-		textView.setText("Waiting for OcrEngine");
+		textViewNotification.setText("Waiting for OcrEngine");
 		ocrEngine.runOcr(photoFile, new AlprCallBack() {
 
 			@Override
@@ -169,6 +169,7 @@ public class Main extends Activity {
 					@Override
 					public void run() {
 						setOcrResult(result);
+                        photoFile.delete();
 					}
 
 				});
@@ -183,17 +184,17 @@ public class Main extends Activity {
 		String viewString = "";
         licensePlates.clear();
 		if (result != null) {
-			int i = 0;
+			/*int i = 0;
 			for (; i < result.length - 1; i++)
 				viewString += result[i] + "\n";
-			viewString += result[i];
+			viewString += result[i];*/
             for (int j = 0; j < result.length; j++) {
                 licensePlates.add( result[j] );
             }
 		}
-		textView.setText("OCR Demo App");
-		editText.setText(viewString);
+		textViewNotification.setText(""); // "OCR Demo App"
 		if (result != null) {
+            // TODO Change this so instead of best estimated result it is what the user clicks on
             face.setStall(new ParkingStall(result[0], new Date(System.currentTimeMillis()), null), stall++);
 
             /*String tempt[] = new String[licensePlates.size()];
@@ -214,8 +215,7 @@ public class Main extends Activity {
 	@Override
 	public void onStart() {
 		super.onStart();
-		textView = (TextView) findViewById(R.id.textView2);
-		editText = (EditText) findViewById(R.id.editText1);
+		textViewNotification = (TextView) findViewById(R.id.textViewMainNotification);
 	}
 
 	@Override
@@ -260,7 +260,6 @@ public class Main extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.i("ListView", "You clicked Item: " + id + " at position:" + position);
-                editText.setText( (String) parent.getItemAtPosition(position) );
                 plateNo.setText((String) parent.getItemAtPosition(position));
             }
         });
@@ -280,11 +279,17 @@ public class Main extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		//setContentView(R.layout.activity_main);
 
-		/**
-		 * Leave this method call
-		 */
+        //Remove title bar
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        //set content view AFTER ABOVE sequence (to avoid crash)
+        this.setContentView(R.layout.activity_main); // Probably could just remove title bar before first set contentView
+
+        /**
+         * Leave this method call
+         */
 		onCreateAppInit();
 
         popupInit();
@@ -293,7 +298,7 @@ public class Main extends Activity {
 		face = BlockFace.emptyPaddedBlockFace("1", "C", 14);
 
 		// Temp Button init location
-		final Button button = (Button) findViewById(R.id.button1);
+		final Button button = (Button) findViewById(R.id.buttonMainPhoto);
 		button.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
@@ -303,7 +308,7 @@ public class Main extends Activity {
 
 
 		// Temp Button init location
-		final Button button2 = (Button) findViewById(R.id.button2);
+		final Button button2 = (Button) findViewById(R.id.buttonMainSync);
 		button2.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
                 if (Utils.isWifiConnected() || !ParkingTrackerPreferences.getNonWifiConnectionNotificationSetting()) {
@@ -359,7 +364,7 @@ public class Main extends Activity {
 
 					@Override
 					public void run() {
-						TextView view = (TextView) findViewById(R.id.textView2);
+						TextView view = (TextView) findViewById(R.id.textViewMainNotification);
 						view.setText("Result was a " + task.getResult());
 					}
 
