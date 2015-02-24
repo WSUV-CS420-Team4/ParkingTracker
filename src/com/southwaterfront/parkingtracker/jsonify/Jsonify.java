@@ -24,12 +24,12 @@ public final class Jsonify {
 
 	public static final char STRING_DELIMITER = '|';
 	public static final String BLOCKFACES_ARRAY_ID = "blockfaces";
-	public static final String BLOCK_ID = "block";
-	public static final String FACE_ID = "face";
-	public static final String STALLS_ARRAY_ID = "stalls";
-	public static final String PLATE_ID = "plate";
-	public static final String TIME_ID = "time";
-	public static final String ATTR_ID = "attr";
+	public static final String BLOCK_ID = "Block";
+	public static final String FACE_ID = "Face";
+	public static final String STALLS_ARRAY_ID = "Stalls";
+	public static final String PLATE_ID = "Plate";
+	public static final String TIME_ID = "Time";
+	public static final String ATTR_ID = "Attr";
 	public static final String NUM_STALLS_ID = "numStalls";
 	public static final String DATE_ID = "epochTime";
 	
