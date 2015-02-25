@@ -2,10 +2,13 @@ package com.southwaterfront.parkingtracker.AssetManager;
 
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Set;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,6 +16,8 @@ import android.content.res.Resources;
 import android.os.Environment;
 import android.util.Log;
 
+import com.southwaterfront.parkingtracker.data.BlockFace;
+import com.southwaterfront.parkingtracker.jsonify.BlockParser;
 import com.southwaterfront.parkingtracker.util.Utils;
 
 /**
@@ -65,6 +70,8 @@ public class AssetManager {
 	private final String streetModelFileName = "streetModel.json";
 
 	private final File streetModelJsonFile;
+	
+	private Set<BlockFace> streetModel;
 
 	/**
 	 * Make constructor private to disallow outside instantiation
@@ -154,8 +161,29 @@ public class AssetManager {
 					runtimeDataDir);
 		if (!this.streetModelJsonFile.exists())
 			copyAsset(this.streetModelFileName, this.streetModelJsonFile.getAbsolutePath());
+		
+		FileInputStream in = null;
+		try {
+			in = new FileInputStream(this.streetModelJsonFile);
+		} catch (FileNotFoundException e) {
+			throw new IllegalStateException("Street model file not found"); // Impossible ??
+		}
+		
+		this.streetModel = BlockParser.parseBlock(in);
+		if (this.streetModel == null)
+			// TODO: Do something drastic
+			throw new IllegalStateException("Ded");
 	}
 
+	/**
+	 * Getter for street model
+	 * 
+	 * @return The model as defined as a set of empty block faces
+	 */
+	public Set<BlockFace> getStreetModel() {
+		return this.streetModel;
+	}
+	
 	private void copyFile(InputStream in, OutputStream out) throws IOException {
 		byte[] buffer = new byte[4096];
 		int read;
