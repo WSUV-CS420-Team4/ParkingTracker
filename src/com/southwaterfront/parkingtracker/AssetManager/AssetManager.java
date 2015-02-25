@@ -62,6 +62,10 @@ public class AssetManager {
 
 	private final File alprConfigFile;
 
+	private final String streetModelFileName = "streetModel.json";
+
+	private final File streetModelJsonFile;
+
 	/**
 	 * Make constructor private to disallow outside instantiation
 	 * of this class
@@ -91,6 +95,8 @@ public class AssetManager {
 		if (!this.imageCacheDir.exists())
 			this.imageCacheDir.mkdir();
 		this.alprConfigFile = new File(this.internalFileDir + File.separator + this.alprRuntimeFolder + File.separator + this.configFileName);
+
+		this.streetModelJsonFile = new File(this.internalFileDir, this.streetModelFileName);
 	}
 
 	public File getInternalFileDir() {
@@ -146,6 +152,8 @@ public class AssetManager {
 		if (!new File(runtimeDataDir).exists())
 			copyAlprAssetFolder(this.alprRuntimeFolder,
 					runtimeDataDir);
+		if (!this.streetModelJsonFile.exists())
+			copyAsset(this.streetModelFileName, this.streetModelJsonFile.getAbsolutePath());
 	}
 
 	private void copyFile(InputStream in, OutputStream out) throws IOException {
@@ -171,6 +179,15 @@ public class AssetManager {
 	 */
 	public File getImageCacheDir() {
 		return this.imageCacheDir;
+	}
+	
+	/**
+	 * Getter for the street model as defined in JSON
+	 * 
+	 * @return File reference
+	 */
+	public File getSteetModelFile() {
+		return this.streetModelJsonFile;
 	}
 
 	/**
