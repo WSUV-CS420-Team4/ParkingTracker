@@ -61,7 +61,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_weight="1"
             android:textSize="40dp"
-            android:background="@drawable/buttonLight"
+            android:background="@drawable/button_light"
             android:textColor="#ffffff" />
 
         <LinearLayout
@@ -78,7 +78,7 @@
                 android:text="Map"
                 android:id="@+id/buttonMainMap"
                 android:layout_weight="1"
-                android:background="@drawable/buttonDark"
+                android:background="@drawable/button_dark"
                 android:textColor="#ffffff" />
 
             <Button
@@ -88,7 +88,7 @@
                 android:text="Sync"
                 android:id="@+id/buttonMainSync"
                 android:layout_weight="1"
-                android:background="@drawable/buttonDark"
+                android:background="@drawable/button_dark"
                 android:textColor="#ffffff" />
         </LinearLayout>
 
@@ -106,7 +106,7 @@
                 android:text="View Data"
                 android:id="@+id/buttonMainData"
                 android:layout_weight="1"
-                android:background="@drawable/buttonDark"
+                android:background="@drawable/button_dark"
                 android:textColor="#ffffff" />
 
             <Button
@@ -116,7 +116,7 @@
                 android:text="Options"
                 android:id="@+id/buttonMainOptions"
                 android:layout_weight="1"
-                android:background="@drawable/buttonDark"
+                android:background="@drawable/button_dark"
                 android:textColor="#ffffff" />
         </LinearLayout>
     </LinearLayout>
