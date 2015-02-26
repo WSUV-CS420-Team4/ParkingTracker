@@ -8,7 +8,8 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.phototest.MainActivity"
-    android:gravity="top|center">
+    android:gravity="top|center"
+    android:background="@drawable/background">
 
     <LinearLayout
         android:orientation="horizontal"
@@ -30,7 +31,8 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="South Waterfront Community Relations"
             android:id="@+id/textViewMainTitle"
-            android:paddingLeft="10dp" />
+            android:paddingLeft="10dp"
+            android:textColor="#6B6C70" />
     </LinearLayout>
 
     <FrameLayout
@@ -58,7 +60,9 @@
             android:id="@+id/buttonMainPhoto"
             android:layout_gravity="center_horizontal"
             android:layout_weight="1"
-            android:textSize="40dp" />
+            android:textSize="40dp"
+            android:background="@drawable/buttonLight"
+            android:textColor="#ffffff" />
 
         <LinearLayout
             android:orientation="horizontal"
@@ -73,7 +77,9 @@
                 android:layout_height="wrap_content"
                 android:text="Map"
                 android:id="@+id/buttonMainMap"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:background="@drawable/buttonDark"
+                android:textColor="#ffffff" />
 
             <Button
                 style="?android:attr/buttonStyleSmall"
@@ -81,7 +87,9 @@
                 android:layout_height="wrap_content"
                 android:text="Sync"
                 android:id="@+id/buttonMainSync"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:background="@drawable/buttonDark"
+                android:textColor="#ffffff" />
         </LinearLayout>
 
         <LinearLayout
@@ -97,7 +105,9 @@
                 android:layout_height="wrap_content"
                 android:text="View Data"
                 android:id="@+id/buttonMainData"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:background="@drawable/buttonDark"
+                android:textColor="#ffffff" />
 
             <Button
                 style="?android:attr/buttonStyleSmall"
@@ -105,7 +115,9 @@
                 android:layout_height="wrap_content"
                 android:text="Options"
                 android:id="@+id/buttonMainOptions"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:background="@drawable/buttonDark"
+                android:textColor="#ffffff" />
         </LinearLayout>
     </LinearLayout>
 
