@@ -44,7 +44,8 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text=""
-            android:id="@+id/textViewMainNotification" />
+            android:id="@+id/textViewMainNotification"
+            android:textColor="#6B6C70" />
 
     </FrameLayout>
 

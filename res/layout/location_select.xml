@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_margin="1dp"
-        android:background="@android:color/darker_gray"
+        android:background="@drawable/background_dark"
         android:layout_gravity="center_horizontal">
         <LinearLayout
             android:layout_width="wrap_content"
@@ -29,7 +29,8 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="Select Location"
                 android:id="@+id/textViewLocationSelectTitle"
-                android:gravity="center_horizontal" />
+                android:gravity="center_horizontal"
+                android:textColor="#B2CE35" />
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -42,7 +43,8 @@
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:layout_weight="1"
-                    android:gravity="center_horizontal">
+                    android:gravity="center_horizontal"
+                    android:layout_margin="2dp">
 
                     <TextView
                         android:layout_width="fill_parent"
@@ -50,14 +52,17 @@
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:text="Block"
                         android:id="@+id/textViewLocationSelectBlockTitle"
-                        android:gravity="center_horizontal" />
+                        android:gravity="center_horizontal"
+                        android:textColor="#B2CE35" />
 
                     <Spinner
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/spinnerLocationSelectBlock"
                         android:layout_weight="1"
-                        android:gravity="center_horizontal" />
+                        android:gravity="center_horizontal"
+                        android:background="#969696"
+                        android:textAlignment="center" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -65,7 +70,8 @@
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:layout_weight="1"
-                    android:gravity="center_horizontal">
+                    android:gravity="center_horizontal"
+                    android:layout_margin="2dp">
 
                     <TextView
                         android:layout_width="fill_parent"
@@ -73,14 +79,17 @@
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:text="Face"
                         android:id="@+id/textViewLocationSelectFaceTitle"
-                        android:gravity="center_horizontal" />
+                        android:gravity="center_horizontal"
+                        android:textColor="#B2CE35" />
 
                     <Spinner
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/spinnerLocationSelectFace"
                         android:layout_weight="1"
-                        android:gravity="center_horizontal" />
+                        android:gravity="center_horizontal"
+                        android:background="#969696"
+                        android:textAlignment="center" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -88,7 +97,8 @@
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:layout_weight="1"
-                    android:gravity="center_horizontal">
+                    android:gravity="center_horizontal"
+                    android:layout_margin="2dp">
 
                     <TextView
                         android:layout_width="fill_parent"
@@ -96,14 +106,17 @@
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:text="Stall"
                         android:id="@+id/textViewLocationSelectStallTitle"
-                        android:gravity="center_horizontal" />
+                        android:gravity="center_horizontal"
+                        android:textColor="#B2CE35" />
 
                     <Spinner
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/spinnerStall"
                         android:layout_weight="1"
-                        android:gravity="center_horizontal" />
+                        android:gravity="center_horizontal"
+                        android:background="#969696"
+                        android:textAlignment="center" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -121,7 +134,8 @@
                     android:text="Back"
                     android:id="@+id/buttonLocationSelectBack"
                     android:layout_gravity="center_horizontal"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:textColor="#ffffff" />
 
                 <Button
                     style="?android:attr/buttonStyleSmall"
@@ -129,7 +143,8 @@
                     android:layout_height="wrap_content"
                     android:text="Confirm"
                     android:id="@+id/buttonLocationSelectConfirm"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:textColor="#ffffff" />
 
             </LinearLayout>
 

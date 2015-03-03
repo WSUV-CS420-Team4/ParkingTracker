@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_margin="1dp"
-        android:background="@android:color/darker_gray"
+        android:background="@drawable/background_dark"
         android:layout_gravity="center_horizontal">
         <LinearLayout
             android:layout_width="wrap_content"
@@ -29,14 +29,16 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="Login"
                 android:id="@+id/textViewLoginTitle"
-                android:gravity="center_horizontal" />
+                android:gravity="center_horizontal"
+                android:textColor="#B2CE35" />
 
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="Name:"
                 android:gravity="left"
-                android:id="@+id/textViewLoginName" />
+                android:id="@+id/textViewLoginName"
+                android:textColor="#B2CE35" />
 
             <EditText
                 android:layout_width="wrap_content"
@@ -44,14 +46,16 @@
                 android:inputType="textPersonName"
                 android:text="Name"
                 android:ems="10"
-                android:id="@+id/editTextLoginName" />
+                android:id="@+id/editTextLoginName"
+                android:textColor="#FFFFFF" />
 
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="Password:"
                 android:gravity="left"
-                android:id="@+id/textViewLoginPassword" />
+                android:id="@+id/textViewLoginPassword"
+                android:textColor="#B2CE35" />
 
             <EditText
                 android:layout_width="wrap_content"
@@ -59,7 +63,8 @@
                 android:inputType="textPassword"
                 android:text="Password"
                 android:ems="10"
-                android:id="@+id/editTextLoginPassword" />
+                android:id="@+id/editTextLoginPassword"
+                android:textColor="#FFFFFF" />
 
             <FrameLayout
                 android:layout_width="fill_parent"
@@ -78,7 +83,8 @@
                     android:text="Back"
                     android:id="@+id/buttonLoginBack"
                     android:layout_gravity="center_horizontal"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:textColor="#FFFFFF" />
 
                 <Button
                     style="?android:attr/buttonStyleSmall"
@@ -86,7 +92,8 @@
                     android:layout_height="wrap_content"
                     android:text="Confirm"
                     android:id="@+id/buttonLoginConfirm"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:textColor="#FFFFFF" />
 
             </LinearLayout>
 
