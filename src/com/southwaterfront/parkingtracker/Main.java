@@ -34,6 +34,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -80,6 +81,8 @@ public class Main extends Activity {
     PopupWindow popupWindow;
     ListView listView;
     Button okay;
+    Button takePhoto;
+    ProgressBar progressBar;
 
 	private File createImageFile() throws IOException {
 		// Create an image file name
@@ -160,6 +163,9 @@ public class Main extends Activity {
 		imageView.setImageBitmap(bitmap);*/
 
 		textViewNotification.setText("Waiting for OcrEngine");
+        progressBar.setVisibility(View.VISIBLE);
+        takePhoto.setVisibility(View.GONE);
+
 		ocrEngine.runOcr(photoFile, new AlprCallBack() {
 
 			@Override
@@ -193,6 +199,8 @@ public class Main extends Activity {
             }
 		}
 		textViewNotification.setText(""); // "OCR Demo App"
+        progressBar.setVisibility(View.GONE);
+        takePhoto.setVisibility(View.VISIBLE);
 		if (result != null) {
             // TODO Change this so instead of best estimated result it is what the user clicks on
             face.setStall(new ParkingStall(result[0], new Date(System.currentTimeMillis()), null), stall++);
@@ -298,8 +306,8 @@ public class Main extends Activity {
 		face = BlockFace.emptyPaddedBlockFace("1", "C", 14);
 
 		// Temp Button init location
-		final Button button = (Button) findViewById(R.id.buttonMainPhoto);
-		button.setOnClickListener(new View.OnClickListener() {
+		takePhoto = (Button) findViewById(R.id.buttonMainPhoto);
+		takePhoto.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Perform action on click
 				dispatchTakePictureIntent2(); 	
@@ -318,6 +326,9 @@ public class Main extends Activity {
 					wifiAlert.show();
 			}
 		});
+
+        // Temp ProgressBar init location
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
