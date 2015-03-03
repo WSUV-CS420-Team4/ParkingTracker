@@ -9,7 +9,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.phototest.MainActivity"
     android:gravity="top|center"
-    android:background="@drawable/background">
+    android:background="@drawable/background_light">
 
     <LinearLayout
         android:orientation="horizontal"
@@ -45,6 +45,7 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text=""
             android:id="@+id/textViewMainNotification" />
+
     </FrameLayout>
 
     <LinearLayout
@@ -52,6 +53,14 @@
         android:layout_width="300dp"
         android:layout_height="350dp"
         android:gravity="center">
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBar"
+            android:visibility="gone"
+            android:layout_weight="1" />
 
         <Button
             android:layout_width="fill_parent"
@@ -62,7 +71,8 @@
             android:layout_weight="1"
             android:textSize="40dp"
             android:background="@drawable/button_light"
-            android:textColor="#ffffff" />
+            android:textColor="#ffffff"
+            android:visibility="visible" />
 
         <LinearLayout
             android:orientation="horizontal"
