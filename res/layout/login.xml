@@ -32,43 +32,64 @@
                 android:gravity="center_horizontal"
                 android:textColor="#B2CE35" />
 
-            <TextView
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="Name:"
-                android:gravity="left"
-                android:id="@+id/textViewLoginName"
-                android:textColor="#B2CE35" />
+                android:layout_height="fill_parent"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp">
 
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:text="Name"
-                android:ems="10"
-                android:id="@+id/editTextLoginName"
-                android:textColor="#FFFFFF" />
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="1"
+                    android:layout_marginBottom="5dp">
 
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="Password:"
-                android:gravity="left"
-                android:id="@+id/textViewLoginPassword"
-                android:textColor="#B2CE35" />
+                    <TextView
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Name:"
+                        android:gravity="left"
+                        android:id="@+id/textViewLoginName"
+                        android:textColor="#B2CE35" />
 
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:text="Password"
-                android:ems="10"
-                android:id="@+id/editTextLoginPassword"
-                android:textColor="#FFFFFF" />
+                    <EditText
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName"
+                        android:text="Name"
+                        android:ems="10"
+                        android:id="@+id/editTextLoginName"
+                        android:textColor="#FFFFFF" />
+                </LinearLayout>
 
-            <FrameLayout
-                android:layout_width="fill_parent"
-                android:layout_height="25dp"></FrameLayout>
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="1"
+                    android:layout_marginTop="5dp">
+
+                    <TextView
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Password:"
+                        android:gravity="left"
+                        android:id="@+id/textViewLoginPassword"
+                        android:textColor="#B2CE35" />
+
+                    <EditText
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:text="Password"
+                        android:ems="10"
+                        android:id="@+id/editTextLoginPassword"
+                        android:textColor="#FFFFFF" />
+                </LinearLayout>
+
+            </LinearLayout>
 
             <LinearLayout
                 android:orientation="horizontal"

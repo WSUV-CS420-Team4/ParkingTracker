@@ -61,8 +61,7 @@
                         android:id="@+id/spinnerLocationSelectBlock"
                         android:layout_weight="1"
                         android:gravity="center_horizontal"
-                        android:background="#969696"
-                        android:textAlignment="center" />
+                        android:background="#969696" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -88,8 +87,7 @@
                         android:id="@+id/spinnerLocationSelectFace"
                         android:layout_weight="1"
                         android:gravity="center_horizontal"
-                        android:background="#969696"
-                        android:textAlignment="center" />
+                        android:background="#969696" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -115,8 +113,7 @@
                         android:id="@+id/spinnerStall"
                         android:layout_weight="1"
                         android:gravity="center_horizontal"
-                        android:background="#969696"
-                        android:textAlignment="center" />
+                        android:background="#969696" />
                 </LinearLayout>
 
             </LinearLayout>
