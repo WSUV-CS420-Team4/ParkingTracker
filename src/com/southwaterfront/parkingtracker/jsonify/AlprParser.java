@@ -52,7 +52,7 @@ public class AlprParser {
 		for (JsonValue v : resultArray) {
 			if (v instanceof JsonObject) {
 				JsonObject vO = (JsonObject) v;
-				String plate = vO.getString(Jsonify.PLATE_ID);
+				String plate = vO.getString(Jsonify.RESULTS_PLATE_ID);
 				if (plate != null)
 					gatherList.add(plate);
 			}
