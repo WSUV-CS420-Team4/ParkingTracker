@@ -56,6 +56,10 @@ public class AssetManager {
 	private final File externalFileDir;
 
 	private final File imageCacheDir;
+	
+	private final File authToken;
+	
+	private final String authTokenFile = "authTokenFile";
 
 	private final String IMAGE_CACHE_DIR_NAME = "imageCache";
 
@@ -102,7 +106,7 @@ public class AssetManager {
 		if (!this.imageCacheDir.exists())
 			this.imageCacheDir.mkdir();
 		this.alprConfigFile = new File(this.internalFileDir + File.separator + this.alprRuntimeFolder + File.separator + this.configFileName);
-
+		this.authToken = new File(this.internalFileDir, this.authTokenFile);
 		this.streetModelJsonFile = new File(this.internalFileDir, this.streetModelFileName);
 	}
 
@@ -190,6 +194,16 @@ public class AssetManager {
 		while((read = in.read(buffer)) != -1)
 			out.write(buffer, 0, read);
 		out.flush();
+	}
+	
+	/**
+	 * Getter for authToken
+	 * 
+	 * 
+	 * 
+	 */
+	public File getAuthToken() {
+		return this.authToken;
 	}
 
 	/**
