@@ -45,6 +45,7 @@ import com.southwaterfront.parkingtracker.data.BlockFace;
 import com.southwaterfront.parkingtracker.data.CallBack;
 import com.southwaterfront.parkingtracker.data.DataManager;
 import com.southwaterfront.parkingtracker.data.ParkingStall;
+import com.southwaterfront.parkingtracker.dialog.LoginDialogFragment;
 import com.southwaterfront.parkingtracker.prefs.ParkingTrackerPreferences;
 import com.southwaterfront.parkingtracker.util.AsyncTask;
 import com.southwaterfront.parkingtracker.util.Utils;
@@ -329,6 +330,9 @@ public class Main extends Activity {
 
         // Temp ProgressBar init location
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+
+        LoginDialogFragment loginDialogFragment = new LoginDialogFragment();
+        loginDialogFragment.show(getFragmentManager(), "Login");
 
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
