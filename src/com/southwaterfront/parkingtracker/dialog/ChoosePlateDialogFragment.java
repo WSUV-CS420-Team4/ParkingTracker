@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -20,19 +19,12 @@ import com.southwaterfront.parkingtracker.Main;
 import com.southwaterfront.parkingtracker.R;
 
 /**
- * Created by Joel on 3/4/2015.
+ * ChoosePlateDialogFragment
  */
 public class ChoosePlateDialogFragment extends DialogFragment {
 
-    private ArrayAdapter<String> arrayAdapter;
-    private Button addLicense;
-    private Button addFlag;
-    private ListView listView;
-    private TextView plateNo;
-
     public static ChoosePlateDialogFragment newInstance() {
-        ChoosePlateDialogFragment dialog = new ChoosePlateDialogFragment();
-        return dialog;
+        return new ChoosePlateDialogFragment();
     }
 
     @Override
@@ -40,28 +32,6 @@ public class ChoosePlateDialogFragment extends DialogFragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
-
-        /*listView = (ListView) inflater.inflate(R.layout.choose_plate, null).findViewById(R.id.listViewChoosePlate);
-        plateNo = (TextView) inflater.inflate(R.layout.choose_plate, null).findViewById(R.id.textViewChoosePlateResult);
-
-        if (listView == null)
-            Log.i("WHAT?!", "HOW CAN THIS BE?!");
-
-        List<String> temp = ((Main)getActivity()).getLicensePlates();
-        Log.i("ChoosePlateDialog", "temp = " + temp.size());
-        arrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, temp );
-        arrayAdapter.setDropDownViewResource(R.layout.choose_plate);
-
-        listView.setAdapter(arrayAdapter);
-        //listView.setAdapter( ((Main)getActivity()).getArrayAdapter() );
-
-        listView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.i("ListViewChoosePlate", "You clicked Item: " + id + " at position:" + position);
-                plateNo.setText((String) parent.getItemAtPosition(position));
-            }
-        });*/
 
         View dialogView = inflater.inflate(R.layout.choose_plate, null);
 
@@ -79,10 +49,10 @@ public class ChoosePlateDialogFragment extends DialogFragment {
                     }
                 });
 
-        listView = (ListView) dialogView.findViewById(R.id.listViewChoosePlate);
-        plateNo = (TextView) dialogView.findViewById(R.id.textViewChoosePlateResult);
-        addLicense = (Button) dialogView.findViewById(R.id.buttonChoosePlateAddLicense);
-        addFlag = (Button) dialogView.findViewById(R.id.buttonChoosePlateAddFlag);
+        final ListView listView = (ListView) dialogView.findViewById(R.id.listViewChoosePlate);
+        final TextView plateNo = (TextView) dialogView.findViewById(R.id.textViewChoosePlateResult);
+        final Button addLicense = (Button) dialogView.findViewById(R.id.buttonChoosePlateAddLicense);
+        final Button addFlag = (Button) dialogView.findViewById(R.id.buttonChoosePlateAddFlag);
 
         listView.setAdapter( ((Main)getActivity()).getArrayAdapter() );
         listView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
@@ -154,65 +124,17 @@ public class ChoosePlateDialogFragment extends DialogFragment {
                 });
 
                 // Set button background to match dialog
-                if (cancel != null) {
-                    cancel.setBackgroundDrawable(getResources().getDrawable(R.drawable.background_dark));
-                    cancel.setTextColor(Color.WHITE);
-                    cancel.invalidate();
-                }
+                cancel.setBackgroundDrawable(getResources().getDrawable(R.drawable.background_dark));
+                cancel.setTextColor(Color.WHITE);
+                cancel.invalidate();
 
                 // Set button background to match dialog
-                if (confirm != null) {
-                    confirm.setBackgroundDrawable(getResources().getDrawable(R.drawable.background_dark));
-                    confirm.setTextColor(Color.WHITE);
-                    confirm.invalidate();
-                }
+                confirm.setBackgroundDrawable(getResources().getDrawable(R.drawable.background_dark));
+                confirm.setTextColor(Color.WHITE);
+                confirm.invalidate();
             }
         });
 
-
-
         return dialog;
     }
-
-    /*@Override
-    public void onResume() {
-        super.onResume();
-        Log.i("ChoosePlateDialog", "onResume");
-
-        if (listView != null) {
-            List<String> temp = ((Main)getActivity()).getLicensePlates();
-            Log.i("ChoosePlateDialog2", "temp = " + temp.size());
-            arrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, temp );
-            arrayAdapter.setDropDownViewResource(R.layout.choose_plate);
-            arrayAdapter.notifyDataSetChanged();
-
-            listView.setAdapter(arrayAdapter);
-
-            Log.i("ChoosePlateDialog2", "listView != null");
-        } else {
-            Log.i("ChoosePlateDialog2", "listView == null");
-        }
-    }*/
-
-    /*public void setAdapter(List<String> list) {
-        //arrayAdapter.clear();
-        arrayAdapter.addAll(list);
-        arrayAdapter.notifyDataSetChanged();
-    }*/
-
-    /*public void setAdapter(ArrayAdapter<String> arrayAdapter) {
-        this.arrayAdapter = arrayAdapter;
-
-        if (arrayAdapter.isEmpty()) {
-            Log.i("arrayAdapter", "Looks like its empty...!");
-        } else {
-            Log.i("arrayAdapter", "Count = " + arrayAdapter.getCount());
-        }
-
-        if (listView != null) {
-            listView.setAdapter(this.arrayAdapter);
-        } else {
-            Log.i("ChoosePlateDialog", "listView == null");
-        }
-    }*/
 }
