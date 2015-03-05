@@ -9,11 +9,11 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,8 +30,6 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
@@ -45,13 +43,12 @@ import com.southwaterfront.parkingtracker.data.BlockFace;
 import com.southwaterfront.parkingtracker.data.CallBack;
 import com.southwaterfront.parkingtracker.data.DataManager;
 import com.southwaterfront.parkingtracker.data.ParkingStall;
+import com.southwaterfront.parkingtracker.dialog.ChoosePlateDialogFragment;
 import com.southwaterfront.parkingtracker.dialog.LoginDialogFragment;
 import com.southwaterfront.parkingtracker.prefs.ParkingTrackerPreferences;
 import com.southwaterfront.parkingtracker.util.AsyncTask;
 import com.southwaterfront.parkingtracker.util.Utils;
 import com.southwaterfront.parkingtracker.util.WifiStateUploadableDataReceiver;
-
-import org.w3c.dom.Text;
 
 public class Main extends Activity {
 
@@ -77,11 +74,13 @@ public class Main extends Activity {
     List<String> licensePlates = new ArrayList<String>();
     ArrayAdapter<String> arrayAdapter;
 
+    FragmentManager fragmentManager;
+    FragmentTransaction fragmentTransaction;
     TextView plateNo;
     View popupLayout;
-    PopupWindow popupWindow;
+    //PopupWindow popupWindow;
+    ChoosePlateDialogFragment choosePlateDialogFragment;
     ListView listView;
-    Button okay;
     Button takePhoto;
     ProgressBar progressBar;
 
@@ -188,7 +187,6 @@ public class Main extends Activity {
 	int stall = 0;
 
 	private void setOcrResult(String[] result) {
-		String viewString = "";
         licensePlates.clear();
 		if (result != null) {
 			/*int i = 0;
@@ -209,12 +207,14 @@ public class Main extends Activity {
             /*String tempt[] = new String[licensePlates.size()];
             tempt = licensePlates.toArray(tempt);*/
             arrayAdapter = new ArrayAdapter<String>(Main.this, android.R.layout.simple_list_item_1, licensePlates );
-            arrayAdapter.setDropDownViewResource(R.layout.popup);
+            arrayAdapter.setDropDownViewResource(R.layout.choose_plate);
 
             Log.i("List", "licensePlates: " + licensePlates.size());
-            listView.setAdapter(arrayAdapter);
+            //choosePlateDialogFragment.setAdapter(arrayAdapter);
 
-            popupWindow.showAtLocation(popupLayout, Gravity.CENTER, 0, 0);
+            // ChoosePlateDialogFragment Show Here
+            showChoosePlateDialog();
+            //choosePlateDialogFragment.show(getFragmentManager(), "Login");
 
             Toast.makeText(Main.this, licensePlates.size() + " Results", Toast.LENGTH_LONG).show();
         }
@@ -254,16 +254,19 @@ public class Main extends Activity {
 		Log.i(LOG_TAG, "App initialized successfully");
 	}
 
-    private void popupInit() {
+    private void ChoosePlateInit() {
 
-        LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(this.LAYOUT_INFLATER_SERVICE);
-        popupLayout = layoutInflater.inflate(R.layout.popup, null);
+        //choosePlateDialogFragment = new ChoosePlateDialogFragment();
+
+        // Old Popup window style
+        /*LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(this.LAYOUT_INFLATER_SERVICE);
+        popupLayout = layoutInflater.inflate(R.layout.choose_plate, null);
 
         popupWindow = new PopupWindow(popupLayout, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         popupWindow.setContentView(popupLayout);
         popupWindow.setFocusable(true);
 
-        listView = (ListView) popupLayout.findViewById(R.id.listView);
+        listView = (ListView) popupLayout.findViewById(R.id.listViewChoosePlate);
 
         listView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
             @Override
@@ -273,15 +276,7 @@ public class Main extends Activity {
             }
         });
 
-        okay = (Button) popupLayout.findViewById(R.id.okay);
-
-        okay.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                popupWindow.dismiss();
-            }
-        });
-
-        plateNo = (TextView) popupLayout.findViewById(R.id.textView);
+        plateNo = (TextView) popupLayout.findViewById(R.id.textViewChoosePlateResult);*/
 
     }
 
@@ -301,7 +296,10 @@ public class Main extends Activity {
          */
 		onCreateAppInit();
 
-        popupInit();
+        fragmentManager = getFragmentManager();
+        fragmentTransaction = fragmentManager.beginTransaction();
+
+        ChoosePlateInit();
 
 
 		face = BlockFace.emptyPaddedBlockFace("1", "C", 14);
@@ -331,6 +329,7 @@ public class Main extends Activity {
         // Temp ProgressBar init location
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
+        // Temp DialogFragment init location
         LoginDialogFragment loginDialogFragment = new LoginDialogFragment();
         loginDialogFragment.show(getFragmentManager(), "Login");
 
@@ -355,6 +354,20 @@ public class Main extends Activity {
 		.setNegativeButton("No", dialogClickListener);
 
 	}
+
+    public void showChoosePlateDialog() {
+        // Create the fragment and show it as a dialog.
+        ChoosePlateDialogFragment newFragment = ChoosePlateDialogFragment.newInstance();
+        newFragment.show(getFragmentManager(), "choosePlate");
+    }
+
+    public ArrayAdapter<String> getArrayAdapter() {
+        return arrayAdapter;
+    }
+
+    public List<String> getLicensePlates() {
+        return licensePlates;
+    }
 
 	@Override
 	public void onDestroy() {

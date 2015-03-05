@@ -29,7 +29,7 @@ public class LoginDialogFragment extends DialogFragment{
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     //TODO LoginDialogFragment the user
-                    AddLicenseDialogFragment temp = new AddLicenseDialogFragment();
+                    ChoosePlateDialogFragment temp = new ChoosePlateDialogFragment();
                     temp.show(getFragmentManager(), "Temp");
                 }
             })
