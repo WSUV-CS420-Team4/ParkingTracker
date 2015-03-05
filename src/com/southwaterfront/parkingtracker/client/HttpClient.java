@@ -9,7 +9,6 @@ import java.net.URL;
 
 import javax.json.Json;
 import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
 
 import android.util.Log;
 
@@ -22,68 +21,81 @@ import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
 import com.southwaterfront.parkingtracker.jsonify.Jsonify;
+import com.southwaterfront.parkingtracker.util.Utils;
 
 //create a request factory
 //create a client definition that can send POST requests
 //create a wrapper that sends POST requests to upload data to server
 
 public class HttpClient {
-	private static final String authTokenName = "X-Auth-Token";
-	private static final File authTokenFile = AssetManager.getInstance().getAuthToken();
+
 	private static String LOG_TAG = "HttpClient";
+	private static final File authTokenFile = AssetManager.getInstance().getAuthToken();
+	private static final String authTokenKeyName = "X-Auth-Token";
 	private static String authToken = readAuthFile(authTokenFile);
-	
-	private static final String SERVER_URL = "http://parking.bitsrc.net/api/v1/blockfaces";
-	private static final String LOGIN_URL = "http://bend.encs.vancouver.wsu.edu/~jason_moss/api/v1/login";
+
+	private static final String POST_BLOCKFACE_DATA_URL = "https://bend.encs.vancouver.wsu.edu/~jason_moss/api/v1/blockfaces";
+	private static final String LOGIN_URL = "https://bend.encs.vancouver.wsu.edu/~jason_moss/api/v1/login";
+	private static final String GET_STREET_MODEL_URL = "https://bend.encs.vancouver.wsu.edu/~jason_moss/api/v1/streetmodel";
 	private static final NetHttpTransport transport = new NetHttpTransport();
 	private static final HttpRequestFactory requestFactory = transport.createRequestFactory();
-	
-	
-	static public void sendPostRequest(byte[] d) throws RequestFailedException {
+	private static final int UNAUTHORIZED_STATUS_CODE = 401;
+
+
+	static public void postBlockFaceData(byte[] d) throws RequestFailedException {
 		if (d == null)
 			throw new IllegalArgumentException("Bytes to send cannot be null");
-		
+
 		GenericUrl url = null;
 		try {
-			url = new GenericUrl(new URL(SERVER_URL));
+			url = new GenericUrl(new URL(POST_BLOCKFACE_DATA_URL));
 		} catch (MalformedURLException e) {
 			// Not possible
 		} 
+		
+		if (authToken == null) {
+			// TODO: Login
+		}
+			
 		ByteArrayContent data = new ByteArrayContent(null, d);
 		HttpRequest postRequest;
 		HttpResponse response;
 		try {
 			postRequest = requestFactory.buildPostRequest(url, data);
-			//postRequest.setHeaders();
 			HttpHeaders headers = postRequest.getHeaders();
-			headers.set(authTokenName, authToken);
+			headers.set(authTokenKeyName, authToken);
 			postRequest.setHeaders(headers);
 			response = postRequest.execute();	
 		} catch (IOException e) {
 			Log.e(LOG_TAG, "The request could not execute Error message: " + e.getMessage(), e);
 			throw new RequestFailedException("The request failed to execute", e);
 		}
-		
+
 		Log.i(LOG_TAG, "The POST request response code is " + response.getStatusCode() + " with message " + response.getStatusMessage());
-		
-		if (response.getStatusCode() == 401){
-			// send message to app that users auth token is not valid
-			
-			
-		} else if (!response.isSuccessStatusCode())
-			throw new RequestFailedException("The request was not successfull, the response code is " + response.getStatusCode());
+
+		if (response.getStatusCode() == UNAUTHORIZED_STATUS_CODE){
+			// TODO: Login
+
+
+		} else if (!response.isSuccessStatusCode()) {
+			int status = response.getStatusCode();
+			String error = status + ": " + response.getStatusMessage();
+			throw new RequestFailedException(error);
+		}
 	}
-	
-	public static void sendPostRequest(JsonObject obj) throws RequestFailedException {
+
+	public static void postBlockFaceData(JsonObject obj) throws RequestFailedException {
 		if (obj == null)
 			throw new IllegalArgumentException("JsonObject cannot be null");
-		
+
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Jsonify.writeJsonObjectToStream(obj, out);
-		HttpClient.sendPostRequest(out.toByteArray());
+		HttpClient.postBlockFaceData(out.toByteArray());
 	}
-	
-	public static void SendLoginRequest(String username, String password) throws RequestFailedException{
+
+	public static boolean sendLoginRequest(String username, String password) throws RequestFailedException {
+		if (username == null || password == null)
+			throw new IllegalArgumentException("Arguments cannot be null");
 		JsonObject credentials = Json.createObjectBuilder().add("Username", username).add("Password", password).build();
 		GenericUrl url = null;
 		HttpRequest loginRequest;
@@ -104,27 +116,41 @@ public class HttpClient {
 			throw new RequestFailedException("The request failed to execute", e);
 		}
 		if (!response.isSuccessStatusCode()){
-			throw new RequestFailedException("Login/Password incorrect");
+			int status = response.getStatusCode();
+			String error;
+			if (status == UNAUTHORIZED_STATUS_CODE)
+				return false;
+			else
+				error = status + ": " + response.getStatusMessage();
+			throw new RequestFailedException(error);
 		} else {
 			JsonObject js;
+			InputStream in = null;
 			try {
-				InputStream in = response.getContent();
+				in = response.getContent();
 				js = Jsonify.createJsonObjectFromStream(in);
-				String token = js.getString(authTokenName);
-				// TODO this string needs to be put into the authTokenFile
-				
-				
-				
-				
+				String token = js.getString(authTokenKeyName);
+				if (token != null && token.length() > 0) {
+					authToken = token;
+					Utils.asyncFileDelete(authTokenFile);
+					Utils.asyncFileWrite(authToken.getBytes(), authTokenFile);
+				} else
+					return false;
+
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} finally {
+				try {
+					if (in != null)
+						in.close();
+				} catch(Exception e) {}
 			}
 		}
-
+		return true;
 	}
-	
+
 	public static String readAuthFile(File authTokenFile){
+		if (authTokenFile == null || !authTokenFile.exists())
+			return null;
 		RandomAccessFile in = null;
 		try {
 			in = new RandomAccessFile(authTokenFile, "r");
@@ -133,22 +159,22 @@ public class HttpClient {
 			String token = new String(temp);
 			return token;
 		} catch(Exception e) {
-			
 			return null;
 		} finally {
 			try {
-				in.close();
+				if (in != null)
+					in.close();
 			} catch (IOException e) {
 			}
 		}
 	}
-	
+
 	public static class RequestFailedException extends Exception {
 
 		public RequestFailedException(String string, IOException e) {
 			super(string, e);
 		}
-		
+
 		public RequestFailedException(String string) {
 			super(string);
 		}
@@ -158,7 +184,7 @@ public class HttpClient {
 		}
 
 		private static final long serialVersionUID = -4728904407478563082L;
-		
+
 	}
-	
+
 }

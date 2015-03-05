@@ -1,150 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/locationSelect"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@android:color/background_light">
+    android:background="@drawable/background_dark"
+    android:gravity="center">
+
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_margin="1dp"
-        android:background="@drawable/background_dark"
-        android:layout_gravity="center_horizontal">
-        <LinearLayout
-            android:layout_width="wrap_content"
+        android:layout_margin="20dp">
+
+        <ImageView
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_margin="20dp">
+            android:src="@drawable/ic_launcher" />
 
-            <ImageView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_launcher" />
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Select Location"
+            android:id="@+id/textViewLocationSelectTitle"
+            android:gravity="center_horizontal"
+            android:textColor="#B2CE35" />
 
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Select Location"
-                android:id="@+id/textViewLocationSelectTitle"
-                android:gravity="center_horizontal"
-                android:textColor="#B2CE35" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_margin="15dp"
+            android:baselineAligned="false">
 
             <LinearLayout
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout_margin="15dp">
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:layout_margin="2dp">
 
-                <LinearLayout
-                    android:orientation="vertical"
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Block"
+                    android:id="@+id/textViewLocationSelectBlockTitle"
+                    android:gravity="center_horizontal"
+                    android:textColor="#B2CE35" />
+
+                <Spinner
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:layout_weight="1"
+                    android:id="@+id/spinnerLocationSelectBlock"
                     android:gravity="center_horizontal"
-                    android:layout_margin="2dp">
-
-                    <TextView
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="Block"
-                        android:id="@+id/textViewLocationSelectBlockTitle"
-                        android:gravity="center_horizontal"
-                        android:textColor="#B2CE35" />
-
-                    <Spinner
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/spinnerLocationSelectBlock"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:background="#969696" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal"
-                    android:layout_margin="2dp">
-
-                    <TextView
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="Face"
-                        android:id="@+id/textViewLocationSelectFaceTitle"
-                        android:gravity="center_horizontal"
-                        android:textColor="#B2CE35" />
-
-                    <Spinner
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/spinnerLocationSelectFace"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:background="#969696" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal"
-                    android:layout_margin="2dp">
-
-                    <TextView
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="Stall"
-                        android:id="@+id/textViewLocationSelectStallTitle"
-                        android:gravity="center_horizontal"
-                        android:textColor="#B2CE35" />
-
-                    <Spinner
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/spinnerStall"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:background="#969696" />
-                </LinearLayout>
-
+                    android:background="#969696" />
             </LinearLayout>
 
             <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal">
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:layout_margin="2dp">
 
-                <Button
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="0dp"
+                <TextView
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:text="Back"
-                    android:id="@+id/buttonLocationSelectBack"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_weight="1"
-                    android:textColor="#ffffff" />
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Face"
+                    android:id="@+id/textViewLocationSelectFaceTitle"
+                    android:gravity="center_horizontal"
+                    android:textColor="#B2CE35" />
 
-                <Button
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="0dp"
+                <Spinner
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:id="@+id/spinnerLocationSelectFace"
+                    android:gravity="center_horizontal"
+                    android:background="#969696" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:layout_margin="2dp">
+
+                <TextView
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:text="Confirm"
-                    android:id="@+id/buttonLocationSelectConfirm"
-                    android:layout_weight="1"
-                    android:textColor="#ffffff" />
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Stall"
+                    android:id="@+id/textViewLocationSelectStallTitle"
+                    android:gravity="center_horizontal"
+                    android:textColor="#B2CE35" />
 
+                <Spinner
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:id="@+id/spinnerLocationSelectStall"
+                    android:gravity="center_horizontal"
+                    android:background="#969696" />
             </LinearLayout>
 
         </LinearLayout>
+
     </LinearLayout>
 </LinearLayout>

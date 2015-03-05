@@ -154,7 +154,7 @@ class DataWorker implements Runnable {
 		}
 
 		try {
-			HttpClient.sendPostRequest(masterObject);
+			HttpClient.postBlockFaceData(masterObject);
 		} catch (RequestFailedException e) {
 			Log.e(LOG_TAG, "Failed to post data", e);
 			task.setResult(Result.FAIL, ERROR_POST);

@@ -1,74 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/setFlag"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@android:color/background_light">
+    android:background="@drawable/background_dark"
+    android:gravity="center">
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_margin="1dp"
-        android:background="@drawable/background_dark"
-        android:layout_gravity="center_horizontal">
-        <LinearLayout
-            android:layout_width="wrap_content"
+        android:layout_margin="20dp"
+        android:background="@drawable/background_dark">
+
+        <ImageView
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_margin="20dp">
+            android:src="@drawable/ic_launcher" />
 
-            <ImageView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_launcher" />
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Add Flags"
+            android:id="@+id/textViewSetFlagTitle"
+            android:gravity="center_horizontal"
+            android:textColor="#B2CE35" />
 
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Add Flags"
-                android:id="@+id/textViewSetFlagTitle"
-                android:gravity="center_horizontal"
-                android:textColor="#B2CE35" />
+        <ListView
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:id="@+id/listViewSetFlagFlags"
+            android:background="#969696"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp" />
 
-            <ListView
-                android:layout_width="250dp"
-                android:layout_height="250dp"
-                android:id="@+id/listViewSetFlagFlags"
-                android:background="#969696"
-                android:layout_marginTop="15dp"
-                android:layout_marginBottom="15dp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp" />
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal">
-
-                <Button
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="Back"
-                    android:id="@+id/buttonSetFlagBack"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_weight="1"
-                    android:textColor="#FFFFFF" />
-
-                <Button
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="Confirm"
-                    android:id="@+id/buttonSetFlagConfirm"
-                    android:layout_weight="1"
-                    android:textColor="#FFFFFF" />
-
-            </LinearLayout>
-
-        </LinearLayout>
     </LinearLayout>
 </LinearLayout>
