@@ -25,19 +25,7 @@ public class BlockParser {
 
 	private static String LOG_TAG = "BlockParser";
 
-	public static Set<BlockFace> parseBlock(InputStream message){
-		JsonObject obj;
-		try{
-			obj = Jsonify.createJsonObjectFromStream(message);
-		} catch(Exception e){
-			Log.e(LOG_TAG, "Parsing json object failed: " + message, e);
-			return null;
-		} finally {
-			try {
-				message.close();
-			} catch (IOException e) {
-			}
-		}
+	public static Set<BlockFace> parseBlock(JsonObject obj){
 
 		Set<BlockFace> result = new HashSet<BlockFace>();
 
@@ -56,7 +44,7 @@ public class BlockParser {
 					int numStalls = vO.getInt(Jsonify.NUM_STALLS_ID);			
 					result.add(BlockFace.emptyPaddedBlockFace(String.valueOf(block), face, numStalls));
 				} catch(Exception e){
-					Log.e(LOG_TAG, "Parsing json object failed: " + message, e);
+					Log.e(LOG_TAG, "Parsing json object failed: " + obj, e);
 				}
 			}
 		}

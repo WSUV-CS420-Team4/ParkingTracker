@@ -40,6 +40,54 @@ public class HttpClient {
 	private static final NetHttpTransport transport = new NetHttpTransport();
 	private static final HttpRequestFactory requestFactory = transport.createRequestFactory();
 	private static final int UNAUTHORIZED_STATUS_CODE = 401;
+	
+	static public InputStream getStreetModel() throws RequestFailedException {
+		GenericUrl url = null;
+		try {
+			url = new GenericUrl(new URL(GET_STREET_MODEL_URL));
+		} catch (MalformedURLException e) {
+			// Not possible
+		} 
+		
+		if (authToken == null) {
+			
+			//tel app to get login data
+			//login request
+			
+			// TODO: Login
+		}
+		
+		InputStream data = null;
+		HttpRequest getRequest;
+		HttpResponse response;
+		try {
+			getRequest = requestFactory.buildGetRequest(url);
+			HttpHeaders headers = getRequest.getHeaders();
+			headers.set(authTokenKeyName, authToken);
+			getRequest.setHeaders(headers);
+			response = getRequest.execute();	
+		} catch (IOException e) {
+			Log.e(LOG_TAG, "The request could not execute Error message: " + e.getMessage(), e);
+			throw new RequestFailedException("The request failed to execute", e);
+		}
+		if (response.getStatusCode() == UNAUTHORIZED_STATUS_CODE){
+			// TODO: Login
+
+
+		} else if (!response.isSuccessStatusCode()) {
+			int status = response.getStatusCode();
+			String error = status + ": " + response.getStatusMessage();
+			throw new RequestFailedException(error);
+		}
+		try {
+			data = response.getContent();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return data;
+		
+	}
 
 
 	static public void postBlockFaceData(byte[] d) throws RequestFailedException {
@@ -54,6 +102,10 @@ public class HttpClient {
 		} 
 		
 		if (authToken == null) {
+			
+			//tel app to get login data
+			//login request
+			
 			// TODO: Login
 		}
 			
@@ -137,7 +189,8 @@ public class HttpClient {
 				} else
 					return false;
 
-			} catch (IOException e) {
+			} catch (Exception e) {
+				return false;
 			} finally {
 				try {
 					if (in != null)

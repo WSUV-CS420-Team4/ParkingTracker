@@ -10,14 +10,19 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Set;
 
+import javax.json.JsonObject;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Environment;
 import android.util.Log;
 
+import com.southwaterfront.parkingtracker.client.HttpClient;
+import com.southwaterfront.parkingtracker.client.HttpClient.RequestFailedException;
 import com.southwaterfront.parkingtracker.data.BlockFace;
 import com.southwaterfront.parkingtracker.jsonify.BlockParser;
+import com.southwaterfront.parkingtracker.jsonify.Jsonify;
 import com.southwaterfront.parkingtracker.util.Utils;
 
 /**
@@ -166,14 +171,27 @@ public class AssetManager {
 		if (!this.streetModelJsonFile.exists())
 			copyAsset(this.streetModelFileName, this.streetModelJsonFile.getAbsolutePath());
 		
-		FileInputStream in = null;
+		/// try to download streetModel
 		try {
-			in = new FileInputStream(this.streetModelJsonFile);
-		} catch (FileNotFoundException e) {
-			throw new IllegalStateException("Street model file not found"); // Impossible ??
-		}
+			InputStream in = HttpClient.getStreetModel();
+			JsonObject obj = IStoJSON(in);
+			this.streetModel = BlockParser.parseBlock(obj);
+			Utils.asyncFileDelete(streetModelJsonFile);
+			Utils.asyncFileWrite(obj, streetModelJsonFile);		
+			
+		// failed to download, using backup	
+		} catch (RequestFailedException e1) {
+			FileInputStream in = null;
+			
+			try {
+				in = new FileInputStream(this.streetModelJsonFile);
+				JsonObject obj = IStoJSON(in);
+				this.streetModel = BlockParser.parseBlock(obj);
+			} catch (FileNotFoundException e) {
+				throw new IllegalStateException("Street model file not found"); // Impossible ??
+			}
+		}	
 		
-		this.streetModel = BlockParser.parseBlock(in);
 		if (this.streetModel == null)
 			// TODO: Do something drastic
 			throw new IllegalStateException("Ded");
@@ -200,12 +218,35 @@ public class AssetManager {
 	 * Getter for authToken
 	 * 
 	 * 
-	 * 
+	 * @return authToken
 	 */
 	public File getAuthToken() {
 		return this.authToken;
 	}
-
+	
+	/**
+	 * Converts InputStream to JsonObject
+	 * 
+	 * 
+	 * @return JsonObject
+	 */
+	
+	private JsonObject IStoJSON(InputStream in){
+		JsonObject obj = null;
+		try{
+			obj = Jsonify.createJsonObjectFromStream(in);
+		} catch(Exception e){
+			Log.e(LOG_TAG, "Parsing json object failed: " + in, e);
+		} finally {
+			try {
+				in.close();
+			} catch (IOException e) {
+			}
+		}
+		return obj;
+	}
+	
+	
 	/**
 	 * Getter for main activity context
 	 * 
