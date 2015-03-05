@@ -14,9 +14,9 @@ import android.widget.Button;
 import com.southwaterfront.parkingtracker.R;
 
 /**
- * Created by Joel on 3/3/2015.
+ * Created by Joel on 3/4/2015.
  */
-public class LoginDialogFragment extends DialogFragment{
+public class AddLicenseDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -24,21 +24,19 @@ public class LoginDialogFragment extends DialogFragment{
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        builder.setView(inflater.inflate(R.layout.login, null))
-            .setPositiveButton("Sign In", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    //TODO LoginDialogFragment the user
-                    AddLicenseDialogFragment temp = new AddLicenseDialogFragment();
-                    temp.show(getFragmentManager(), "Temp");
-                }
-            })
+        builder.setView(inflater.inflate(R.layout.add_license, null))
+                .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //TODO SetFlagDialogFragment
+                    }
+                })
 
-            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    LoginDialogFragment.this.getDialog().cancel();
-                }
-            });
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        AddLicenseDialogFragment.this.getDialog().cancel();
+                    }
+                });
 
         AlertDialog dialog = builder.create();
 
