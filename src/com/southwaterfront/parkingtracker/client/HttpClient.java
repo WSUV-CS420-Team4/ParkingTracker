@@ -32,17 +32,17 @@ public class HttpClient {
 	private static final File authTokenFile = AssetManager.getInstance().getAuthToken();
 	private static String LOG_TAG = "HttpClient";
 	private static String authToken = readAuthFile(authTokenFile);
-	
+
 	private static final String SERVER_URL = "http://parking.bitsrc.net/api/v1/blockfaces";
 	private static final String LOGIN_URL = "http://bend.encs.vancouver.wsu.edu/~jason_moss/api/v1/login";
 	private static final NetHttpTransport transport = new NetHttpTransport();
 	private static final HttpRequestFactory requestFactory = transport.createRequestFactory();
-	
-	
+
+
 	static public void sendPostRequest(byte[] d) throws RequestFailedException {
 		if (d == null)
 			throw new IllegalArgumentException("Bytes to send cannot be null");
-		
+
 		GenericUrl url = null;
 		try {
 			url = new GenericUrl(new URL(SERVER_URL));
@@ -63,26 +63,26 @@ public class HttpClient {
 			Log.e(LOG_TAG, "The request could not execute Error message: " + e.getMessage(), e);
 			throw new RequestFailedException("The request failed to execute", e);
 		}
-		
+
 		Log.i(LOG_TAG, "The POST request response code is " + response.getStatusCode() + " with message " + response.getStatusMessage());
-		
+
 		if (response.getStatusCode() == 401){
 			// send message to app that users auth token is not valid
-			
-			
+
+
 		} else if (!response.isSuccessStatusCode())
 			throw new RequestFailedException("The request was not successfull, the response code is " + response.getStatusCode());
 	}
-	
+
 	public static void sendPostRequest(JsonObject obj) throws RequestFailedException {
 		if (obj == null)
 			throw new IllegalArgumentException("JsonObject cannot be null");
-		
+
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Jsonify.writeJsonObjectToStream(obj, out);
 		HttpClient.sendPostRequest(out.toByteArray());
 	}
-	
+
 	public static void SendLoginRequest(String username, String password) throws RequestFailedException{
 		JsonObject credentials = Json.createObjectBuilder().add("Username", username).add("Password", password).build();
 		GenericUrl url = null;
@@ -112,10 +112,10 @@ public class HttpClient {
 				js = Jsonify.createJsonObjectFromStream(in);
 				String token = js.getString(authTokenName);
 				// TODO this string needs to be put into the authTokenFile
-				
-				
-				
-				
+
+
+
+
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -123,7 +123,7 @@ public class HttpClient {
 		}
 
 	}
-	
+
 	public static String readAuthFile(File authTokenFile){
 		RandomAccessFile in = null;
 		try {
@@ -133,22 +133,23 @@ public class HttpClient {
 			String token = new String(temp);
 			return token;
 		} catch(Exception e) {
-			
+
 			return null;
 		} finally {
 			try {
-				in.close();
+				if (in != null)
+					in.close();
 			} catch (IOException e) {
 			}
 		}
 	}
-	
+
 	public static class RequestFailedException extends Exception {
 
 		public RequestFailedException(String string, IOException e) {
 			super(string, e);
 		}
-		
+
 		public RequestFailedException(String string) {
 			super(string);
 		}
@@ -158,7 +159,7 @@ public class HttpClient {
 		}
 
 		private static final long serialVersionUID = -4728904407478563082L;
-		
+
 	}
-	
+
 }
