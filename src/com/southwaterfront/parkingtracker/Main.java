@@ -76,11 +76,6 @@ public class Main extends Activity {
 
     FragmentManager fragmentManager;
     FragmentTransaction fragmentTransaction;
-    TextView plateNo;
-    View popupLayout;
-    //PopupWindow popupWindow;
-    ChoosePlateDialogFragment choosePlateDialogFragment;
-    ListView listView;
     Button takePhoto;
     ProgressBar progressBar;
 

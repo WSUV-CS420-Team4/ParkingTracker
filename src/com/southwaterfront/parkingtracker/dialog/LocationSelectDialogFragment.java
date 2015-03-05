@@ -6,17 +6,24 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 
 import com.southwaterfront.parkingtracker.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Created by Joel on 3/3/2015.
+ * Created by Joel on 3/5/2015.
  */
-public class LoginDialogFragment extends DialogFragment{
+public class LocationSelectDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -24,21 +31,47 @@ public class LoginDialogFragment extends DialogFragment{
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        builder.setView(inflater.inflate(R.layout.login, null))
-            .setPositiveButton("Sign In", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    //TODO LoginDialogFragment the user
-                    LocationSelectDialogFragment temp = new LocationSelectDialogFragment();
-                    temp.show(getFragmentManager(), "Temp");
-                }
-            })
+        View dialogView = inflater.inflate(R.layout.location_select, null);
 
-            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    LoginDialogFragment.this.getDialog().cancel();
-                }
-            });
+        builder.setView(dialogView)
+                .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //TODO SetFlagDialogFragment
+                    }
+                })
+
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        LocationSelectDialogFragment.this.getDialog().cancel();
+                    }
+                });
+
+        final Spinner block = (Spinner) dialogView.findViewById(R.id.spinnerLocationSelectBlock);
+        final Spinner face = (Spinner) dialogView.findViewById(R.id.spinnerLocationSelectFace);
+        final Spinner stall = (Spinner) dialogView.findViewById(R.id.spinnerLocationSelectStall);
+
+        List<String> tempList = new ArrayList<String>();
+
+        tempList.add("A");
+        tempList.add("B");
+        tempList.add("C");
+        ArrayAdapter<String> tempAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, tempList);
+        tempAdapter.setDropDownViewResource(R.layout.spinner_layout);
+
+        block.setAdapter(tempAdapter);
+
+        block.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.i("BlockSpinner", "" + parent.getItemAtPosition(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         AlertDialog dialog = builder.create();
 
