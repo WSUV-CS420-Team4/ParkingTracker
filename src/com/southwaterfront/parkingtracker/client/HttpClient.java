@@ -34,7 +34,8 @@ public class HttpClient {
 	private static String authToken = readAuthFile(authTokenFile);
 
 	private static final String POST_BLOCKFACE_DATA_URL = "https://bend.encs.vancouver.wsu.edu/~jason_moss/api/v1/blockfaces";
-	private static final String LOGIN_URL = "http://bend.encs.vancouver.wsu.edu/~jason_moss/api/v1/login";
+	private static final String LOGIN_URL = "https://bend.encs.vancouver.wsu.edu/~jason_moss/api/v1/login";
+	private static final String GET_STREET_MODEL_URL = "https://bend.encs.vancouver.wsu.edu/~jason_moss/api/v1/streetmodel";
 	private static final NetHttpTransport transport = new NetHttpTransport();
 	private static final HttpRequestFactory requestFactory = transport.createRequestFactory();
 
