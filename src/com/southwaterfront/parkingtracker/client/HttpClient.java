@@ -33,7 +33,7 @@ public class HttpClient {
 	private static String LOG_TAG = "HttpClient";
 	private static String authToken = readAuthFile(authTokenFile);
 
-	private static final String SERVER_URL = "http://parking.bitsrc.net/api/v1/blockfaces";
+	private static final String POST_BLOCKFACE_DATA_URL = "https://bend.encs.vancouver.wsu.edu/~jason_moss/api/v1/blockfaces";
 	private static final String LOGIN_URL = "http://bend.encs.vancouver.wsu.edu/~jason_moss/api/v1/login";
 	private static final NetHttpTransport transport = new NetHttpTransport();
 	private static final HttpRequestFactory requestFactory = transport.createRequestFactory();
@@ -45,7 +45,7 @@ public class HttpClient {
 
 		GenericUrl url = null;
 		try {
-			url = new GenericUrl(new URL(SERVER_URL));
+			url = new GenericUrl(new URL(POST_BLOCKFACE_DATA_URL));
 		} catch (MalformedURLException e) {
 			// Not possible
 		} 
