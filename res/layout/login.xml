@@ -25,7 +25,8 @@
             android:text="Login"
             android:id="@+id/textViewLoginTitle"
             android:gravity="center_horizontal"
-            android:textColor="#B2CE35" />
+            android:textColor="#B2CE35"
+            android:singleLine="false" />
 
         <LinearLayout
             android:orientation="vertical"
@@ -83,33 +84,6 @@
                     android:textColor="#FFFFFF"
                     android:hint="Password" />
             </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal">
-
-            <Button
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="Back"
-                android:id="@+id/buttonLoginBack"
-                android:layout_gravity="center_horizontal"
-                android:layout_weight="1"
-                android:textColor="#FFFFFF" />
-
-            <Button
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="Confirm"
-                android:id="@+id/buttonLoginConfirm"
-                android:layout_weight="1"
-                android:textColor="#FFFFFF" />
 
         </LinearLayout>
 
