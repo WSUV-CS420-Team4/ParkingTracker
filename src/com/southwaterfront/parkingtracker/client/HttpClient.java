@@ -140,6 +140,17 @@ public class HttpClient {
 		HttpClient.postBlockFaceData(out.toByteArray());
 	}
 
+	/**
+	 * Sends a login request to the server. Two things to be aware of. First, 
+	 * this cannot be run on the UI thread. Second, if the login was correct the result
+	 * is true, otherwise it is false. However, other errors may occur and these are
+	 * denoted by a thrown {@link RequestFailedException}.
+	 * 
+	 * @param usernam Username
+	 * @param password Password
+	 * @return True is logged in, false if incorrect login credentials
+	 * @throws RequestFailedException Thrown if there is an IO error or server error
+	 */
 	public static boolean sendLoginRequest(String username, String password) throws RequestFailedException {
 		if (username == null || password == null)
 			throw new IllegalArgumentException("Arguments cannot be null");
@@ -196,7 +207,7 @@ public class HttpClient {
 		return true;
 	}
 
-	public static String readAuthFile(File authTokenFile){
+	private static String readAuthFile(File authTokenFile){
 		if (authTokenFile == null || !authTokenFile.exists())
 			return null;
 		RandomAccessFile in = null;

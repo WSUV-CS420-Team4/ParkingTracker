@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.southwaterfront.parkingtracker.R;
+import com.southwaterfront.parkingtracker.client.HttpClient;
 
 /**
  * Created by Joel on 3/3/2015.
@@ -29,6 +30,9 @@ public class LoginDialogFragment extends DialogFragment{
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     //TODO LoginDialogFragment the user
+                	
+                		// HttpClient.sendLoginRequest(username, password);
+                	
                     LocationSelectDialogFragment temp = new LocationSelectDialogFragment();
                     temp.show(getFragmentManager(), "Temp");
                 }
