@@ -13,12 +13,12 @@ import java.util.List;
  */
 public final class BlockFace {
 
-	public final String 						block;
+	public final int 						block;
 	public final String 						face;
 	private final List<ParkingStall> stalls;
 
-	public BlockFace(String block, String face) {
-		if (block == null || face == null)
+	public BlockFace(int block, String face) {
+		if (face == null)
 			throw new IllegalArgumentException("Arguments cannot be null");
 		
 		this.block = block;
@@ -35,8 +35,8 @@ public final class BlockFace {
 	 * @param stalls Number of empty stalls to put
 	 * @return Created empty padded block face
 	 */
-	public static BlockFace emptyPaddedBlockFace(String block, String face, int stalls) {
-		if (block == null || face == null)
+	public static BlockFace emptyPaddedBlockFace(int block, String face, int stalls) {
+		if (face == null)
 			throw new IllegalArgumentException("Arguments cannot be null");
 		if (stalls < 0)
 			throw new IllegalArgumentException("Must have a positive size");
@@ -112,7 +112,7 @@ public final class BlockFace {
 	public boolean equals(Object other) {
 		if (other instanceof BlockFace) {
 			BlockFace o = (BlockFace) other;
-			return this.block.equalsIgnoreCase(o.block) && this.face.equalsIgnoreCase(o.face);
+			return this.block == o.block && this.face.equalsIgnoreCase(o.face);
 		} else
 			return false;
 	}
@@ -123,7 +123,7 @@ public final class BlockFace {
 	 */
 	@Override
 	public int hashCode() {
-		return this.block.hashCode() ^ this.face.hashCode();
+		return this.block ^ this.face.hashCode();
 	}
 
 }

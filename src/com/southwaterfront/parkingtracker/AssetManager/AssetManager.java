@@ -171,7 +171,7 @@ public class AssetManager {
 		if (!this.streetModelJsonFile.exists())
 			copyAsset(this.streetModelFileName, this.streetModelJsonFile.getAbsolutePath());
 		
-		/// try to download streetModel
+		/*
 		try {
 			InputStream in = HttpClient.getStreetModel();
 			JsonObject obj = IStoJSON(in);
@@ -195,6 +195,7 @@ public class AssetManager {
 		if (this.streetModel == null)
 			// TODO: Do something drastic
 			throw new IllegalStateException("Ded");
+			*/
 	}
 
 	/**

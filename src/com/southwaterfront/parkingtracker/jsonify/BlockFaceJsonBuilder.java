@@ -43,7 +43,7 @@ public class BlockFaceJsonBuilder {
 
 	private SimpleDateFormat dateFormat;
 
-	public BlockFaceJsonBuilder(String block, String face) {
+	public BlockFaceJsonBuilder(int block, String face) {
 		this.objectBuilder = jsonFactory.createObjectBuilder();
 		this.stallsArrayBuilder = jsonFactory.createArrayBuilder();
 		this.currentStallBuilder = null;

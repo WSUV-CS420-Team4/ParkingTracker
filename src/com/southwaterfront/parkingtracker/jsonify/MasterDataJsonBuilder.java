@@ -126,10 +126,10 @@ public class MasterDataJsonBuilder {
 	 * @param block Name of block
 	 * @param face Name of face
 	 */
-	public void startBlockFace(String block, String face) {
+	public void startBlockFace(int block, String face) {
 		if (this.object != null)
 			return;
-		if (block == null || face == null)
+		if (face == null)
 			throw new IllegalArgumentException("Arguments cannot be null");
 		
 		if (this.currentBlockFaceBuilder != null) {

@@ -20,18 +20,12 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -297,7 +291,7 @@ public class Main extends Activity {
         ChoosePlateInit();
 
 
-		face = BlockFace.emptyPaddedBlockFace("1", "C", 14);
+		face = BlockFace.emptyPaddedBlockFace(1, "C", 14);
 
 		// Temp Button init location
 		takePhoto = (Button) findViewById(R.id.buttonMainPhoto);
@@ -378,7 +372,7 @@ public class Main extends Activity {
 
 	private void upload() {
 		data.saveBlockFace(face, null);
-		face = new BlockFace("3", "B");
+		face = new BlockFace(3, "B");
 		data.uploadSessionData(new CallBack() {
 
 			@Override

@@ -1,7 +1,5 @@
 package com.southwaterfront.parkingtracker.jsonify;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -42,7 +40,7 @@ public class BlockParser {
 					int block = vO.getInt(Jsonify.BLOCK_ID);
 					String face = vO.getString(Jsonify.FACE_ID);
 					int numStalls = vO.getInt(Jsonify.NUM_STALLS_ID);			
-					result.add(BlockFace.emptyPaddedBlockFace(String.valueOf(block), face, numStalls));
+					result.add(BlockFace.emptyPaddedBlockFace(block, face, numStalls));
 				} catch(Exception e){
 					Log.e(LOG_TAG, "Parsing json object failed: " + obj, e);
 				}
