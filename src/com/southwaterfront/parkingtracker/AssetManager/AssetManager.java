@@ -19,10 +19,9 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.southwaterfront.parkingtracker.client.HttpClient;
-import com.southwaterfront.parkingtracker.client.HttpClient.RequestFailedException;
 import com.southwaterfront.parkingtracker.data.BlockFace;
-import com.southwaterfront.parkingtracker.jsonify.BlockParser;
 import com.southwaterfront.parkingtracker.jsonify.Jsonify;
+import com.southwaterfront.parkingtracker.jsonify.StreetModelParser;
 import com.southwaterfront.parkingtracker.util.Utils;
 
 /**
@@ -61,9 +60,9 @@ public class AssetManager {
 	private final File externalFileDir;
 
 	private final File imageCacheDir;
-	
+
 	private final File authToken;
-	
+
 	private final String authTokenFile = "authTokenFile";
 
 	private final String IMAGE_CACHE_DIR_NAME = "imageCache";
@@ -79,7 +78,7 @@ public class AssetManager {
 	private final String streetModelFileName = "streetModel.json";
 
 	private final File streetModelJsonFile;
-	
+
 	private Set<BlockFace> streetModel;
 
 	/**
@@ -170,32 +169,43 @@ public class AssetManager {
 					runtimeDataDir);
 		if (!this.streetModelJsonFile.exists())
 			copyAsset(this.streetModelFileName, this.streetModelJsonFile.getAbsolutePath());
-		
-		/*
-		try {
-			InputStream in = HttpClient.getStreetModel();
-			JsonObject obj = IStoJSON(in);
-			this.streetModel = BlockParser.parseBlock(obj);
-			Utils.asyncFileDelete(streetModelJsonFile);
-			Utils.asyncFileWrite(obj, streetModelJsonFile);		
-			
-		// failed to download, using backup	
-		} catch (RequestFailedException e1) {
-			FileInputStream in = null;
-			
-			try {
-				in = new FileInputStream(this.streetModelJsonFile);
-				JsonObject obj = IStoJSON(in);
-				this.streetModel = BlockParser.parseBlock(obj);
-			} catch (FileNotFoundException e) {
-				throw new IllegalStateException("Street model file not found"); // Impossible ??
+
+		Runnable r = new Runnable() {
+
+			public void run() {
+				try {
+					InputStream in = HttpClient.getStreetModel();
+					JsonObject obj = IStoJSON(in);
+					streetModel = StreetModelParser.parse(obj);
+					if (streetModel != null) {
+						Utils.asyncFileDelete(streetModelJsonFile);
+						Utils.asyncFileWrite(obj, streetModelJsonFile);	
+					}
+
+					// failed to download, using backup	
+				} catch (Exception e1) {
+				}	
+
+				if (streetModel == null) {
+					FileInputStream in = null;
+
+					try {
+						in = new FileInputStream(streetModelJsonFile);
+						JsonObject obj = IStoJSON(in);
+						streetModel = StreetModelParser.parse(obj);
+					} catch (FileNotFoundException e) {
+						throw new IllegalStateException("Street model file not found"); // Impossible ??
+					}
+				}
+
+				if (streetModel == null)
+					// TODO: Do something drastic
+					throw new IllegalStateException("Ded");
 			}
-		}	
-		
-		if (this.streetModel == null)
-			// TODO: Do something drastic
-			throw new IllegalStateException("Ded");
-			*/
+
+		};
+		Thread streetModelGetter = new Thread(r);
+		streetModelGetter.start();;
 	}
 
 	/**
@@ -206,7 +216,7 @@ public class AssetManager {
 	public Set<BlockFace> getStreetModel() {
 		return this.streetModel;
 	}
-	
+
 	private void copyFile(InputStream in, OutputStream out) throws IOException {
 		byte[] buffer = new byte[4096];
 		int read;
@@ -214,7 +224,7 @@ public class AssetManager {
 			out.write(buffer, 0, read);
 		out.flush();
 	}
-	
+
 	/**
 	 * Getter for authToken
 	 * 
@@ -224,14 +234,14 @@ public class AssetManager {
 	public File getAuthToken() {
 		return this.authToken;
 	}
-	
+
 	/**
 	 * Converts InputStream to JsonObject
 	 * 
 	 * 
 	 * @return JsonObject
 	 */
-	
+
 	private JsonObject IStoJSON(InputStream in){
 		JsonObject obj = null;
 		try{
@@ -246,8 +256,8 @@ public class AssetManager {
 		}
 		return obj;
 	}
-	
-	
+
+
 	/**
 	 * Getter for main activity context
 	 * 
@@ -264,7 +274,7 @@ public class AssetManager {
 	public File getImageCacheDir() {
 		return this.imageCacheDir;
 	}
-	
+
 	/**
 	 * Getter for the street model as defined in JSON
 	 * 

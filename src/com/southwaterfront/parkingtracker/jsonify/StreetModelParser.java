@@ -19,19 +19,18 @@ import com.southwaterfront.parkingtracker.data.BlockFace;
  *
  */
 
-public class BlockParser {
+public class StreetModelParser {
 
-	private static String LOG_TAG = "BlockParser";
+	private static String LOG_TAG = "StreetModelParser";
 
-	public static Set<BlockFace> parseBlock(JsonObject obj){
+	public static Set<BlockFace> parse(JsonObject obj){
 
 		Set<BlockFace> result = new HashSet<BlockFace>();
 
 		JsonArray BlockFaces = obj.getJsonArray(Jsonify.BLOCKFACES_ARRAY_ID);
-		if (BlockFaces == null){
+		if (BlockFaces == null) {
 			return null;
 		}
-
 
 		for (JsonValue v : BlockFaces) {
 			if (v instanceof JsonObject) {
@@ -47,7 +46,7 @@ public class BlockParser {
 			}
 		}
 
-		return result;
+		return result.isEmpty() ? null : result;
 	}
 
 }

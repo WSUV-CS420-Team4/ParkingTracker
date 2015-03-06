@@ -70,11 +70,8 @@ public class HttpClient {
 			Log.e(LOG_TAG, "The request could not execute Error message: " + e.getMessage(), e);
 			throw new RequestFailedException("The request failed to execute", e);
 		}
-		if (response.getStatusCode() == UNAUTHORIZED_STATUS_CODE){
-			// TODO: Login
-
-
-		} else if (!response.isSuccessStatusCode()) {
+		
+		if (!response.isSuccessStatusCode()) {
 			int status = response.getStatusCode();
 			String error = status + ": " + response.getStatusMessage();
 			throw new RequestFailedException(error);
@@ -82,8 +79,6 @@ public class HttpClient {
 		try {
 			data = response.getContent();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return data;
 		
