@@ -95,9 +95,13 @@ public final class BlockFace {
 		if (obj == null)
 			return false;
 		
-		boolean modified =  this.stalls.remove(obj);
+		boolean modified = this.stalls.remove(obj);
 		this.modifiedSince |= modified;
 		return modified;
+	}
+	
+	public void resetModifiedFlag() {
+		this.modifiedSince = false;
 	}
 
 	/**
