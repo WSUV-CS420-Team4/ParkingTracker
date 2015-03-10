@@ -1,7 +1,7 @@
 package com.southwaterfront.parkingtracker.jsonify;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
@@ -23,9 +23,9 @@ public class StreetModelParser {
 
 	private static String LOG_TAG = "StreetModelParser";
 
-	public static Set<BlockFace> parse(JsonObject obj){
+	public static List<BlockFace> parse(JsonObject obj){
 
-		Set<BlockFace> result = new HashSet<BlockFace>();
+		ArrayList<BlockFace> result = new ArrayList<BlockFace>();
 
 		JsonArray BlockFaces = obj.getJsonArray(Jsonify.BLOCKFACES_ARRAY_ID);
 		if (BlockFaces == null) {

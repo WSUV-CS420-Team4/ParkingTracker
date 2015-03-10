@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Set;
 
 import javax.json.JsonObject;
@@ -79,7 +80,7 @@ public class AssetManager {
 
 	private final File streetModelJsonFile;
 
-	private Set<BlockFace> streetModel;
+	private List<BlockFace> streetModel;
 
 	/**
 	 * Make constructor private to disallow outside instantiation
@@ -213,7 +214,7 @@ public class AssetManager {
 	 * 
 	 * @return The model as defined as a set of empty block faces
 	 */
-	public Set<BlockFace> getStreetModel() {
+	public List<BlockFace> getStreetModel() {
 		return this.streetModel;
 	}
 
