@@ -371,7 +371,7 @@ public class Main extends Activity {
 	}
 
 	private void upload() {
-		data.saveBlockFace(face, null);
+		//data.saveBlockFace(face, null);
 		face = new BlockFace(3, "B");
 		data.uploadSessionData(new CallBack() {
 

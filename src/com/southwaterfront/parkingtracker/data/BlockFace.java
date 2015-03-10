@@ -100,8 +100,21 @@ public final class BlockFace {
 		return modified;
 	}
 	
+	/**
+	 * Resets the flag specifying if the data has been modified since
+	 * last reset
+	 * 
+	 */
 	public void resetModifiedFlag() {
 		this.modifiedSince = false;
+	}
+	
+	/**
+	 * Checks if data modified
+	 * @return True if modified since last 
+	 */
+	public boolean isModified() {
+		return this.modifiedSince;
 	}
 
 	/**

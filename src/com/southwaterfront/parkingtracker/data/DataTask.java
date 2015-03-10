@@ -17,32 +17,27 @@ public class DataTask extends AsyncTask {
 	 */
 	public static enum Tasks {
 		/**
-		 * Store a block face
+		 * Save session data
 		 */
-		STORE_FACE,
+		SAVE_DATA,
 		/**
 		 * Upload session data to server
 		 */
 		UPLOAD_DATA
 	}
 	
-	public final Object obj;
+	public final Session sess;
 	
 	public final CallBack callBack;
 	
 	public final Tasks type;
 	
-	public DataTask(Object obj, CallBack callBack, Tasks type) {
+	public DataTask(Session s, CallBack callBack, Tasks type) {
 		super();
-		
-		if (obj == null || type == null)
+		if (s == null || type == null)
 			throw new IllegalArgumentException("Cannot be null object, pass a BlockFace for a store or a Session for upload");
-		if (type == Tasks.STORE_FACE && !(obj instanceof BlockFace))
-			throw new IllegalArgumentException("Must store a block face object");
-		if (type == Tasks.UPLOAD_DATA && !(obj instanceof Session))
-			throw new IllegalArgumentException("Need a Session object reference for upload task");
 		
-		this.obj = obj;
+		this.sess = s;
 		this.callBack = callBack;
 		this.type = type;
 	}

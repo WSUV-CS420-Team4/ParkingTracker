@@ -364,6 +364,7 @@ public class DataManager implements Closeable {
 	 * @param face BlockFace to add to data
 	 * @param callBack A callback that can be used 
 	 */
+	/*
 	public void saveBlockFace(BlockFace face, CallBack callBack) {
 		checkNotClosed();
 
@@ -373,7 +374,7 @@ public class DataManager implements Closeable {
 		DataTask task = new DataTask(face, callBack, DataTask.Tasks.STORE_FACE);
 
 		this.dataTasks.add(task);
-	}
+	}*/
 
 	/**
 	 * Uploads the current session data to the server

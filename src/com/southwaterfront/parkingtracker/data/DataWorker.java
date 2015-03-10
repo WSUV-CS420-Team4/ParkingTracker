@@ -15,7 +15,6 @@ import android.util.Log;
 import com.southwaterfront.parkingtracker.client.HttpClient;
 import com.southwaterfront.parkingtracker.client.HttpClient.RequestFailedException;
 import com.southwaterfront.parkingtracker.data.DataManager.Session;
-import com.southwaterfront.parkingtracker.jsonify.BlockFaceJsonBuilder;
 import com.southwaterfront.parkingtracker.jsonify.Jsonify;
 import com.southwaterfront.parkingtracker.jsonify.MasterDataJsonBuilder;
 import com.southwaterfront.parkingtracker.util.AsyncTask;
@@ -71,13 +70,13 @@ class DataWorker implements Runnable {
 			} finally {
 				if (task != null) {
 					switch (task.type) {
-					case STORE_FACE:
-						storeFace(task);
+					case SAVE_DATA:
+						//storeFace(task);
 						Log.i(LOG_TAG, "Completed store face task for session " + this.session);
 						break;
 					case UPLOAD_DATA:
 						uploadData(task);
-						Log.i(LOG_TAG, "Completed upload task with result " + task.getResult() + " on session " + task.obj);
+						Log.i(LOG_TAG, "Completed upload task with result " + task.getResult() + " on session " + task.sess);
 						break;
 					default:
 						break;
@@ -92,7 +91,7 @@ class DataWorker implements Runnable {
 		}
 		Log.i(LOG_TAG, "Worker for " + session.SESSION_ID + " interrupted and finished");
 	}
-
+/*
 	private void storeFace(DataTask task) {
 		BlockFace face = (BlockFace) task.obj;
 
@@ -119,10 +118,10 @@ class DataWorker implements Runnable {
 		} 
 		
 		task.setResult(perResult, perTask.getErrorMessage());
-	}
+	}*/
 
 	private void uploadData(DataTask task) {
-		Session sess = (Session) task.obj;
+		Session sess = task.sess;
 
 		Log.i(LOG_TAG, "Attempting to upload data for session " + sess.SESSION_ID);
 
