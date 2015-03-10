@@ -8,8 +8,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import javax.json.JsonObject;
 
@@ -21,6 +21,7 @@ import android.util.Log;
 
 import com.southwaterfront.parkingtracker.client.HttpClient;
 import com.southwaterfront.parkingtracker.data.BlockFace;
+import com.southwaterfront.parkingtracker.data.BlockFaceDefinition;
 import com.southwaterfront.parkingtracker.jsonify.Jsonify;
 import com.southwaterfront.parkingtracker.jsonify.StreetModelParser;
 import com.southwaterfront.parkingtracker.util.Utils;
@@ -80,7 +81,7 @@ public class AssetManager {
 
 	private final File streetModelJsonFile;
 
-	private List<BlockFace> streetModel;
+	private List<BlockFaceDefinition> streetModel;
 
 	/**
 	 * Make constructor private to disallow outside instantiation
@@ -210,11 +211,23 @@ public class AssetManager {
 	}
 
 	/**
-	 * Getter for street model
+	 * Getter for data model
 	 * 
-	 * @return The model as defined as a set of empty block faces
+	 * @return The model as defined as a list of empty block faces
 	 */
-	public List<BlockFace> getStreetModel() {
+	public List<BlockFace> getDataModel() {
+		ArrayList<BlockFace> l = new ArrayList<BlockFace>();
+		for (BlockFaceDefinition d : this.streetModel)
+			l.add(BlockFace.emptyPaddedBlockFace(d.block, d.face, d.numStalls));
+		return l;
+	}
+	
+	/**
+	 * Getter for street model definitions
+	 * 
+	 * @return Street model
+	 */
+	public List<BlockFaceDefinition> getStretModel() {
 		return this.streetModel;
 	}
 

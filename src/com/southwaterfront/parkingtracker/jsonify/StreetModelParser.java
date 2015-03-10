@@ -10,6 +10,7 @@ import javax.json.JsonValue;
 import android.util.Log;
 
 import com.southwaterfront.parkingtracker.data.BlockFace;
+import com.southwaterfront.parkingtracker.data.BlockFaceDefinition;
 
 /***********
  * 
@@ -23,9 +24,9 @@ public class StreetModelParser {
 
 	private static String LOG_TAG = "StreetModelParser";
 
-	public static List<BlockFace> parse(JsonObject obj){
+	public static List<BlockFaceDefinition> parse(JsonObject obj){
 
-		ArrayList<BlockFace> result = new ArrayList<BlockFace>();
+		ArrayList<BlockFaceDefinition> result = new ArrayList<BlockFaceDefinition>();
 
 		JsonArray BlockFaces = obj.getJsonArray(Jsonify.BLOCKFACES_ARRAY_ID);
 		if (BlockFaces == null) {
@@ -39,7 +40,7 @@ public class StreetModelParser {
 					int block = vO.getInt(Jsonify.BLOCK_ID);
 					String face = vO.getString(Jsonify.FACE_ID);
 					int numStalls = vO.getInt(Jsonify.NUM_STALLS_ID);			
-					result.add(BlockFace.emptyPaddedBlockFace(block, face, numStalls));
+					result.add(new BlockFaceDefinition(block, face, numStalls));
 				} catch(Exception e){
 					Log.e(LOG_TAG, "Parsing json object failed: " + obj, e);
 				}

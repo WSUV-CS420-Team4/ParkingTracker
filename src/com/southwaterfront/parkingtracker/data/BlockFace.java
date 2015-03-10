@@ -16,6 +16,7 @@ public final class BlockFace {
 	public final int 						block;
 	public final String 						face;
 	private final List<ParkingStall> stalls;
+	private boolean modifiedSince;
 
 	public BlockFace(int block, String face) {
 		if (face == null)
@@ -24,6 +25,7 @@ public final class BlockFace {
 		this.block = block;
 		this.face = face;
 		this.stalls = new ArrayList<ParkingStall>();
+		this.modifiedSince = false;
 	}
 
 	/**
@@ -60,6 +62,7 @@ public final class BlockFace {
 			return;
 		
 		this.stalls.add(stall);
+		this.modifiedSince = true;
 	}
 	
 	/**
@@ -79,6 +82,7 @@ public final class BlockFace {
 			this.stalls.add(ParkingStall.EmptyStall);
 		
 		this.stalls.set(position, stall);
+		this.modifiedSince = true;
 	}
 
 	/**
@@ -91,7 +95,9 @@ public final class BlockFace {
 		if (obj == null)
 			return false;
 		
-		return this.stalls.remove(obj);
+		boolean modified =  this.stalls.remove(obj);
+		this.modifiedSince |= modified;
+		return modified;
 	}
 
 	/**

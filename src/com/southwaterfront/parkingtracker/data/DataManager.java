@@ -7,10 +7,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
@@ -83,7 +81,7 @@ public class DataManager implements Closeable {
 		public final File 	cacheFolder;
 		public final Date 	loadTime;
 		public final File		masterDataFile;
-		public final Set<BlockFace> blockFaces;
+		public final List<BlockFace> blockFaces;
 
 		public Session(Date createTime, File cacheFolder) {
 			if (createTime == null || cacheFolder == null)
@@ -95,7 +93,7 @@ public class DataManager implements Closeable {
 			this.cacheFolder = cacheFolder;
 			this.loadTime = new Date(System.currentTimeMillis());
 
-			this.blockFaces = new HashSet<BlockFace>();
+			this.blockFaces = assetManager.getDataModel();
 
 			this.masterDataFile = new File(this.cacheFolder, DataManager.MASTER_DATA_FILE_NAME);
 		}
@@ -115,7 +113,7 @@ public class DataManager implements Closeable {
 			this.cacheFolder = cacheFolder;
 			this.loadTime = new Date(System.currentTimeMillis());
 
-			this.blockFaces = new HashSet<BlockFace>();
+			this.blockFaces = assetManager.getDataModel();
 
 			this.masterDataFile = new File(this.cacheFolder, DataManager.MASTER_DATA_FILE_NAME);
 		}
@@ -304,6 +302,15 @@ public class DataManager implements Closeable {
 		return Collections.unmodifiableSortedSet(this.sessions);
 	}
 
+	/**
+	 * Getter for the current session
+	 * 
+	 * @return Current session instance
+	 */
+	public Session getCurrentSession() {
+		return this.currentSession;
+	}
+	
 	/**
 	 * Removes sessions which are not the current session
 	 */
