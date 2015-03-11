@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.json.JsonObject;
@@ -203,6 +204,8 @@ public class AssetManager {
 				if (streetModel == null)
 					// TODO: Do something drastic
 					throw new IllegalStateException("Ded");
+				else
+					streetModel = Collections.unmodifiableList(streetModel);
 			}
 
 		};
@@ -213,19 +216,19 @@ public class AssetManager {
 	/**
 	 * Getter for data model
 	 * 
-	 * @return The model as defined as a list of empty block faces
+	 * @return The model as an unmodifiable list
 	 */
 	public List<BlockFace> getDataModel() {
 		ArrayList<BlockFace> l = new ArrayList<BlockFace>();
 		for (BlockFaceDefinition d : this.streetModel)
 			l.add(BlockFace.emptyPaddedBlockFace(d.block, d.face, d.numStalls));
-		return l;
+		return Collections.unmodifiableList(l);
 	}
-	
+
 	/**
 	 * Getter for street model definitions
 	 * 
-	 * @return Street model
+	 * @return unmodifiable Street model
 	 */
 	public List<BlockFaceDefinition> getStretModel() {
 		return this.streetModel;

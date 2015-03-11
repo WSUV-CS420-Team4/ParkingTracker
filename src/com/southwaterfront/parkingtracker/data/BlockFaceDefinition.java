@@ -1,6 +1,11 @@
 package com.southwaterfront.parkingtracker.data;
 
-
+/**
+ * This is a block face definition
+ * 
+ * @author Vitaliy Gavrilov
+ *
+ */
 public class BlockFaceDefinition {
 
 	public final int block;

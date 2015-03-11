@@ -225,6 +225,7 @@ public class Main extends Activity {
 	@Override
 	public void onPause() {
 		super.onPause();
+		data.saveCurrentSessionData();
 		isInForeground = false;
 	}
 

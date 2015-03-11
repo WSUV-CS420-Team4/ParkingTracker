@@ -43,7 +43,7 @@ public class DataManager implements Closeable {
 
 	private boolean closed;
 
-	private static final char FILE_NAME_DELIMITER = ' ';
+	//private static final char FILE_NAME_DELIMITER = ' ';
 
 	private static final String ERROR_CLOSED = "The data manager is closed and cannot be operated on";
 
@@ -81,7 +81,8 @@ public class DataManager implements Closeable {
 		public final File 	cacheFolder;
 		public final Date 	loadTime;
 		public final File		masterDataFile;
-		public final List<BlockFace> blockFaces;
+		public final List<BlockFace> data;
+		private boolean locked;
 
 		public Session(Date createTime, File cacheFolder) {
 			if (createTime == null || cacheFolder == null)
@@ -93,9 +94,10 @@ public class DataManager implements Closeable {
 			this.cacheFolder = cacheFolder;
 			this.loadTime = new Date(System.currentTimeMillis());
 
-			this.blockFaces = assetManager.getDataModel();
+			this.data = assetManager.getDataModel();
 
 			this.masterDataFile = new File(this.cacheFolder, DataManager.MASTER_DATA_FILE_NAME);
+			this.locked = false;
 		}
 
 		public Session(String createTime, File cacheFolder) {
@@ -113,9 +115,10 @@ public class DataManager implements Closeable {
 			this.cacheFolder = cacheFolder;
 			this.loadTime = new Date(System.currentTimeMillis());
 
-			this.blockFaces = assetManager.getDataModel();
+			this.data = assetManager.getDataModel();
 
 			this.masterDataFile = new File(this.cacheFolder, DataManager.MASTER_DATA_FILE_NAME);
+			this.locked = false;
 		}
 
 		/**
@@ -124,9 +127,16 @@ public class DataManager implements Closeable {
 		 * @return True if session is locked to writing, false if open
 		 */
 		public boolean isLocked() {
-			return this.masterDataFile.exists();
+			return this.locked;
 		}
 
+		/**
+		 * Locks sessions from adding data, cannot be undone
+		 */
+		public void lockSession() {
+			this.locked = true;
+		}
+		
 		@Override
 		public int compareTo(Session another) {
 			return this.createTime.compareTo(another.createTime);
@@ -263,9 +273,10 @@ public class DataManager implements Closeable {
 		this.dataThread.start();
 	}
 
+	/*
 	public String createBlockFaceFileName(BlockFace face) {
 		return face.block + FILE_NAME_DELIMITER + face.face;
-	}
+	}*/
 
 	/**
 	 * Getter for current session time stamp
@@ -348,33 +359,20 @@ public class DataManager implements Closeable {
 			else
 				return false;
 		}
-
+		session.lockSession();
 		return this.sessions.remove(session);
 	}
-
+	
 	/**
-	 * This call stores the block face. It deals with all necessary persistence,
-	 * session adherence, and encapsulation. The data processing is sent to a worker
-	 * thread so it is safe to call this on the UI thread.
-	 * <br>
-	 * Within a single {@link Session}, it is good practice to add save only one instance of
-	 * a block face representing the same face. If multiple are saved, both will be sent to the server
-	 * upon uploading and the server will resolve the data.
-	 * 
-	 * @param face BlockFace to add to data
-	 * @param callBack A callback that can be used 
+	 * Saves the current session changes to disk asynchronously
 	 */
-	/*
-	public void saveBlockFace(BlockFace face, CallBack callBack) {
+	public void saveCurrentSessionData() {
 		checkNotClosed();
 
-		if (face == null)
-			return;
-
-		DataTask task = new DataTask(face, callBack, DataTask.Tasks.STORE_FACE);
+		DataTask task = new DataTask(this.currentSession, null, DataTask.Tasks.SAVE_DATA);
 
 		this.dataTasks.add(task);
-	}*/
+	}
 
 	/**
 	 * Uploads the current session data to the server

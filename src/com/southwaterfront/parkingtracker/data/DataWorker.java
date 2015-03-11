@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 
 import javax.json.JsonObject;
@@ -15,6 +14,7 @@ import android.util.Log;
 import com.southwaterfront.parkingtracker.client.HttpClient;
 import com.southwaterfront.parkingtracker.client.HttpClient.RequestFailedException;
 import com.southwaterfront.parkingtracker.data.DataManager.Session;
+import com.southwaterfront.parkingtracker.jsonify.BlockFaceJsonBuilder;
 import com.southwaterfront.parkingtracker.jsonify.Jsonify;
 import com.southwaterfront.parkingtracker.jsonify.MasterDataJsonBuilder;
 import com.southwaterfront.parkingtracker.util.AsyncTask;
@@ -47,14 +47,11 @@ class DataWorker implements Runnable {
 
 	private boolean running;
 
-	private Random rand;
-
 	public DataWorker(DataManager dataManager, Session sess, BlockingQueue<DataTask> tasks) {
 		this.dataManager = dataManager;
 		this.LOG_TAG = "DataWorker " + sess.SESSION_ID;
 		this.session = sess;
 		this.tasks = tasks;
-		this.rand = new Random();
 		running = true;
 	}
 
@@ -71,8 +68,8 @@ class DataWorker implements Runnable {
 				if (task != null) {
 					switch (task.type) {
 					case SAVE_DATA:
-						//storeFace(task);
-						Log.i(LOG_TAG, "Completed store face task for session " + this.session);
+						saveData(task);
+						Log.i(LOG_TAG, "Completed save data task for session " + task.sess);
 						break;
 					case UPLOAD_DATA:
 						uploadData(task);
@@ -91,34 +88,41 @@ class DataWorker implements Runnable {
 		}
 		Log.i(LOG_TAG, "Worker for " + session.SESSION_ID + " interrupted and finished");
 	}
-/*
-	private void storeFace(DataTask task) {
-		BlockFace face = (BlockFace) task.obj;
 
-		if (this.session.isLocked()) {
+	private void saveData(DataTask task) {
+		Session sess = task.sess;
+
+		if (sess.isLocked()) {
 			task.setResult(Result.FAIL, ERROR_SESSION_LOCKED);
 			return;
 		}
+		if (sess.masterDataFile.exists()) {
+			AsyncTask t = Utils.asyncFileDelete(sess.masterDataFile);
+			t.waitOnResult();
+		}
+		File cacheFolder = sess.cacheFolder;
+		List<BlockFace> curData = sess.data;
+		File[] savedData = cacheFolder.listFiles(); 
 
-		//this.session.blockFaces.add(face);
-
-		JsonObject obj = BlockFaceJsonBuilder.buildObjectFromBlockFace(face);
-
-		String fileName = this.dataManager.createBlockFaceFileName(face);
-		String useName = fileName;
-
-		AsyncTask perTask = null;
-		Result perResult = Result.FAIL;
-		for (int i = 0; i < 3 && perResult == Result.FAIL; i++) {
-			File file = new File(this.session.cacheFolder, useName);
-			perTask = Utils.asyncFileWrite(obj, file);
-			perResult = perTask.waitOnResult();
-			int nonce = rand.nextInt();
-			useName = fileName + nonce;
-		} 
-		
-		task.setResult(perResult, perTask.getErrorMessage());
-	}*/
+		if (savedData == null || savedData.length == 0) {
+			for (BlockFace b : curData) {
+				File f = new File(cacheFolder, b.getName());
+				JsonObject o = BlockFaceJsonBuilder.buildObjectFromBlockFace(b);
+				// Utils.asyncFileDelete(f);
+				Utils.asyncFileWrite(o, f);
+			}
+		} else {
+			for (BlockFace b : curData) {
+				if (b.isModified()) {
+					File f = new File(cacheFolder, b.getName());
+					JsonObject o = BlockFaceJsonBuilder.buildObjectFromBlockFace(b);
+					Utils.asyncFileDelete(f);
+					Utils.asyncFileWrite(o, f);
+				}
+			}
+		}
+		task.setResult(Result.SUCCESS, null);
+	}
 
 	private void uploadData(DataTask task) {
 		Session sess = task.sess;

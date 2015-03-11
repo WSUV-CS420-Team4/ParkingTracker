@@ -17,6 +17,7 @@ public final class BlockFace {
 	public final String 						face;
 	private final List<ParkingStall> stalls;
 	private boolean modifiedSince;
+	private final String name;
 
 	public BlockFace(int block, String face) {
 		if (face == null)
@@ -26,6 +27,7 @@ public final class BlockFace {
 		this.face = face;
 		this.stalls = new ArrayList<ParkingStall>();
 		this.modifiedSince = false;
+		this.name = this.block + "_" + this.face;
 	}
 
 	/**
@@ -149,4 +151,12 @@ public final class BlockFace {
 		return this.block ^ this.face.hashCode();
 	}
 
+	/**
+	 * Getter for name of block face, used for file naming
+	 * @return String name of block face
+	 */
+	public String getName() {
+		return this.name;
+	}
+	
 }
