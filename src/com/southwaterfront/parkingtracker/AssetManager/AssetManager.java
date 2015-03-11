@@ -82,7 +82,7 @@ public class AssetManager {
 
 	private final File streetModelJsonFile;
 
-	private List<BlockFaceDefinition> streetModel;
+	private volatile List<BlockFaceDefinition> streetModel;
 
 	/**
 	 * Make constructor private to disallow outside instantiation
@@ -159,7 +159,8 @@ public class AssetManager {
 
 	/**
 	 * This method is used to do sanity checks on all data upon the initialization
-	 * of this app
+	 * of this app<p>
+	 * This method cannot be run on the UI thread
 	 */
 	public void assetSanityCheck() {
 		openAlprSanity();
@@ -173,44 +174,37 @@ public class AssetManager {
 		if (!this.streetModelJsonFile.exists())
 			copyAsset(this.streetModelFileName, this.streetModelJsonFile.getAbsolutePath());
 
-		Runnable r = new Runnable() {
 
-			public void run() {
-				try {
-					InputStream in = HttpClient.getStreetModel();
-					JsonObject obj = IStoJSON(in);
-					streetModel = StreetModelParser.parse(obj);
-					if (streetModel != null) {
-						Utils.asyncFileDelete(streetModelJsonFile);
-						Utils.asyncFileWrite(obj, streetModelJsonFile);	
-					}
-
-					// failed to download, using backup	
-				} catch (Exception e1) {
-				}	
-
-				if (streetModel == null) {
-					FileInputStream in = null;
-
-					try {
-						in = new FileInputStream(streetModelJsonFile);
-						JsonObject obj = IStoJSON(in);
-						streetModel = StreetModelParser.parse(obj);
-					} catch (FileNotFoundException e) {
-						throw new IllegalStateException("Street model file not found"); // Impossible ??
-					}
-				}
-
-				if (streetModel == null)
-					// TODO: Do something drastic
-					throw new IllegalStateException("Ded");
-				else
-					streetModel = Collections.unmodifiableList(streetModel);
+		try {
+			InputStream in = HttpClient.getStreetModel();
+			JsonObject obj = IStoJSON(in);
+			streetModel = StreetModelParser.parse(obj);
+			if (streetModel != null) {
+				Utils.asyncFileDelete(streetModelJsonFile);
+				Utils.asyncFileWrite(obj, streetModelJsonFile);	
 			}
 
-		};
-		Thread streetModelGetter = new Thread(r);
-		streetModelGetter.start();;
+			// failed to download, using backup	
+		} catch (Exception e1) {
+		}	
+
+		if (streetModel == null) {
+			FileInputStream in = null;
+
+			try {
+				in = new FileInputStream(streetModelJsonFile);
+				JsonObject obj = IStoJSON(in);
+				streetModel = StreetModelParser.parse(obj);
+			} catch (FileNotFoundException e) {
+				throw new IllegalStateException("Street model file not found"); // Impossible ??
+			}
+		}
+
+		if (streetModel == null)
+			// TODO: Do something drastic
+			throw new IllegalStateException("Ded");
+		else
+			streetModel = Collections.unmodifiableList(streetModel);
 	}
 
 	/**

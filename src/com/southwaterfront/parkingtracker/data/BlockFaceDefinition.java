@@ -13,7 +13,7 @@ public class BlockFaceDefinition {
 	public final int numStalls;			
 	
 	public BlockFaceDefinition(int block, String face, int numStalls) {
-		if (face == null || numStalls < 1)
+		if (face == null || numStalls < 0)
 			throw new IllegalArgumentException("Arguments cannot be null");
 		this.block = block;
 		this.face = face;

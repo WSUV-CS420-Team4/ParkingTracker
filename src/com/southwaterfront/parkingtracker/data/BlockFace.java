@@ -80,7 +80,7 @@ public final class BlockFace {
 		if (stall == null || position < 0)
 			return;
 		
-		for (int i = this.stalls.size(); i < position; i++)
+		for (int i = this.stalls.size(); i <= position; i++)
 			this.stalls.add(ParkingStall.EmptyStall);
 		
 		this.stalls.set(position, stall);

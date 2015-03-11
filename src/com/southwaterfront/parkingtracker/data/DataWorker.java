@@ -114,6 +114,7 @@ class DataWorker implements Runnable {
 		} else {
 			for (BlockFace b : curData) {
 				if (b.isModified()) {
+					b.resetModifiedFlag();
 					File f = new File(cacheFolder, b.getName());
 					JsonObject o = BlockFaceJsonBuilder.buildObjectFromBlockFace(b);
 					Utils.asyncFileDelete(f);

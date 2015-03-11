@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -58,6 +59,7 @@ public class Main extends Activity {
 	private AssetManager assets;
 	private DataManager data;
 	private BlockFace face;
+	private List<BlockFace> b;
 	private AlprEngine ocrEngine;
 	TextView textViewNotification;
 	AlertDialog.Builder wifiAlert;
@@ -65,13 +67,13 @@ public class Main extends Activity {
 	IntentFilter wifiFilter;
 	File photoFile;
 
-    List<String> licensePlates = new ArrayList<String>();
-    ArrayAdapter<String> arrayAdapter;
+	List<String> licensePlates = new ArrayList<String>();
+	ArrayAdapter<String> arrayAdapter;
 
-    FragmentManager fragmentManager;
-    FragmentTransaction fragmentTransaction;
-    Button takePhoto;
-    ProgressBar progressBar;
+	FragmentManager fragmentManager;
+	FragmentTransaction fragmentTransaction;
+	Button takePhoto;
+	ProgressBar progressBar;
 
 	private File createImageFile() throws IOException {
 		// Create an image file name
@@ -120,7 +122,7 @@ public class Main extends Activity {
 	}
 
 	private void setPic() {
-        // No longer need to set pic
+		// No longer need to set pic
 		/*final ImageView imageView = (ImageView)  findViewById(R.id.imageView1);
 
 		// Get the dimensions of the View
@@ -152,8 +154,8 @@ public class Main extends Activity {
 		imageView.setImageBitmap(bitmap);*/
 
 		textViewNotification.setText("Waiting for OcrEngine");
-        progressBar.setVisibility(View.VISIBLE);
-        takePhoto.setVisibility(View.GONE);
+		progressBar.setVisibility(View.VISIBLE);
+		takePhoto.setVisibility(View.GONE);
 
 		ocrEngine.runOcr(photoFile, new AlprCallBack() {
 
@@ -164,7 +166,7 @@ public class Main extends Activity {
 					@Override
 					public void run() {
 						setOcrResult(result);
-                        photoFile.delete();
+						photoFile.delete();
 					}
 
 				});
@@ -176,37 +178,40 @@ public class Main extends Activity {
 	int stall = 0;
 
 	private void setOcrResult(String[] result) {
-        licensePlates.clear();
+		licensePlates.clear();
 		if (result != null) {
 			/*int i = 0;
 			for (; i < result.length - 1; i++)
 				viewString += result[i] + "\n";
 			viewString += result[i];*/
-            for (int j = 0; j < result.length; j++) {
-                licensePlates.add( result[j] );
-            }
+			for (int j = 0; j < result.length; j++) {
+				licensePlates.add( result[j] );
+			}
 		}
 		textViewNotification.setText(""); // "OCR Demo App"
-        progressBar.setVisibility(View.GONE);
-        takePhoto.setVisibility(View.VISIBLE);
+		progressBar.setVisibility(View.GONE);
+		takePhoto.setVisibility(View.VISIBLE);
 		if (result != null) {
-            // TODO Change this so instead of best estimated result it is what the user clicks on
-            face.setStall(new ParkingStall(result[0], new Date(System.currentTimeMillis()), null), stall++);
+			// TODO Change this so instead of best estimated result it is what the user clicks on
+			// Change this later Joel, I was just using for testing
+			Random r = new Random();
+			int block = r.nextInt(b.size() - 1) + 1;
+			b.get(block).setStall(new ParkingStall(result[0], new Date(System.currentTimeMillis()), null), stall++);
 
-            /*String tempt[] = new String[licensePlates.size()];
+			/*String tempt[] = new String[licensePlates.size()];
             tempt = licensePlates.toArray(tempt);*/
-            arrayAdapter = new ArrayAdapter<String>(Main.this, android.R.layout.simple_list_item_1, licensePlates );
-            arrayAdapter.setDropDownViewResource(R.layout.choose_plate);
+			arrayAdapter = new ArrayAdapter<String>(Main.this, android.R.layout.simple_list_item_1, licensePlates );
+			arrayAdapter.setDropDownViewResource(R.layout.choose_plate);
 
-            Log.i("List", "licensePlates: " + licensePlates.size());
-            //choosePlateDialogFragment.setAdapter(arrayAdapter);
+			Log.i("List", "licensePlates: " + licensePlates.size());
+			//choosePlateDialogFragment.setAdapter(arrayAdapter);
 
-            // ChoosePlateDialogFragment Show Here
-            showChoosePlateDialog();
-            //choosePlateDialogFragment.show(getFragmentManager(), "Login");
+			// ChoosePlateDialogFragment Show Here
+			showChoosePlateDialog();
+			//choosePlateDialogFragment.show(getFragmentManager(), "Login");
 
-            Toast.makeText(Main.this, licensePlates.size() + " Results", Toast.LENGTH_LONG).show();
-        }
+			Toast.makeText(Main.this, licensePlates.size() + " Results", Toast.LENGTH_LONG).show();
+		}
 	}
 	// -------------------------------------------------------------------------------------------------
 
@@ -230,26 +235,33 @@ public class Main extends Activity {
 	}
 
 	private void onCreateAppInit() {
-		AssetManager.init(this);
-		assets = AssetManager.getInstance();
-		assets.assetSanityCheck();
-		data = DataManager.getInstance();
-		ocrEngine = AlprEngine.getInstance();
-		Utils.resetCacheSize();
-		wifiFilter = new IntentFilter();
-		wifiFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-		this.wifiReceiver = new WifiStateUploadableDataReceiver();
-		this.registerReceiver(this.wifiReceiver, this.wifiFilter);
-		
+		Runnable r = new Runnable() {
+
+			public void run() {
+				AssetManager.init(Main.this);
+				assets = AssetManager.getInstance();
+				assets.assetSanityCheck();
+				data = DataManager.getInstance();
+				ocrEngine = AlprEngine.getInstance();
+				Utils.resetCacheSize();
+				wifiFilter = new IntentFilter();
+				wifiFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+				wifiReceiver = new WifiStateUploadableDataReceiver();
+				registerReceiver(wifiReceiver, wifiFilter);
+				b = data.getCurrentSession().data;
+			}
+		};
+		Thread initThread = new Thread(r);
+		initThread.start();
 		Log.i(LOG_TAG, "App initialized successfully");
 	}
 
-    private void ChoosePlateInit() {
+	private void ChoosePlateInit() {
 
-        //choosePlateDialogFragment = new ChoosePlateDialogFragment();
+		//choosePlateDialogFragment = new ChoosePlateDialogFragment();
 
-        // Old Popup window style
-        /*LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(this.LAYOUT_INFLATER_SERVICE);
+		// Old Popup window style
+		/*LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(this.LAYOUT_INFLATER_SERVICE);
         popupLayout = layoutInflater.inflate(R.layout.choose_plate, null);
 
         popupWindow = new PopupWindow(popupLayout, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -268,28 +280,28 @@ public class Main extends Activity {
 
         plateNo = (TextView) popupLayout.findViewById(R.id.textViewChoosePlateResult);*/
 
-    }
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		//setContentView(R.layout.activity_main);
 
-        //Remove title bar
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		//Remove title bar
+		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        //set content view AFTER ABOVE sequence (to avoid crash)
-        this.setContentView(R.layout.activity_main); // Probably could just remove title bar before first set contentView
+		//set content view AFTER ABOVE sequence (to avoid crash)
+		this.setContentView(R.layout.activity_main); // Probably could just remove title bar before first set contentView
 
-        /**
-         * Leave this method call
-         */
+		/**
+		 * Leave this method call
+		 */
 		onCreateAppInit();
 
-        fragmentManager = getFragmentManager();
-        fragmentTransaction = fragmentManager.beginTransaction();
+		fragmentManager = getFragmentManager();
+		fragmentTransaction = fragmentManager.beginTransaction();
 
-        ChoosePlateInit();
+		ChoosePlateInit();
 
 
 		face = BlockFace.emptyPaddedBlockFace(1, "C", 14);
@@ -308,20 +320,20 @@ public class Main extends Activity {
 		final Button button2 = (Button) findViewById(R.id.buttonMainSync);
 		button2.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-                if (Utils.isWifiConnected() || !ParkingTrackerPreferences.getNonWifiConnectionNotificationSetting()) {
-                    upload();
-                }
+				if (Utils.isWifiConnected() || !ParkingTrackerPreferences.getNonWifiConnectionNotificationSetting()) {
+					upload();
+				}
 				else
 					wifiAlert.show();
 			}
 		});
 
-        // Temp ProgressBar init location
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+		// Temp ProgressBar init location
+		progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
-        // Temp DialogFragment init location
-        LoginDialogFragment loginDialogFragment = new LoginDialogFragment();
-        loginDialogFragment.show(getFragmentManager(), "Login");
+		// Temp DialogFragment init location
+		LoginDialogFragment loginDialogFragment = new LoginDialogFragment();
+		loginDialogFragment.show(getFragmentManager(), "Login");
 
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
@@ -345,26 +357,26 @@ public class Main extends Activity {
 
 	}
 
-    public void showChoosePlateDialog() {
-        // Create the fragment and show it as a dialog.
-        ChoosePlateDialogFragment newFragment = ChoosePlateDialogFragment.newInstance();
-        newFragment.show(getFragmentManager(), "choosePlate");
-    }
+	public void showChoosePlateDialog() {
+		// Create the fragment and show it as a dialog.
+		ChoosePlateDialogFragment newFragment = ChoosePlateDialogFragment.newInstance();
+		newFragment.show(getFragmentManager(), "choosePlate");
+	}
 
-    public ArrayAdapter<String> getArrayAdapter() {
-        return arrayAdapter;
-    }
+	public ArrayAdapter<String> getArrayAdapter() {
+		return arrayAdapter;
+	}
 
-    public List<String> getLicensePlates() {
-        return licensePlates;
-    }
+	public List<String> getLicensePlates() {
+		return licensePlates;
+	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		onDestroyAppClose();
 	}
-	
+
 	private void onDestroyAppClose() {
 		this.unregisterReceiver(this.wifiReceiver);
 		data.close();
