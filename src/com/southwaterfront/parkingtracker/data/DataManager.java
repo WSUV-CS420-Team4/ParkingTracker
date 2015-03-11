@@ -5,6 +5,7 @@ import java.io.File;
 import java.lang.Thread.State;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -17,6 +18,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import android.util.Log;
 
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
+import com.southwaterfront.parkingtracker.jsonify.BlockFaceParser;
 import com.southwaterfront.parkingtracker.util.AsyncTask;
 import com.southwaterfront.parkingtracker.util.Result;
 import com.southwaterfront.parkingtracker.util.Utils;
@@ -39,7 +41,7 @@ public class DataManager implements Closeable {
 
 	private final String FILE_NAME_FORMAT = "yyyy-MM-dd HH:mm";
 
-	private static final DataManager instance = new DataManager();
+	private static DataManager instance = null;
 
 	private boolean closed;
 
@@ -94,7 +96,7 @@ public class DataManager implements Closeable {
 			this.cacheFolder = cacheFolder;
 			this.loadTime = new Date(System.currentTimeMillis());
 
-			this.data = assetManager.getDataModel();
+			this.data = streetToDataModel(this.cacheFolder);
 
 			this.masterDataFile = new File(this.cacheFolder, DataManager.MASTER_DATA_FILE_NAME);
 			this.locked = false;
@@ -115,7 +117,7 @@ public class DataManager implements Closeable {
 			this.cacheFolder = cacheFolder;
 			this.loadTime = new Date(System.currentTimeMillis());
 
-			this.data = assetManager.getDataModel();
+			this.data = streetToDataModel(this.cacheFolder);
 
 			this.masterDataFile = new File(this.cacheFolder, DataManager.MASTER_DATA_FILE_NAME);
 			this.locked = false;
@@ -136,7 +138,7 @@ public class DataManager implements Closeable {
 		public void lockSession() {
 			this.locked = true;
 		}
-		
+
 		@Override
 		public int compareTo(Session another) {
 			return this.createTime.compareTo(another.createTime);
@@ -155,6 +157,8 @@ public class DataManager implements Closeable {
 	 * @return Instance of DataManager
 	 */
 	public static DataManager getInstance() {
+		if (DataManager.instance == null)
+			DataManager.instance = new DataManager();
 		return DataManager.instance;
 	}
 
@@ -170,7 +174,7 @@ public class DataManager implements Closeable {
 			this.dataCacheDir.mkdir();
 		this.sessions = new TreeSet<Session>();
 		this.dateFormat = new SimpleDateFormat(FILE_NAME_FORMAT);
-		
+
 		loadSessions();
 
 		if (this.sessions.isEmpty()) {
@@ -273,11 +277,6 @@ public class DataManager implements Closeable {
 		this.dataThread.start();
 	}
 
-	/*
-	public String createBlockFaceFileName(BlockFace face) {
-		return face.block + FILE_NAME_DELIMITER + face.face;
-	}*/
-
 	/**
 	 * Getter for current session time stamp
 	 * 
@@ -302,6 +301,27 @@ public class DataManager implements Closeable {
 	}
 
 	/**
+	 * Converts the street model to a data model instance
+	 * 
+	 * @return The model as an unmodifiable list
+	 */
+	private List<BlockFace> streetToDataModel(File cacheFolder) {
+		ArrayList<BlockFace> l = new ArrayList<BlockFace>();
+		for (BlockFaceDefinition d : assetManager.getStretModel()) {
+			String name = BlockFace.getName(d.block, d.face);
+			File f = new File(cacheFolder, name);
+			BlockFace b = null;
+			if (f.exists()) {
+				b = BlockFaceParser.parse(f);
+			} 
+			if (b == null)
+				b = BlockFace.emptyPaddedBlockFace(d.block, d.face, d.numStalls);
+			l.add(b);
+		}
+		return Collections.unmodifiableList(l);
+	}
+
+	/**
 	 * Getter for set of sessions available, though
 	 * not necessarily in memory.
 	 * 
@@ -321,7 +341,7 @@ public class DataManager implements Closeable {
 	public Session getCurrentSession() {
 		return this.currentSession;
 	}
-	
+
 	/**
 	 * Removes sessions which are not the current session
 	 */
@@ -362,7 +382,7 @@ public class DataManager implements Closeable {
 		session.lockSession();
 		return this.sessions.remove(session);
 	}
-	
+
 	/**
 	 * Saves the current session changes to disk asynchronously
 	 */
@@ -406,7 +426,7 @@ public class DataManager implements Closeable {
 		if (this.closed)
 			throw new IllegalStateException(ERROR_CLOSED);
 	}
-	
+
 	/**
 	 * Method to check if there are available sessions to upload, determined
 	 * by the existence of a session that has a block face saved.
@@ -429,6 +449,7 @@ public class DataManager implements Closeable {
 	@Override
 	public void close() {
 		if (!this.closed) {
+			DataManager.instance = null;
 			for (Session s : this.sessions) {
 				File cacheFolder = s.cacheFolder;
 				File[] files = cacheFolder.listFiles();
@@ -437,7 +458,7 @@ public class DataManager implements Closeable {
 					AsyncTask t = Utils.asyncFileDelete(cacheFolder);
 					t.waitOnResult();
 				}
-				
+
 				this.dataThread.interrupt();
 				this.closed = true;
 			}

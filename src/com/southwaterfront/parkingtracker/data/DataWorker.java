@@ -14,6 +14,7 @@ import android.util.Log;
 import com.southwaterfront.parkingtracker.client.HttpClient;
 import com.southwaterfront.parkingtracker.client.HttpClient.RequestFailedException;
 import com.southwaterfront.parkingtracker.data.DataManager.Session;
+import com.southwaterfront.parkingtracker.data.DataTask.Tasks;
 import com.southwaterfront.parkingtracker.jsonify.BlockFaceJsonBuilder;
 import com.southwaterfront.parkingtracker.jsonify.Jsonify;
 import com.southwaterfront.parkingtracker.jsonify.MasterDataJsonBuilder;
@@ -72,6 +73,7 @@ class DataWorker implements Runnable {
 						Log.i(LOG_TAG, "Completed save data task for session " + task.sess);
 						break;
 					case UPLOAD_DATA:
+						saveData(new DataTask(task.sess, null, Tasks.SAVE_DATA));
 						uploadData(task);
 						Log.i(LOG_TAG, "Completed upload task with result " + task.getResult() + " on session " + task.sess);
 						break;
@@ -136,22 +138,21 @@ class DataWorker implements Runnable {
 			throw new IllegalStateException("How is the cache not a directory?");
 
 		File masterDataFile = sess.masterDataFile;
-		JsonObject masterObject;
+		JsonObject masterObject = null;
 		if (masterDataFile.exists()) {
 			FileInputStream in = null;
 			try {
 				in = new FileInputStream(masterDataFile);
 				masterObject = Jsonify.createJsonObjectFromStream(in);
 			} catch (Exception e) {
-				task.setResult(Result.FAIL, ERROR_MASTER_CORRUPT);
-				return;
 			} finally {
 				try {
 					in.close();
 				} catch (Exception e) {
 				}
 			}
-		} else {
+		} 
+		if (masterObject == null) {
 			masterObject = createMasterObjectFromFiles(task, cacheDir, masterDataFile);
 			if (task.getResult() == Result.FAIL)
 				return;
@@ -180,23 +181,9 @@ class DataWorker implements Runnable {
 		JsonObject masterObject = MasterDataJsonBuilder.buildObjectFromBlockFaceObjects(objs);
 
 		AsyncTask saveTask = Utils.asyncFileWrite(masterObject, masterDataFile);
-		Result saveResult = saveTask.waitOnResult();
-		if (saveResult == Result.SUCCESS)
-			deleteDirFiles(cacheDir);
+		saveTask.waitOnResult();
 
 		return masterObject;
-	}
-
-	/**
-	 * Except {@link DataManager#MASTER_DATA_FILE_NAME}
-	 * 
-	 * @param dir Directory
-	 */
-	private void deleteDirFiles(File dir) {
-		for (File f : dir.listFiles()) {
-			if (!f.getName().equals(DataManager.MASTER_DATA_FILE_NAME))
-				Utils.asyncFileDelete(f);
-		}
 	}
 
 	private List<JsonObject> buildFileJsonObjects(File cacheDir) {

@@ -208,18 +208,6 @@ public class AssetManager {
 	}
 
 	/**
-	 * Getter for data model
-	 * 
-	 * @return The model as an unmodifiable list
-	 */
-	public List<BlockFace> getDataModel() {
-		ArrayList<BlockFace> l = new ArrayList<BlockFace>();
-		for (BlockFaceDefinition d : this.streetModel)
-			l.add(BlockFace.emptyPaddedBlockFace(d.block, d.face, d.numStalls));
-		return Collections.unmodifiableList(l);
-	}
-
-	/**
 	 * Getter for street model definitions
 	 * 
 	 * @return unmodifiable Street model

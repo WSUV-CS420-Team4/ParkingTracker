@@ -48,7 +48,7 @@ public final class BlockFace {
 		
 		for (int i = 0; i < stalls; i++)
 			bF.stalls.add(ParkingStall.EmptyStall);
-		
+		bF.resetModifiedFlag();
 		return bF;
 	}
 	
@@ -157,6 +157,17 @@ public final class BlockFace {
 	 */
 	public String getName() {
 		return this.name;
+	}
+	
+	/**
+	 * Creats the blockface name for a block face
+	 * 
+	 * @param block Block id
+	 * @param face Face string
+	 * @return Block face name
+	 */
+	public static String getName(int block, String face) {
+		return block + "_" + face;
 	}
 	
 }

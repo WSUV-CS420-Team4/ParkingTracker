@@ -23,7 +23,7 @@ public class AlprEngine implements Closeable {
 
 	private final String LOG_TAG = "AlprEngine";
 
-	private static final AlprEngine instance = new AlprEngine();
+	private static AlprEngine instance = null;
 
 	private static final String ERROR_CLOSED = "The OcrEngine is closed and cannot be used";
 
@@ -38,9 +38,9 @@ public class AlprEngine implements Closeable {
 	private final BlockingQueue<TaskWrapper> imagesTasks;
 
 	private final Thread worker;
-	
+
 	private final String configFilePath;
-	
+
 	private volatile int numResults;
 
 	private static class TaskWrapper {
@@ -104,9 +104,9 @@ public class AlprEngine implements Closeable {
 		//this.worker.setDaemon(true);
 		this.worker.setName("OcrWorker");
 		this.worker.start();
-		
+
 		this.configFilePath = this.assetManager.getAlprConfigFile().getAbsolutePath();
-		
+
 		this.numResults = DEFAULT_RESULT_COUNT;
 	}
 
@@ -116,6 +116,8 @@ public class AlprEngine implements Closeable {
 	 * @return Singleton instance of {@link AlprEngine}
 	 */
 	public static AlprEngine getInstance() {
+		if (AlprEngine.instance == null)
+			AlprEngine.instance = new AlprEngine();
 		return AlprEngine.instance;
 	}
 
@@ -127,7 +129,7 @@ public class AlprEngine implements Closeable {
 	public int getNumberOfResults() {
 		return this.numResults;
 	}
-	
+
 	/**
 	 * Set the number of results for the ALPR engine to produce per picture
 	 * 
@@ -167,6 +169,7 @@ public class AlprEngine implements Closeable {
 	@Override
 	public void close() {
 		if (!this.closed) {
+			AlprEngine.instance = null;
 			Log.i(LOG_TAG, "Shutting down Alpr");
 			this.worker.interrupt();
 			this.closed = true;

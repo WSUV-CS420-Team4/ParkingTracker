@@ -42,6 +42,7 @@ import com.southwaterfront.parkingtracker.dialog.ChoosePlateDialogFragment;
 import com.southwaterfront.parkingtracker.dialog.LoginDialogFragment;
 import com.southwaterfront.parkingtracker.prefs.ParkingTrackerPreferences;
 import com.southwaterfront.parkingtracker.util.AsyncTask;
+import com.southwaterfront.parkingtracker.util.Result;
 import com.southwaterfront.parkingtracker.util.Utils;
 import com.southwaterfront.parkingtracker.util.WifiStateUploadableDataReceiver;
 
@@ -57,9 +58,8 @@ public class Main extends Activity {
 	String mCurrentPhotoPath;
 
 	private AssetManager assets;
-	private DataManager data;
-	private BlockFace face;
-	private List<BlockFace> b;
+	private DataManager dataManager;
+	private List<BlockFace> data;
 	private AlprEngine ocrEngine;
 	TextView textViewNotification;
 	AlertDialog.Builder wifiAlert;
@@ -195,8 +195,8 @@ public class Main extends Activity {
 			// TODO Change this so instead of best estimated result it is what the user clicks on
 			// Change this later Joel, I was just using for testing
 			Random r = new Random();
-			int block = r.nextInt(b.size() - 1) + 1;
-			b.get(block).setStall(new ParkingStall(result[0], new Date(System.currentTimeMillis()), null), stall++);
+			int block = r.nextInt(data.size() - 1) + 1;
+			data.get(block).setStall(new ParkingStall(result[0], new Date(System.currentTimeMillis()), null), stall++);
 
 			/*String tempt[] = new String[licensePlates.size()];
             tempt = licensePlates.toArray(tempt);*/
@@ -230,7 +230,7 @@ public class Main extends Activity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		data.saveCurrentSessionData();
+		dataManager.saveCurrentSessionData();
 		isInForeground = false;
 	}
 
@@ -241,14 +241,14 @@ public class Main extends Activity {
 				AssetManager.init(Main.this);
 				assets = AssetManager.getInstance();
 				assets.assetSanityCheck();
-				data = DataManager.getInstance();
+				dataManager = DataManager.getInstance();
 				ocrEngine = AlprEngine.getInstance();
 				Utils.resetCacheSize();
 				wifiFilter = new IntentFilter();
 				wifiFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 				wifiReceiver = new WifiStateUploadableDataReceiver();
 				registerReceiver(wifiReceiver, wifiFilter);
-				b = data.getCurrentSession().data;
+				data = dataManager.getCurrentSession().data;
 			}
 		};
 		Thread initThread = new Thread(r);
@@ -302,9 +302,6 @@ public class Main extends Activity {
 		fragmentTransaction = fragmentManager.beginTransaction();
 
 		ChoosePlateInit();
-
-
-		face = BlockFace.emptyPaddedBlockFace(1, "C", 14);
 
 		// Temp Button init location
 		takePhoto = (Button) findViewById(R.id.buttonMainPhoto);
@@ -379,14 +376,12 @@ public class Main extends Activity {
 
 	private void onDestroyAppClose() {
 		this.unregisterReceiver(this.wifiReceiver);
-		data.close();
+		dataManager.close();
 		ocrEngine.close();
 	}
 
 	private void upload() {
-		//data.saveBlockFace(face, null);
-		face = new BlockFace(3, "B");
-		data.uploadSessionData(new CallBack() {
+		dataManager.uploadSessionData(new CallBack() {
 
 			@Override
 			public void call(final AsyncTask task) {
@@ -396,6 +391,8 @@ public class Main extends Activity {
 					public void run() {
 						TextView view = (TextView) findViewById(R.id.textViewMainNotification);
 						view.setText("Result was a " + task.getResult());
+						if (task.getResult() == Result.SUCCESS)
+							data = dataManager.getCurrentSession().data;
 					}
 
 				});
