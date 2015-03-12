@@ -29,7 +29,7 @@ import com.southwaterfront.parkingtracker.prefs.ParkingTrackerPreferences;
  */
 public class WifiStateUploadableDataReceiver extends BroadcastReceiver {
 
-	private final String LOG_TAG = "WifiReceiver";
+	private final String LOG_TAG = "WifiStateUploadableDataReceiver";
 
 	private final Notification uploadNotification;
 
