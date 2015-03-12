@@ -35,6 +35,11 @@ public class ChoosePlateDialogFragment extends DialogFragment {
 
         View dialogView = inflater.inflate(R.layout.choose_plate, null);
 
+        final ListView listView = (ListView) dialogView.findViewById(R.id.listViewChoosePlate);
+        final TextView plateNo = (TextView) dialogView.findViewById(R.id.textViewChoosePlateResult);
+        final Button addLicense = (Button) dialogView.findViewById(R.id.buttonChoosePlateAddLicense);
+        final Button addFlag = (Button) dialogView.findViewById(R.id.buttonChoosePlateAddFlag);
+
         builder.setView(dialogView)
                 .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     @Override
@@ -48,11 +53,6 @@ public class ChoosePlateDialogFragment extends DialogFragment {
                         ChoosePlateDialogFragment.this.getDialog().cancel();
                     }
                 });
-
-        final ListView listView = (ListView) dialogView.findViewById(R.id.listViewChoosePlate);
-        final TextView plateNo = (TextView) dialogView.findViewById(R.id.textViewChoosePlateResult);
-        final Button addLicense = (Button) dialogView.findViewById(R.id.buttonChoosePlateAddLicense);
-        final Button addFlag = (Button) dialogView.findViewById(R.id.buttonChoosePlateAddFlag);
 
         listView.setAdapter( ((Main)getActivity()).getArrayAdapter() );
         listView.setOnItemClickListener( new AdapterView.OnItemClickListener() {

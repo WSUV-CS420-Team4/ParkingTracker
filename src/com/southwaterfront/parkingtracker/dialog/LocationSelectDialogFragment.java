@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 
+import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
 import com.southwaterfront.parkingtracker.R;
 
 import java.util.ArrayList;
@@ -33,6 +34,10 @@ public class LocationSelectDialogFragment extends DialogFragment {
 
         View dialogView = inflater.inflate(R.layout.location_select, null);
 
+        final Spinner block = (Spinner) dialogView.findViewById(R.id.spinnerLocationSelectBlock);
+        final Spinner face = (Spinner) dialogView.findViewById(R.id.spinnerLocationSelectFace);
+        final Spinner stall = (Spinner) dialogView.findViewById(R.id.spinnerLocationSelectStall);
+
         builder.setView(dialogView)
                 .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     @Override
@@ -47,11 +52,13 @@ public class LocationSelectDialogFragment extends DialogFragment {
                     }
                 });
 
-        final Spinner block = (Spinner) dialogView.findViewById(R.id.spinnerLocationSelectBlock);
-        final Spinner face = (Spinner) dialogView.findViewById(R.id.spinnerLocationSelectFace);
-        final Spinner stall = (Spinner) dialogView.findViewById(R.id.spinnerLocationSelectStall);
-
         List<String> tempList = new ArrayList<String>();
+
+        // TODO Check what data I get from getDataModel and pre populate spinners
+        AssetManager assetManager = AssetManager.getInstance();
+        assetManager.assetSanityCheck();
+        //assetManager.getDataModel();
+
 
         tempList.add("A");
         tempList.add("B");

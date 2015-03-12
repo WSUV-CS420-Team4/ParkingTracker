@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.southwaterfront.parkingtracker.R;
 import com.southwaterfront.parkingtracker.client.HttpClient;
@@ -25,12 +26,18 @@ public class LoginDialogFragment extends DialogFragment{
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        builder.setView(inflater.inflate(R.layout.login, null))
+        View dialogView = inflater.inflate(R.layout.login, null);
+
+        final EditText editTextName = (EditText) dialogView.findViewById(R.id.editTextLoginName);
+        final EditText editTextPassword = (EditText) dialogView.findViewById(R.id.editTextLoginPassword);
+
+        builder.setView(dialogView)
             .setPositiveButton("Sign In", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     //TODO LoginDialogFragment the user
-                	
+                	//HttpClient.sendLoginRequest(editTextName.getText().toString(), editTextPassword.getText().toString());
+
                 		// HttpClient.sendLoginRequest(username, password);
                 	
                     LocationSelectDialogFragment temp = new LocationSelectDialogFragment();
