@@ -49,6 +49,8 @@ public class BlockFaceParser {
 				JsonObject o = (JsonObject) elem;
 				String plate = o.getString(Jsonify.PLATE_ID, null);
 				String time = o.getString(Jsonify.TIME_ID, null);
+				String attr = o.getString(Jsonify.ATTR_ID, null);
+				String[] attrs = null;
 				if (plate == null || time == null)
 					continue;
 				Date d;
@@ -57,10 +59,12 @@ public class BlockFaceParser {
 				} catch (ParseException e) {
 					continue;
 				}
-				b.setStall(new ParkingStall(plate, d, null), i);
+				if (attr != null)
+					attrs = attr.split(Jsonify.STRING_DELIMITER);
+				b.setStall(new ParkingStall(plate, d, attrs), i);
 			}
 		}
-		
+
 		b.resetModifiedFlag();
 		return b;
 	}
