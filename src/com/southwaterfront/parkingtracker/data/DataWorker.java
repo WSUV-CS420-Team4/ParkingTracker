@@ -39,8 +39,8 @@ class DataWorker implements Runnable {
 	private static final String ERROR_SESSION_LOCKED = "Unable to complete the task because the session is locked and is in a read-only state";
 
 	private static final String ERROR_MASTER_CORRUPT = "The master data file with the upload data is corrupt";
-
-	private static final String ERROR_POST = "Failed posting data to server";
+	
+	private static final String ERROR_UPLOAD_IO = "Could not connect to server";
 
 	private final Session session;
 
@@ -162,7 +162,11 @@ class DataWorker implements Runnable {
 			HttpClient.postBlockFaceData(masterObject);
 		} catch (RequestFailedException e) {
 			Log.e(LOG_TAG, "Failed to post data", e);
-			task.setResult(Result.FAIL, ERROR_POST);
+			task.setResult(Result.FAIL, e.getMessage());
+			return;
+		} catch (IOException e) {
+			Log.e(LOG_TAG, "Failed to post data", e);
+			task.setResult(Result.FAIL, ERROR_UPLOAD_IO);
 			return;
 		}
 
