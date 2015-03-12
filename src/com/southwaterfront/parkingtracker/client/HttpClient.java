@@ -10,6 +10,7 @@ import java.net.URL;
 import javax.json.Json;
 import javax.json.JsonObject;
 
+import android.app.Activity;
 import android.util.Log;
 
 import com.google.api.client.http.ByteArrayContent;
@@ -20,6 +21,7 @@ import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
+import com.southwaterfront.parkingtracker.dialog.LoginDialogFragment;
 import com.southwaterfront.parkingtracker.jsonify.Jsonify;
 import com.southwaterfront.parkingtracker.util.Utils;
 
@@ -40,6 +42,8 @@ public class HttpClient {
 	private static final NetHttpTransport transport = new NetHttpTransport();
 	private static final HttpRequestFactory requestFactory = transport.createRequestFactory();
 	private static final int UNAUTHORIZED_STATUS_CODE = 401;
+	
+	private static final Activity main = AssetManager.getInstance().getMainActivity();
 
 	static public InputStream getStreetModel() throws RequestFailedException, IOException {
 		GenericUrl url = null;
@@ -55,6 +59,16 @@ public class HttpClient {
 			//login request
 
 			// TODO: Login
+			
+			
+			final LoginDialogFragment loginDialogFragment = new LoginDialogFragment();
+			loginDialogFragment.show(main.getFragmentManager(), "Login");
+			try {
+				loginDialogFragment.waitOnResult();
+			} catch (InterruptedException e) {
+				
+			}
+			
 		}
 
 		InputStream data = null;

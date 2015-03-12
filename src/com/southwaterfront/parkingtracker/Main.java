@@ -329,8 +329,8 @@ public class Main extends Activity {
 		progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
 		// Temp DialogFragment init location
-		LoginDialogFragment loginDialogFragment = new LoginDialogFragment();
-		loginDialogFragment.show(getFragmentManager(), "Login");
+		//LoginDialogFragment loginDialogFragment = new LoginDialogFragment();
+		//loginDialogFragment.show(getFragmentManager(), "Login");
 
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
