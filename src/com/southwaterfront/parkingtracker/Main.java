@@ -390,9 +390,12 @@ public class Main extends Activity {
 					@Override
 					public void run() {
 						TextView view = (TextView) findViewById(R.id.textViewMainNotification);
-						view.setText("Result was a " + task.getResult());
-						if (task.getResult() == Result.SUCCESS)
+						//view.setText("Result was a " + task.getResult());
+						if (task.getResult() == Result.SUCCESS) {
 							data = dataManager.getCurrentSession().data;
+							view.setText("Successfully uploaded data");
+						} else
+							view.setText(task.getErrorMessage());
 					}
 
 				});

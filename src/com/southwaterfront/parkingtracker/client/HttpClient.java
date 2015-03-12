@@ -40,52 +40,47 @@ public class HttpClient {
 	private static final NetHttpTransport transport = new NetHttpTransport();
 	private static final HttpRequestFactory requestFactory = transport.createRequestFactory();
 	private static final int UNAUTHORIZED_STATUS_CODE = 401;
-	
-	static public InputStream getStreetModel() throws RequestFailedException {
+
+	static public InputStream getStreetModel() throws RequestFailedException, IOException {
 		GenericUrl url = null;
 		try {
 			url = new GenericUrl(new URL(GET_STREET_MODEL_URL));
 		} catch (MalformedURLException e) {
 			// Not possible
 		} 
-		
+
 		if (authToken == null) {
-			
+
 			//tel app to get login data
 			//login request
-			
+
 			// TODO: Login
 		}
-		
+
 		InputStream data = null;
 		HttpRequest getRequest;
 		HttpResponse response;
-		try {
-			getRequest = requestFactory.buildGetRequest(url);
-			HttpHeaders headers = getRequest.getHeaders();
-			headers.set(authTokenKeyName, authToken);
-			getRequest.setHeaders(headers);
-			response = getRequest.execute();	
-		} catch (IOException e) {
-			Log.e(LOG_TAG, "The request could not execute Error message: " + e.getMessage(), e);
-			throw new RequestFailedException("The request failed to execute", e);
-		}
-		
+		getRequest = requestFactory.buildGetRequest(url);
+		HttpHeaders headers = getRequest.getHeaders();
+		headers.set(authTokenKeyName, authToken);
+		getRequest.setHeaders(headers);
+		response = getRequest.execute();	
+
+
 		if (!response.isSuccessStatusCode()) {
 			int status = response.getStatusCode();
 			String error = status + ": " + response.getStatusMessage();
 			throw new RequestFailedException(error);
 		}
-		try {
-			data = response.getContent();
-		} catch (IOException e) {
-		}
+
+		data = response.getContent();
+
 		return data;
-		
+
 	}
 
 
-	static public void postBlockFaceData(byte[] d) throws RequestFailedException {
+	static public void postBlockFaceData(byte[] d) throws RequestFailedException, IOException {
 		if (d == null)
 			throw new IllegalArgumentException("Bytes to send cannot be null");
 
@@ -95,28 +90,25 @@ public class HttpClient {
 		} catch (MalformedURLException e) {
 			// Not possible
 		} 
-		
+
 		if (authToken == null) {
-			
+
 			//tel app to get login data
 			//login request
-			
+
 			// TODO: Login
 		}
-			
+
 		ByteArrayContent data = new ByteArrayContent(null, d);
 		HttpRequest postRequest;
 		HttpResponse response;
-		try {
-			postRequest = requestFactory.buildPostRequest(url, data);
-			HttpHeaders headers = postRequest.getHeaders();
-			headers.set(authTokenKeyName, authToken);
-			postRequest.setHeaders(headers);
-			response = postRequest.execute();	
-		} catch (IOException e) {
-			Log.e(LOG_TAG, "The request could not execute Error message: " + e.getMessage(), e);
-			throw new RequestFailedException("The request failed to execute", e);
-		}
+
+		postRequest = requestFactory.buildPostRequest(url, data);
+		HttpHeaders headers = postRequest.getHeaders();
+		headers.set(authTokenKeyName, authToken);
+		postRequest.setHeaders(headers);
+		response = postRequest.execute();	
+
 
 		Log.i(LOG_TAG, "The POST request response code is " + response.getStatusCode() + " with message " + response.getStatusMessage());
 
@@ -131,7 +123,7 @@ public class HttpClient {
 		}
 	}
 
-	public static void postBlockFaceData(JsonObject obj) throws RequestFailedException {
+	public static void postBlockFaceData(JsonObject obj) throws RequestFailedException, IOException {
 		if (obj == null)
 			throw new IllegalArgumentException("JsonObject cannot be null");
 
@@ -150,8 +142,9 @@ public class HttpClient {
 	 * @param password Password
 	 * @return True is logged in, false if incorrect login credentials
 	 * @throws RequestFailedException Thrown if there is an IO error or server error
+	 * @throws IOException 
 	 */
-	public static boolean sendLoginRequest(String username, String password) throws RequestFailedException {
+	public static boolean sendLoginRequest(String username, String password) throws RequestFailedException, IOException {
 		if (username == null || password == null)
 			throw new IllegalArgumentException("Arguments cannot be null");
 		JsonObject credentials = Json.createObjectBuilder().add("Username", username).add("Password", password).build();
@@ -166,13 +159,10 @@ public class HttpClient {
 		ByteArrayOutputStream temp = new ByteArrayOutputStream();
 		Jsonify.writeJsonObjectToStream(credentials, temp);
 		ByteArrayContent out = new ByteArrayContent(null, temp.toByteArray()); 
-		try {
-			loginRequest = requestFactory.buildPostRequest(url, out);
-			response = loginRequest.execute();
-		} catch (IOException e) {
-			Log.e(LOG_TAG, "The  login request could not execute Error message: " + e.getMessage(), e);
-			throw new RequestFailedException("The request failed to execute", e);
-		}
+
+		loginRequest = requestFactory.buildPostRequest(url, out);
+		response = loginRequest.execute();
+
 		if (!response.isSuccessStatusCode()){
 			int status = response.getStatusCode();
 			String error;
@@ -236,10 +226,6 @@ public class HttpClient {
 
 		public RequestFailedException(String string) {
 			super(string);
-		}
-
-		public RequestFailedException() {
-			super();
 		}
 
 		private static final long serialVersionUID = -4728904407478563082L;
