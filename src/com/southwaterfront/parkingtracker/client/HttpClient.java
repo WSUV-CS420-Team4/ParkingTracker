@@ -185,7 +185,7 @@ public class HttpClient {
 			try {
 				in = response.getContent();
 				js = Jsonify.createJsonObjectFromStream(in);
-				String token = js.getString(TOKEN_GET_KEY);
+				String token = js.getString(TOKEN_GET_KEY, null);
 				if (token != null && token.length() > 0) {
 					authToken = token;
 					Utils.asyncFileDelete(authTokenFile);
