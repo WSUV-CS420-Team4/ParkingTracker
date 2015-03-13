@@ -30,13 +30,13 @@ import com.southwaterfront.parkingtracker.client.HttpClient.RequestFailedExcepti
  * Created by Joel on 3/3/2015.
  */
 public class LoginDialogFragment extends DialogFragment {
-	
+
 	private static final String LOG_TAG = LoginDialogFragment.class.getSimpleName();
 
 	private final Lock lock;
 	private final Condition done;
 	private boolean success;
-	
+
 	private static final Activity main = AssetManager.getInstance().getMainActivity();
 
 	public LoginDialogFragment() {
@@ -174,7 +174,7 @@ public class LoginDialogFragment extends DialogFragment {
 
 		return dialog;
 	}
-	
+
 	private void setText(final TextView v, final String m) {
 		main.runOnUiThread(new Runnable() {
 
@@ -182,7 +182,7 @@ public class LoginDialogFragment extends DialogFragment {
 			public void run() {
 				v.setText(m);
 			}
-			
+
 		});
 	}
 }

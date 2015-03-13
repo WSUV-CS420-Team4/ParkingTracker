@@ -34,6 +34,7 @@ public class HttpClient {
 	private static String LOG_TAG = "HttpClient";
 	private static final File authTokenFile = AssetManager.getInstance().getAuthToken();
 	private static final String authTokenKeyName = "X-Auth-Token";
+	private static final String TOKEN_GET_KEY = "Token";
 	private static String authToken = readAuthFile(authTokenFile);
 
 	private static final String POST_BLOCKFACE_DATA_URL = "https://bend.encs.vancouver.wsu.edu/~jason_moss/api/v1/blockfaces";
@@ -184,7 +185,7 @@ public class HttpClient {
 			try {
 				in = response.getContent();
 				js = Jsonify.createJsonObjectFromStream(in);
-				String token = js.getString(authTokenKeyName);
+				String token = js.getString(TOKEN_GET_KEY);
 				if (token != null && token.length() > 0) {
 					authToken = token;
 					Utils.asyncFileDelete(authTokenFile);
@@ -193,7 +194,7 @@ public class HttpClient {
 					return false;
 
 			} catch (Exception e) {
-				return false;
+				throw new RequestFailedException("Failed to get content from server", e);
 			} finally {
 				try {
 					if (in != null)
@@ -227,7 +228,7 @@ public class HttpClient {
 
 	public static class RequestFailedException extends Exception {
 
-		public RequestFailedException(String string, IOException e) {
+		public RequestFailedException(String string, Exception e) {
 			super(string, e);
 		}
 

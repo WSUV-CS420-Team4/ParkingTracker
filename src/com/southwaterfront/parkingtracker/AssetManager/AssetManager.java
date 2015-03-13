@@ -201,8 +201,7 @@ public class AssetManager {
 		}
 
 		if (streetModel == null)
-			// TODO: Do something drastic
-			throw new IllegalStateException("Ded");
+			throw new IllegalStateException("Unable to get a streetmodel so cannot start");
 		else
 			streetModel = Collections.unmodifiableList(streetModel);
 	}
