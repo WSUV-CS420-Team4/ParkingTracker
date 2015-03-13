@@ -25,7 +25,7 @@ public class AlprEngine implements Closeable {
 
 	private static AlprEngine instance = null;
 
-	private static final String ERROR_CLOSED = "The OcrEngine is closed and cannot be used";
+	private static final String ERROR_CLOSED = "The AlprEngine is closed and cannot be used";
 
 	private static final int DEFAULT_RESULT_COUNT = 5;
 
@@ -102,7 +102,7 @@ public class AlprEngine implements Closeable {
 		AlprWorker w = new AlprWorker(this.alpr, this.imagesTasks);
 		this.worker = new Thread(w);
 		//this.worker.setDaemon(true);
-		this.worker.setName("OcrWorker");
+		this.worker.setName("AlprWorker");
 		this.worker.start();
 
 		this.configFilePath = this.assetManager.getAlprConfigFile().getAbsolutePath();

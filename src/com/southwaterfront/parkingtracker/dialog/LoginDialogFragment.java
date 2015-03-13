@@ -5,6 +5,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -15,10 +16,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.southwaterfront.parkingtracker.R;
+import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
 import com.southwaterfront.parkingtracker.client.HttpClient;
 import com.southwaterfront.parkingtracker.client.HttpClient.RequestFailedException;
 
@@ -27,18 +31,24 @@ import com.southwaterfront.parkingtracker.client.HttpClient.RequestFailedExcepti
  */
 public class LoginDialogFragment extends DialogFragment {
 	
+	private static final String LOG_TAG = LoginDialogFragment.class.getSimpleName();
+
 	private final Lock lock;
 	private final Condition done;
 	private boolean success;
 	
+	private static final Activity main = AssetManager.getInstance().getMainActivity();
+
 	public LoginDialogFragment() {
 		lock = new ReentrantLock();
 		done = lock.newCondition();
 		success = false;
 	}
-	
+
 	public boolean waitOnResult() throws InterruptedException {
+		lock.lock();
 		done.await();
+		lock.unlock();
 		return success;
 	}
 
@@ -52,52 +62,65 @@ public class LoginDialogFragment extends DialogFragment {
 
 		final EditText editTextName = (EditText) dialogView.findViewById(R.id.editTextLoginName);
 		final EditText editTextPassword = (EditText) dialogView.findViewById(R.id.editTextLoginPassword);
+		final TextView textViewLoginTitle = (TextView) dialogView.findViewById(R.id.textViewLoginTitle);
 
 		builder.setView(dialogView)
-		.setPositiveButton("Sign In", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				//TODO LoginDialogFragment the user
-				Runnable r = new Runnable() {
-
-					public void run() {
-						try {
-							HttpClient.sendLoginRequest(editTextName.getText().toString(), editTextPassword.getText().toString());
-						} catch (RequestFailedException e) {
-							// TODO Auto-generated catch block
-							Log.e("LoginDialog", e.getMessage(), e);
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							Log.e("LoginDialog", e.getMessage(), e);
-						}
-						
-						done.signal();
-					}
-				};
-				Thread netThread = new Thread(r);
-				netThread.start();
-				// HttpClient.sendLoginRequest(username, password);
-
-				//LocationSelectDialogFragment temp = new LocationSelectDialogFragment();
-				//temp.show(getFragmentManager(), "Temp");
-			}
-		})
+		.setPositiveButton("Sign In", null)
 
 		.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
+				lock.lock();
 				done.signal();
+				lock.unlock();
 				LoginDialogFragment.this.getDialog().cancel();
 			}
 		});
 
 		AlertDialog dialog = builder.create();
-		// dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(l);
 
 		dialog.setOnShowListener(new DialogInterface.OnShowListener() {
 			@Override
 			public void onShow(final DialogInterface dialog) {
 				final Button cancel = ((AlertDialog)dialog).getButton(DialogInterface.BUTTON_NEGATIVE);
 				final Button confirm = ((AlertDialog)dialog).getButton(DialogInterface.BUTTON_POSITIVE);
+
+				confirm.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						Runnable r = new Runnable() {
+
+							public void run() {
+								boolean loggedIn = false;
+								try {
+									setText(textViewLoginTitle, "Logging in");
+									loggedIn = HttpClient.sendLoginRequest(editTextName.getText().toString(), editTextPassword.getText().toString());
+								} catch (RequestFailedException e) {
+									setText(textViewLoginTitle, e.getMessage());
+									Log.e(LOG_TAG, e.getMessage(), e);
+									return;
+								} catch (IOException e) {
+									setText(textViewLoginTitle, "Unable to connect to server");
+									Log.e(LOG_TAG, e.getMessage(), e);
+									return;
+								}
+								if (loggedIn) {
+									success = true;
+									lock.lock();
+									done.signal();
+									lock.unlock();
+									dialog.dismiss();
+								} else {
+									setText(textViewLoginTitle, "Incorrect username/password");
+								}
+							}
+						};
+						Thread netThread = new Thread(r);
+						netThread.start();
+
+					}
+
+				});
 
 				// Change color of button when pressed
 				cancel.setOnTouchListener(new View.OnTouchListener() {
@@ -150,5 +173,16 @@ public class LoginDialogFragment extends DialogFragment {
 
 
 		return dialog;
+	}
+	
+	private void setText(final TextView v, final String m) {
+		main.runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				v.setText(m);
+			}
+			
+		});
 	}
 }

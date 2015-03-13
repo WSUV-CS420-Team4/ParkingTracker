@@ -195,7 +195,7 @@ public class Main extends Activity {
 			// TODO Change this so instead of best estimated result it is what the user clicks on
 			// Change this later Joel, I was just using for testing
 			Random r = new Random();
-			int block = r.nextInt(data.size() - 1) + 1;
+			int block = r.nextInt(data.size() - 1);
 			data.get(block).setStall(new ParkingStall(result[0], new Date(System.currentTimeMillis()), null), stall++);
 
 			/*String tempt[] = new String[licensePlates.size()];
@@ -230,7 +230,8 @@ public class Main extends Activity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		dataManager.saveCurrentSessionData();
+		if (dataManager != null)
+			dataManager.saveCurrentSessionData();
 		isInForeground = false;
 	}
 

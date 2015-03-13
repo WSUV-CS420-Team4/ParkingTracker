@@ -42,10 +42,24 @@ public class HttpClient {
 	private static final NetHttpTransport transport = new NetHttpTransport();
 	private static final HttpRequestFactory requestFactory = transport.createRequestFactory();
 	private static final int UNAUTHORIZED_STATUS_CODE = 401;
-	
+
 	private static final Activity main = AssetManager.getInstance().getMainActivity();
 
-	static public InputStream getStreetModel() throws RequestFailedException, IOException {
+	private static final String ERROR_LOGIN = "Failed to login";
+
+	private static void initBlockingUILogin() throws RequestFailedException {
+		final LoginDialogFragment loginDialogFragment = new LoginDialogFragment();
+		loginDialogFragment.show(main.getFragmentManager(), "Login");
+		boolean loggedIn = false;
+		try {
+			loggedIn = loginDialogFragment.waitOnResult();
+		} catch (InterruptedException e) {
+		}
+		if (!loggedIn)
+			throw new RequestFailedException(ERROR_LOGIN);
+	}
+
+	public static InputStream getStreetModel() throws RequestFailedException, IOException {
 		GenericUrl url = null;
 		try {
 			url = new GenericUrl(new URL(GET_STREET_MODEL_URL));
@@ -53,23 +67,8 @@ public class HttpClient {
 			// Not possible
 		} 
 
-		if (authToken == null) {
-
-			//tel app to get login data
-			//login request
-
-			// TODO: Login
-			
-			
-			final LoginDialogFragment loginDialogFragment = new LoginDialogFragment();
-			loginDialogFragment.show(main.getFragmentManager(), "Login");
-			try {
-				loginDialogFragment.waitOnResult();
-			} catch (InterruptedException e) {
-				
-			}
-			
-		}
+		if (authToken == null)
+			initBlockingUILogin();
 
 		InputStream data = null;
 		HttpRequest getRequest;
@@ -80,8 +79,9 @@ public class HttpClient {
 		getRequest.setHeaders(headers);
 		response = getRequest.execute();	
 
-
-		if (!response.isSuccessStatusCode()) {
+		if (response.getStatusCode() == UNAUTHORIZED_STATUS_CODE)
+			initBlockingUILogin();
+		else if (!response.isSuccessStatusCode()) {
 			int status = response.getStatusCode();
 			String error = status + ": " + response.getStatusMessage();
 			throw new RequestFailedException(error);
@@ -105,13 +105,8 @@ public class HttpClient {
 			// Not possible
 		} 
 
-		if (authToken == null) {
-
-			//tel app to get login data
-			//login request
-
-			// TODO: Login
-		}
+		if (authToken == null)
+			initBlockingUILogin();
 
 		ByteArrayContent data = new ByteArrayContent(null, d);
 		HttpRequest postRequest;
@@ -126,11 +121,9 @@ public class HttpClient {
 
 		Log.i(LOG_TAG, "The POST request response code is " + response.getStatusCode() + " with message " + response.getStatusMessage());
 
-		if (response.getStatusCode() == UNAUTHORIZED_STATUS_CODE){
-			// TODO: Login
-
-
-		} else if (!response.isSuccessStatusCode()) {
+		if (response.getStatusCode() == UNAUTHORIZED_STATUS_CODE)
+			initBlockingUILogin();
+		else if (!response.isSuccessStatusCode()) {
 			int status = response.getStatusCode();
 			String error = status + ": " + response.getStatusMessage();
 			throw new RequestFailedException(error);
