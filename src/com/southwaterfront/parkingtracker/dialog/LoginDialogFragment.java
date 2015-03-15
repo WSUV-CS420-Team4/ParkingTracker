@@ -46,9 +46,12 @@ public class LoginDialogFragment extends DialogFragment {
 	}
 
 	public boolean waitOnResult() throws InterruptedException {
-		lock.lock();
-		done.await();
-		lock.unlock();
+		try {
+			lock.lock();
+			done.await();
+		} finally {
+			lock.unlock();
+		}
 		return success;
 	}
 
@@ -69,9 +72,12 @@ public class LoginDialogFragment extends DialogFragment {
 
 		.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
-				lock.lock();
-				done.signal();
-				lock.unlock();
+				try {
+					lock.lock();
+					done.signal();
+				} finally {
+					lock.unlock();
+				}
 				LoginDialogFragment.this.getDialog().cancel();
 			}
 		});
@@ -106,9 +112,12 @@ public class LoginDialogFragment extends DialogFragment {
 								}
 								if (loggedIn) {
 									success = true;
-									lock.lock();
-									done.signal();
-									lock.unlock();
+									try {
+										lock.lock();
+										done.signal();
+									} finally {
+										lock.unlock();
+									}
 									dialog.dismiss();
 								} else {
 									setText(textViewLoginTitle, "Incorrect username/password");
