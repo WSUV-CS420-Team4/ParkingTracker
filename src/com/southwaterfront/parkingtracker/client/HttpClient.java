@@ -19,6 +19,7 @@ import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpResponse;
+import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
 import com.southwaterfront.parkingtracker.dialog.LoginDialogFragment;
@@ -111,14 +112,24 @@ public class HttpClient {
 
 		ByteArrayContent data = new ByteArrayContent(null, d);
 		HttpRequest postRequest;
-		HttpResponse response;
+		HttpResponse response = null;
 
 		postRequest = requestFactory.buildPostRequest(url, data);
 		HttpHeaders headers = postRequest.getHeaders();
 		headers.set(authTokenKeyName, authToken);
 		postRequest.setHeaders(headers);
-		response = postRequest.execute();	
-
+		try {
+			response = postRequest.execute();	
+		} catch (HttpResponseException e) {
+			if (e.getStatusCode() == UNAUTHORIZED_STATUS_CODE) {
+				initBlockingUILogin();
+				response = postRequest.execute();
+			} else if (!e.isSuccessStatusCode()) {
+				int status = e.getStatusCode();
+				String error = status + ": " + e.getStatusMessage();
+				throw new RequestFailedException(error);
+			}
+		}
 
 		Log.i(LOG_TAG, "The POST request response code is " + response.getStatusCode() + " with message " + response.getStatusMessage());
 
@@ -169,7 +180,17 @@ public class HttpClient {
 		ByteArrayContent out = new ByteArrayContent(null, temp.toByteArray()); 
 
 		loginRequest = requestFactory.buildPostRequest(url, out);
-		response = loginRequest.execute();
+		try {
+			response = loginRequest.execute();
+		}	catch (HttpResponseException e) {
+			int status = e.getStatusCode();
+			String error;
+			if (status == UNAUTHORIZED_STATUS_CODE)
+				return false;
+			else
+				error = status + ": " + e.getStatusMessage();
+			throw new RequestFailedException(error);
+		}
 
 		if (!response.isSuccessStatusCode()){
 			int status = response.getStatusCode();

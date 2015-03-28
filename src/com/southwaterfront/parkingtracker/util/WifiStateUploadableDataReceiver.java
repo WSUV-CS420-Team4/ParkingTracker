@@ -34,7 +34,7 @@ public class WifiStateUploadableDataReceiver extends BroadcastReceiver {
 	private final Notification uploadNotification;
 
 	private final DataManager data;
-	
+
 	private final NotificationManager notificationManager;
 
 	/**
@@ -48,13 +48,13 @@ public class WifiStateUploadableDataReceiver extends BroadcastReceiver {
 	public WifiStateUploadableDataReceiver() {
 		uploadNotification = Notifications.getUploadNotifcation();
 		data = DataManager.getInstance();
-		
+
 		AssetManager assets = AssetManager.getInstance();
 		Context context = assets.getMainContext();
 
 		notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 	}
-	
+
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		boolean uploadSettingSet = ParkingTrackerPreferences.getWifiDataUploadNotificationSetting();
@@ -65,8 +65,10 @@ public class WifiStateUploadableDataReceiver extends BroadcastReceiver {
 					notificationManager.notify(0, uploadNotification);
 
 				Log.i(LOG_TAG, "Wifi now connected");
-			} else if (wifiWasConnected && !wifiIsConnected)
+			} else if (wifiWasConnected && !wifiIsConnected) {
 				Log.i(LOG_TAG, "Wifi now disconnected");
+				notificationManager.cancel(0);
+			}
 		}
 		wifiWasConnected = wifiIsConnected;
 	}
