@@ -80,6 +80,7 @@ public class ChoosePlateDialogFragment extends DialogFragment {
             public void onClick(View v) {
                 // Perform action on click
                 // TODO
+                ((Main) getActivity()).showSetFlagsDialog();
             }
         });
 

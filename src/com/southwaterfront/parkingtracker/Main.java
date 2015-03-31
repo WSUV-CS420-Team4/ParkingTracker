@@ -40,6 +40,7 @@ import com.southwaterfront.parkingtracker.data.DataManager;
 import com.southwaterfront.parkingtracker.data.ParkingStall;
 import com.southwaterfront.parkingtracker.dialog.ChoosePlateDialogFragment;
 import com.southwaterfront.parkingtracker.dialog.LoginDialogFragment;
+import com.southwaterfront.parkingtracker.dialog.SetFlagsDialogFragment;
 import com.southwaterfront.parkingtracker.prefs.ParkingTrackerPreferences;
 import com.southwaterfront.parkingtracker.util.AsyncTask;
 import com.southwaterfront.parkingtracker.util.Result;
@@ -74,6 +75,9 @@ public class Main extends Activity {
 	FragmentTransaction fragmentTransaction;
 	Button takePhoto;
 	ProgressBar progressBar;
+
+    CharSequence[] flagOptions = { "Handicap Placards", "Residential  Permit", "Employee Permit", "Student Permit", "Carpool Permit", "Other" };
+    boolean[] flagSelections;
 
 	private File createImageFile() throws IOException {
 		// Create an image file name
@@ -179,6 +183,7 @@ public class Main extends Activity {
 
 	private void setOcrResult(String[] result) {
 		licensePlates.clear();
+        clearFlagSelections();
 		if (result != null) {
 			/*int i = 0;
 			for (; i < result.length - 1; i++)
@@ -361,6 +366,12 @@ public class Main extends Activity {
 		newFragment.show(getFragmentManager(), "choosePlate");
 	}
 
+    public void showSetFlagsDialog() {
+        // Create the fragment and show it as a dialog.
+        SetFlagsDialogFragment newFragment = SetFlagsDialogFragment.newInstance();
+        newFragment.show(getFragmentManager(), "setFlags");
+    }
+
 	public ArrayAdapter<String> getArrayAdapter() {
 		return arrayAdapter;
 	}
@@ -405,6 +416,22 @@ public class Main extends Activity {
 		});
 
 	}
+
+    public CharSequence[] getFlagOptions() {
+        return flagOptions;
+    }
+
+    public boolean[] getFlagSelections() {
+        return flagSelections;
+    }
+
+    public void setFlagSelections(boolean[] flagSelections) {
+        this.flagSelections = flagSelections;
+    }
+
+    private void clearFlagSelections() {
+        flagSelections =  new boolean[ flagOptions.length ];
+    }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

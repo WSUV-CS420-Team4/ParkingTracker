@@ -10,7 +10,9 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
+import com.southwaterfront.parkingtracker.Main;
 import com.southwaterfront.parkingtracker.R;
 
 /**
@@ -18,17 +20,44 @@ import com.southwaterfront.parkingtracker.R;
  */
 public class SetFlagsDialogFragment extends DialogFragment {
 
+    public static SetFlagsDialogFragment newInstance() {
+        return new SetFlagsDialogFragment();
+    }
+
+    protected boolean[] selections =  null;
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        builder.setView(inflater.inflate(R.layout.set_flags, null))
+        if ( ((Main) getActivity()).getFlagSelections() != null) {
+            selections = new boolean[ ((Main) getActivity()).getFlagSelections().length ];
+            System.arraycopy(((Main) getActivity()).getFlagSelections(), 0, selections, 0, ((Main) getActivity()).getFlagSelections().length);
+        }
+
+        builder.setTitle("Add Flags")
+                .setMultiChoiceItems(((Main) getActivity()).getFlagOptions(), selections, new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+
+                    }
+                })
+
                 .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //TODO SetFlagDialogFragment
+                        ((Main) getActivity()).setFlagSelections(selections);
+                        int temp = 0;
+                        for (boolean bool : selections) {
+                            if (bool)
+                                temp++;
+                        }
+                        if (temp == 1) {
+                            Toast.makeText(getActivity().getApplicationContext(), "Set " + temp + " flag", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getActivity().getApplicationContext(), "Set " + temp + " flags", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 })
 

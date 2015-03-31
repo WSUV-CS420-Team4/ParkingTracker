@@ -33,7 +33,7 @@ public class LoginDialogFragment extends DialogFragment {
 
 	private static final String LOG_TAG = LoginDialogFragment.class.getSimpleName();
 
-	private final Lock lock;
+	Lock lock;
 	private final Condition done;
 	private boolean success;
 
