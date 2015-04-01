@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.southwaterfront.parkingtracker.R;
 
@@ -18,17 +20,29 @@ import com.southwaterfront.parkingtracker.R;
  */
 public class AddLicenseDialogFragment extends DialogFragment {
 
+    public static AddLicenseDialogFragment newInstance() {
+        return new AddLicenseDialogFragment();
+    }
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        builder.setView(inflater.inflate(R.layout.add_license, null))
+        View dialogView = inflater.inflate(R.layout.add_license, null);
+        final EditText createLicense = (EditText) dialogView.findViewById(R.id.editTextLicenseField);
+
+        View choosePlateDialogView = inflater.inflate(R.layout.choose_plate, null);
+        final TextView plateNo = (TextView) choosePlateDialogView.findViewById(R.id.textViewChoosePlateResult);
+
+        builder.setView(dialogView)
                 .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //TODO SetFlagDialogFragment
+
+                        ((ChoosePlateDialogFragment)getFragmentManager().findFragmentByTag("choosePlate"))
+                                .setResultText(createLicense.getText().toString());
                     }
                 })
 
@@ -94,8 +108,7 @@ public class AddLicenseDialogFragment extends DialogFragment {
             }
         });
 
-
-
         return dialog;
     }
+
 }

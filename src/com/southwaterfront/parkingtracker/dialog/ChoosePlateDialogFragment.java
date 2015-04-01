@@ -23,6 +23,8 @@ import com.southwaterfront.parkingtracker.R;
  */
 public class ChoosePlateDialogFragment extends DialogFragment {
 
+    View dialogView;
+
     public static ChoosePlateDialogFragment newInstance() {
         return new ChoosePlateDialogFragment();
     }
@@ -33,7 +35,7 @@ public class ChoosePlateDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        View dialogView = inflater.inflate(R.layout.choose_plate, null);
+        dialogView = inflater.inflate(R.layout.choose_plate, null);
 
         final ListView listView = (ListView) dialogView.findViewById(R.id.listViewChoosePlate);
         final TextView plateNo = (TextView) dialogView.findViewById(R.id.textViewChoosePlateResult);
@@ -44,7 +46,7 @@ public class ChoosePlateDialogFragment extends DialogFragment {
                 .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //TODO SetFlagDialogFragment
+                        //TODO Confirm
                     }
                 })
 
@@ -72,14 +74,13 @@ public class ChoosePlateDialogFragment extends DialogFragment {
         addLicense.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Perform action on click
-                // TODO
+                ((Main) getActivity()).showAddLicenseDialog();
             }
         });
 
         addFlag.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Perform action on click
-                // TODO
                 ((Main) getActivity()).showSetFlagsDialog();
             }
         });
@@ -137,5 +138,9 @@ public class ChoosePlateDialogFragment extends DialogFragment {
         });
 
         return dialog;
+    }
+
+    public void setResultText(final String string) {
+        ((TextView) dialogView.findViewById(R.id.textViewChoosePlateResult)).setText(string);
     }
 }

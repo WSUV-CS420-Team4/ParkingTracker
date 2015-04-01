@@ -38,6 +38,7 @@ import com.southwaterfront.parkingtracker.data.BlockFace;
 import com.southwaterfront.parkingtracker.data.CallBack;
 import com.southwaterfront.parkingtracker.data.DataManager;
 import com.southwaterfront.parkingtracker.data.ParkingStall;
+import com.southwaterfront.parkingtracker.dialog.AddLicenseDialogFragment;
 import com.southwaterfront.parkingtracker.dialog.ChoosePlateDialogFragment;
 import com.southwaterfront.parkingtracker.dialog.LoginDialogFragment;
 import com.southwaterfront.parkingtracker.dialog.SetFlagsDialogFragment;
@@ -370,6 +371,13 @@ public class Main extends Activity {
         // Create the fragment and show it as a dialog.
         SetFlagsDialogFragment newFragment = SetFlagsDialogFragment.newInstance();
         newFragment.show(getFragmentManager(), "setFlags");
+    }
+
+
+    public void showAddLicenseDialog() {
+        // Create the fragment and show it as a dialog.
+        AddLicenseDialogFragment newFragment = AddLicenseDialogFragment.newInstance();
+        newFragment.show(getFragmentManager(), "addLicense");
     }
 
 	public ArrayAdapter<String> getArrayAdapter() {
