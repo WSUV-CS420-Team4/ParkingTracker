@@ -23,7 +23,7 @@ import com.southwaterfront.parkingtracker.R;
  */
 public class ChoosePlateDialogFragment extends DialogFragment {
 
-    View dialogView;
+    private View dialogView;
 
     public static ChoosePlateDialogFragment newInstance() {
         return new ChoosePlateDialogFragment();
@@ -47,6 +47,8 @@ public class ChoosePlateDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //TODO Confirm
+                        Log.i("ChoosePlateDialog", "Confirm Clicked!");
+                        ((Main) getActivity()).showLocationSelectDialog();
                     }
                 })
 

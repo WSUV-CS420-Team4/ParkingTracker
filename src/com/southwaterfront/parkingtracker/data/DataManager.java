@@ -307,7 +307,7 @@ public class DataManager implements Closeable {
 	 */
 	private List<BlockFace> streetToDataModel(File cacheFolder) {
 		ArrayList<BlockFace> l = new ArrayList<BlockFace>();
-		for (BlockFaceDefinition d : assetManager.getStretModel()) {
+		for (BlockFaceDefinition d : assetManager.getStreetModel()) {
 			String name = BlockFace.getName(d.block, d.face);
 			File f = new File(cacheFolder, name);
 			BlockFace b = null;

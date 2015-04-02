@@ -40,7 +40,7 @@ import com.southwaterfront.parkingtracker.data.DataManager;
 import com.southwaterfront.parkingtracker.data.ParkingStall;
 import com.southwaterfront.parkingtracker.dialog.AddLicenseDialogFragment;
 import com.southwaterfront.parkingtracker.dialog.ChoosePlateDialogFragment;
-import com.southwaterfront.parkingtracker.dialog.LoginDialogFragment;
+import com.southwaterfront.parkingtracker.dialog.LocationSelectDialogFragment;
 import com.southwaterfront.parkingtracker.dialog.SetFlagsDialogFragment;
 import com.southwaterfront.parkingtracker.prefs.ParkingTrackerPreferences;
 import com.southwaterfront.parkingtracker.util.AsyncTask;
@@ -77,8 +77,16 @@ public class Main extends Activity {
 	Button takePhoto;
 	ProgressBar progressBar;
 
-    CharSequence[] flagOptions = { "Handicap Placards", "Residential  Permit", "Employee Permit", "Student Permit", "Carpool Permit", "Other" };
-    boolean[] flagSelections;
+    private CharSequence[] flagOptions = { "Handicap Placards", "Residential  Permit", "Employee Permit", "Student Permit", "Carpool Permit", "Other" };
+    private boolean[] flagSelections;
+
+    private List<String> blockArray = new ArrayList<String>();
+    private List<String> faceArray = new ArrayList<String>();
+    private List<String> stallArray = new ArrayList<String>();
+
+    private int currentBlock;
+    private int currentFace;
+    private int currentStall;
 
 	private File createImageFile() throws IOException {
 		// Create an image file name
@@ -310,6 +318,8 @@ public class Main extends Activity {
 
 		ChoosePlateInit();
 
+        setupLocationSelect();
+
 		// Temp Button init location
 		takePhoto = (Button) findViewById(R.id.buttonMainPhoto);
 		takePhoto.setOnClickListener(new View.OnClickListener() {
@@ -331,6 +341,24 @@ public class Main extends Activity {
 					wifiAlert.show();
 			}
 		});
+
+        // Temp Button init location
+        final Button button3 = (Button) findViewById(R.id.buttonMainMap);
+        button3.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Log.i("Main", "Map Clicked!");
+                //showSetFlagsDialog();
+            }
+        });
+
+        // Temp Button init location
+        final Button button4 = (Button) findViewById(R.id.buttonMainData);
+        button4.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Log.i("Main", "View Data Clicked!");
+                //showLocationSelectDialog();
+            }
+        });
 
 		// Temp ProgressBar init location
 		progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -356,8 +384,8 @@ public class Main extends Activity {
 		};
 
 		wifiAlert = new AlertDialog.Builder(this);
-		wifiAlert.setMessage("You are not internet connected through wifi. Are you sure you want to continue?").setPositiveButton("Yes", dialogClickListener)
-		.setNegativeButton("No", dialogClickListener);
+		wifiAlert.setMessage("You are not internet connected through wifi. Are you sure you want to continue?")
+                .setPositiveButton("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener);
 
 	}
 
@@ -378,6 +406,12 @@ public class Main extends Activity {
         // Create the fragment and show it as a dialog.
         AddLicenseDialogFragment newFragment = AddLicenseDialogFragment.newInstance();
         newFragment.show(getFragmentManager(), "addLicense");
+    }
+
+    public void showLocationSelectDialog() {
+        // Create the fragment and show it as a dialog.
+        LocationSelectDialogFragment newFragment = LocationSelectDialogFragment.newInstance();
+        newFragment.show(getFragmentManager(), "locationSelect");
     }
 
 	public ArrayAdapter<String> getArrayAdapter() {
@@ -425,6 +459,66 @@ public class Main extends Activity {
 
 	}
 
+    public void setupLocationSelect() {
+        // TODO remove hard code
+        // assets.getStreetModel();
+
+        blockArray = new ArrayList<String>() {{
+            add("1");
+            add("2");
+            add("3");
+            add("4");
+            add("5");
+            add("6");
+            add("7");
+            add("8");
+            add("9");
+            add("10");
+            add("11");
+            add("12");
+            add("13");
+            add("14");
+            add("15");
+            add("16");
+            add("17");
+            add("18");
+            add("19");
+            add("20");
+            add("21");
+            add("22");
+            add("23");
+            add("24");
+        }};
+        currentBlock = 0;
+
+        faceArray = new ArrayList<String>() {{
+            add("A");
+            add("B");
+            add("C");
+            add("D");
+        }};
+        currentFace = 0;
+
+        stallArray = new ArrayList<String>() {{
+            add("1");
+            add("2");
+            add("3");
+            add("4");
+            add("5");
+            add("6");
+            add("7");
+            add("8");
+            add("9");
+            add("10");
+            add("11");
+            add("12");
+            add("13");
+            add("14");
+            add("15");
+        }};
+        currentStall = 0;
+    }
+
     public CharSequence[] getFlagOptions() {
         return flagOptions;
     }
@@ -433,8 +527,44 @@ public class Main extends Activity {
         return flagSelections;
     }
 
+    public List<String> getBlockArray() {
+        return blockArray;
+    }
+
+    public List<String> getFaceArray() {
+        return faceArray;
+    }
+
+    public List<String> getStallArray() {
+        return stallArray;
+    }
+
     public void setFlagSelections(boolean[] flagSelections) {
         this.flagSelections = flagSelections;
+    }
+
+    public int getCurrentBlock() {
+        return currentBlock;
+    }
+
+    public int getCurrentFace() {
+        return currentFace;
+    }
+
+    public int getCurrentStall() {
+        return currentStall;
+    }
+
+    public void setCurrentBlock(int currentBlock) {
+        this.currentBlock = currentBlock;
+    }
+
+    public void setCurrentFace(int currentFace) {
+        this.currentFace = currentFace;
+    }
+
+    public void setCurrentStall(int currentStall) {
+        this.currentStall = currentStall;
     }
 
     private void clearFlagSelections() {

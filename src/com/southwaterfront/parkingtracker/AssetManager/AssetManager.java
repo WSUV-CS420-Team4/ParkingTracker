@@ -211,7 +211,7 @@ public class AssetManager {
 	 * 
 	 * @return unmodifiable Street model
 	 */
-	public List<BlockFaceDefinition> getStretModel() {
+	public List<BlockFaceDefinition> getStreetModel() {
 		return this.streetModel;
 	}
 

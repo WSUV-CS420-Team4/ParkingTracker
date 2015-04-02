@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.Spinner;
 
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
+import com.southwaterfront.parkingtracker.Main;
 import com.southwaterfront.parkingtracker.R;
 
 import java.util.ArrayList;
@@ -26,8 +27,28 @@ import java.util.List;
  */
 public class LocationSelectDialogFragment extends DialogFragment {
 
+    private List<String> blockArray;
+    private List<String> faceArray;
+    private List<String> stallArray;
+
+    public static LocationSelectDialogFragment newInstance() {
+        return new LocationSelectDialogFragment();
+    }
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        if ( ((Main) getActivity()).getBlockArray() != null) {
+            blockArray  = new ArrayList<String>(((Main) getActivity()).getBlockArray());
+        }
+
+        if ( ((Main) getActivity()).getFaceArray() != null) {
+            faceArray  = new ArrayList<String>(((Main) getActivity()).getFaceArray());
+        }
+
+        if ( ((Main) getActivity()).getStallArray() != null) {
+            stallArray  = new ArrayList<String>(((Main) getActivity()).getStallArray());
+        }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -52,26 +73,20 @@ public class LocationSelectDialogFragment extends DialogFragment {
                     }
                 });
 
-        List<String> tempList = new ArrayList<String>();
+        // ---
 
-        // TODO Check what data I get from getDataModel and pre populate spinners
-        AssetManager assetManager = AssetManager.getInstance();
-        assetManager.assetSanityCheck();
-        //assetManager.getDataModel();
-
-
-        tempList.add("A");
-        tempList.add("B");
-        tempList.add("C");
-        ArrayAdapter<String> tempAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, tempList);
+        ArrayAdapter<String> tempAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, blockArray);
         tempAdapter.setDropDownViewResource(R.layout.spinner_layout);
 
         block.setAdapter(tempAdapter);
+
+        block.setSelection( ((Main) getActivity()).getCurrentBlock() );
 
         block.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Log.i("BlockSpinner", "" + parent.getItemAtPosition(position));
+                ((Main) getActivity()).setCurrentBlock(position);
             }
 
             @Override
@@ -79,6 +94,52 @@ public class LocationSelectDialogFragment extends DialogFragment {
 
             }
         });
+
+        // ---
+
+        tempAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, faceArray);
+        tempAdapter.setDropDownViewResource(R.layout.spinner_layout);
+
+        face.setAdapter(tempAdapter);
+
+        face.setSelection( ((Main) getActivity()).getCurrentFace() );
+
+        face.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.i("FaceSpinner", "" + parent.getItemAtPosition(position));
+                ((Main) getActivity()).setCurrentFace(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        // ---
+
+        tempAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, stallArray);
+        tempAdapter.setDropDownViewResource(R.layout.spinner_layout);
+
+        stall.setAdapter(tempAdapter);
+
+        stall.setSelection( ((Main) getActivity()).getCurrentStall() );
+
+        stall.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.i("StallSpinner", "" + parent.getItemAtPosition(position));
+                ((Main) getActivity()).setCurrentStall(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        // ---
 
         AlertDialog dialog = builder.create();
 
