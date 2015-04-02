@@ -99,7 +99,7 @@ public class LoginDialogFragment extends DialogFragment {
 							public void run() {
 								boolean loggedIn = false;
 								try {
-									setText(textViewLoginTitle, "Logging in");
+									setText(textViewLoginTitle, "Logging in...");
 									loggedIn = HttpClient.sendLoginRequest(editTextName.getText().toString(), editTextPassword.getText().toString());
 								} catch (RequestFailedException e) {
 									setText(textViewLoginTitle, e.getMessage());
@@ -120,7 +120,7 @@ public class LoginDialogFragment extends DialogFragment {
 									}
 									dialog.dismiss();
 								} else {
-									setText(textViewLoginTitle, "Incorrect username/password");
+									setText(textViewLoginTitle, "Incorrect\nusername/password");
 								}
 							}
 						};

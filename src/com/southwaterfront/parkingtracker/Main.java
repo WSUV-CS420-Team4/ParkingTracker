@@ -42,6 +42,7 @@ import com.southwaterfront.parkingtracker.dialog.AddLicenseDialogFragment;
 import com.southwaterfront.parkingtracker.dialog.ChoosePlateDialogFragment;
 import com.southwaterfront.parkingtracker.dialog.LocationSelectDialogFragment;
 import com.southwaterfront.parkingtracker.dialog.SetFlagsDialogFragment;
+import com.southwaterfront.parkingtracker.dialog.ViewDataDialogFragment;
 import com.southwaterfront.parkingtracker.prefs.ParkingTrackerPreferences;
 import com.southwaterfront.parkingtracker.util.AsyncTask;
 import com.southwaterfront.parkingtracker.util.Result;
@@ -360,7 +361,7 @@ public class Main extends Activity {
             public void onClick(View v) {
                 Log.i("Main", "View Data Clicked!");
                 viewData();
-                //showLocationSelectDialog();
+                showViewDataDialog();
             }
         });
 
@@ -415,6 +416,12 @@ public class Main extends Activity {
     public void showLocationSelectDialog() {
         // Create the fragment and show it as a dialog.
         LocationSelectDialogFragment newFragment = LocationSelectDialogFragment.newInstance();
+        newFragment.show(getFragmentManager(), "locationSelect");
+    }
+
+    public void showViewDataDialog() {
+        // Create the fragment and show it as a dialog.
+        ViewDataDialogFragment newFragment = ViewDataDialogFragment.newInstance();
         newFragment.show(getFragmentManager(), "locationSelect");
     }
 
@@ -549,6 +556,10 @@ public class Main extends Activity {
             add(15);
         }};
         currentStall = 0;
+    }
+
+    public List<BlockFace> getData() {
+        return data;
     }
 
     public CharSequence[] getFlagOptions() {
