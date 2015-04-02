@@ -80,10 +80,11 @@ public class Main extends Activity {
     private CharSequence[] flagOptions = { "Handicap Placards", "Residential  Permit", "Employee Permit", "Student Permit", "Carpool Permit", "Other" };
     private boolean[] flagSelections;
 
-    private List<String> blockArray = new ArrayList<String>();
+    private List<Integer> blockArray = new ArrayList<Integer>();
     private List<String> faceArray = new ArrayList<String>();
-    private List<String> stallArray = new ArrayList<String>();
+    private List<Integer> stallArray = new ArrayList<Integer>();
 
+    private String currentResult;
     private int currentBlock;
     private int currentFace;
     private int currentStall;
@@ -208,9 +209,9 @@ public class Main extends Activity {
 		if (result != null) {
 			// TODO Change this so instead of best estimated result it is what the user clicks on
 			// Change this later Joel, I was just using for testing
-			Random r = new Random();
+			/*Random r = new Random();
 			int block = r.nextInt(data.size() - 1);
-			data.get(block).setStall(new ParkingStall(result[0], new Date(System.currentTimeMillis()), null), stall++);
+			data.get(block).setStall(new ParkingStall(result[0], new Date(System.currentTimeMillis()), null), stall++);*/
 
 			/*String tempt[] = new String[licensePlates.size()];
             tempt = licensePlates.toArray(tempt);*/
@@ -320,6 +321,8 @@ public class Main extends Activity {
 
         setupLocationSelect();
 
+        currentResult = "";
+
 		// Temp Button init location
 		takePhoto = (Button) findViewById(R.id.buttonMainPhoto);
 		takePhoto.setOnClickListener(new View.OnClickListener() {
@@ -356,6 +359,7 @@ public class Main extends Activity {
         button4.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.i("Main", "View Data Clicked!");
+                viewData();
                 //showLocationSelectDialog();
             }
         });
@@ -459,35 +463,63 @@ public class Main extends Activity {
 
 	}
 
+    public void addData() {
+
+        // java.lang.UnsupportedOperationException
+        //data.add( new BlockFace(blockArray.get(currentBlock), faceArray.get(currentFace)) );
+
+        // Currently doesn't add correctly
+        data.get(currentBlock).setStall(new ParkingStall(currentResult, new Date(System.currentTimeMillis()), null), currentStall);
+        Log.i("Main", "Added " + currentResult + " to block " + blockArray.get(currentBlock) +
+                ", face " + faceArray.get(currentFace) + ", stall " + stallArray.get(currentStall));
+    }
+
+    public void viewData() {
+        // Logs all the stalls currently held in data
+        Log.i("viewData", "data size: " + data.size());
+
+        for (BlockFace face : data) {
+            for (int i = 0; i < face.getParkingStalls().size(); i++) {
+                Log.i("stall", "block: " + face.block + " face: " + face.face + " stall: " + i +
+                        " plate: " + face.getParkingStalls().get(i).plate + " attr: " + face.getParkingStalls().get(i).attr);
+            }
+
+            // Results without stall data
+            /*for ( ParkingStall stall: face.getParkingStalls()) {
+                Log.i("stall", "block: " + face.block + " face: " + face.face + " plate: " + stall.plate + " attr: " + stall.attr);
+            }*/
+        }
+    }
+
     public void setupLocationSelect() {
         // TODO remove hard code
         // assets.getStreetModel();
 
-        blockArray = new ArrayList<String>() {{
-            add("1");
-            add("2");
-            add("3");
-            add("4");
-            add("5");
-            add("6");
-            add("7");
-            add("8");
-            add("9");
-            add("10");
-            add("11");
-            add("12");
-            add("13");
-            add("14");
-            add("15");
-            add("16");
-            add("17");
-            add("18");
-            add("19");
-            add("20");
-            add("21");
-            add("22");
-            add("23");
-            add("24");
+        blockArray = new ArrayList<Integer>() {{
+            add(1);
+            add(2);
+            add(3);
+            add(4);
+            add(5);
+            add(6);
+            add(7);
+            add(8);
+            add(9);
+            add(10);
+            add(11);
+            add(12);
+            add(13);
+            add(14);
+            add(15);
+            add(16);
+            add(17);
+            add(18);
+            add(19);
+            add(20);
+            add(21);
+            add(22);
+            add(23);
+            add(24);
         }};
         currentBlock = 0;
 
@@ -499,22 +531,22 @@ public class Main extends Activity {
         }};
         currentFace = 0;
 
-        stallArray = new ArrayList<String>() {{
-            add("1");
-            add("2");
-            add("3");
-            add("4");
-            add("5");
-            add("6");
-            add("7");
-            add("8");
-            add("9");
-            add("10");
-            add("11");
-            add("12");
-            add("13");
-            add("14");
-            add("15");
+        stallArray = new ArrayList<Integer>() {{
+            add(1);
+            add(2);
+            add(3);
+            add(4);
+            add(5);
+            add(6);
+            add(7);
+            add(8);
+            add(9);
+            add(10);
+            add(11);
+            add(12);
+            add(13);
+            add(14);
+            add(15);
         }};
         currentStall = 0;
     }
@@ -527,7 +559,7 @@ public class Main extends Activity {
         return flagSelections;
     }
 
-    public List<String> getBlockArray() {
+    public List<Integer> getBlockArray() {
         return blockArray;
     }
 
@@ -535,7 +567,7 @@ public class Main extends Activity {
         return faceArray;
     }
 
-    public List<String> getStallArray() {
+    public List<Integer> getStallArray() {
         return stallArray;
     }
 
@@ -553,6 +585,10 @@ public class Main extends Activity {
 
     public int getCurrentStall() {
         return currentStall;
+    }
+
+    public void setCurrentResult(String currentResult) {
+        this.currentResult = currentResult;
     }
 
     public void setCurrentBlock(int currentBlock) {

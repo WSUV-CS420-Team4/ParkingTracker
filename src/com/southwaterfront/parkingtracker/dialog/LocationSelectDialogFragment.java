@@ -27,9 +27,9 @@ import java.util.List;
  */
 public class LocationSelectDialogFragment extends DialogFragment {
 
-    private List<String> blockArray;
+    private List<Integer> blockArray;
     private List<String> faceArray;
-    private List<String> stallArray;
+    private List<Integer> stallArray;
 
     public static LocationSelectDialogFragment newInstance() {
         return new LocationSelectDialogFragment();
@@ -39,7 +39,7 @@ public class LocationSelectDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         if ( ((Main) getActivity()).getBlockArray() != null) {
-            blockArray  = new ArrayList<String>(((Main) getActivity()).getBlockArray());
+            blockArray  = new ArrayList<Integer>(((Main) getActivity()).getBlockArray());
         }
 
         if ( ((Main) getActivity()).getFaceArray() != null) {
@@ -47,7 +47,7 @@ public class LocationSelectDialogFragment extends DialogFragment {
         }
 
         if ( ((Main) getActivity()).getStallArray() != null) {
-            stallArray  = new ArrayList<String>(((Main) getActivity()).getStallArray());
+            stallArray  = new ArrayList<Integer>(((Main) getActivity()).getStallArray());
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -63,7 +63,9 @@ public class LocationSelectDialogFragment extends DialogFragment {
                 .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //TODO SetFlagDialogFragment
+                        Log.i("LocationSelectDialog", "Confirm Clicked!");
+                        // Add the newly recorded license data to Main.java's data
+                        ((Main) getActivity()).addData();
                     }
                 })
 
@@ -75,10 +77,10 @@ public class LocationSelectDialogFragment extends DialogFragment {
 
         // ---
 
-        ArrayAdapter<String> tempAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, blockArray);
-        tempAdapter.setDropDownViewResource(R.layout.spinner_layout);
+        ArrayAdapter<Integer> tempIntAdapter = new ArrayAdapter<Integer>(getActivity(), android.R.layout.simple_spinner_item, blockArray);
+        tempIntAdapter.setDropDownViewResource(R.layout.spinner_layout);
 
-        block.setAdapter(tempAdapter);
+        block.setAdapter(tempIntAdapter);
 
         block.setSelection( ((Main) getActivity()).getCurrentBlock() );
 
@@ -97,18 +99,19 @@ public class LocationSelectDialogFragment extends DialogFragment {
 
         // ---
 
-        tempAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, faceArray);
-        tempAdapter.setDropDownViewResource(R.layout.spinner_layout);
+        ArrayAdapter<String> tempStrAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, faceArray);
+        tempStrAdapter.setDropDownViewResource(R.layout.spinner_layout);
 
-        face.setAdapter(tempAdapter);
+        face.setAdapter(tempStrAdapter);
 
-        face.setSelection( ((Main) getActivity()).getCurrentFace() );
+        face.setSelection(((Main) getActivity()).getCurrentFace());
 
-        face.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
+        face.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Log.i("FaceSpinner", "" + parent.getItemAtPosition(position));
                 ((Main) getActivity()).setCurrentFace(position);
+
             }
 
             @Override
@@ -119,10 +122,10 @@ public class LocationSelectDialogFragment extends DialogFragment {
 
         // ---
 
-        tempAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, stallArray);
-        tempAdapter.setDropDownViewResource(R.layout.spinner_layout);
+        tempIntAdapter = new ArrayAdapter<Integer>(getActivity(), android.R.layout.simple_spinner_item, stallArray);
+        tempIntAdapter.setDropDownViewResource(R.layout.spinner_layout);
 
-        stall.setAdapter(tempAdapter);
+        stall.setAdapter(tempIntAdapter);
 
         stall.setSelection( ((Main) getActivity()).getCurrentStall() );
 

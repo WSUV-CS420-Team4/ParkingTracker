@@ -48,6 +48,7 @@ public class ChoosePlateDialogFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         //TODO Confirm
                         Log.i("ChoosePlateDialog", "Confirm Clicked!");
+                        ((Main) getActivity()).setCurrentResult(plateNo.getText().toString());
                         ((Main) getActivity()).showLocationSelectDialog();
                     }
                 })
