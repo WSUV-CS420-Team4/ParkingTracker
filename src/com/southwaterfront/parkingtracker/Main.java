@@ -78,11 +78,11 @@ public class Main extends Activity {
 
 	private Button buttonTakePhoto;
 	private Button buttonMap;
-    private Button buttonSync;
-    private Button buttonData;
-    private Button buttonOptions;
+	private Button buttonSync;
+	private Button buttonData;
+	private Button buttonOptions;
 
-    private ProgressBar progressBar;
+	private ProgressBar progressBar;
 
 	private CharSequence[] flagOptions = { "Handicap Placards", "Residential  Permit", "Employee Permit", "Student Permit", "Carpool Permit", "Other" };
 	private boolean[] flagSelections;
@@ -272,6 +272,13 @@ public class Main extends Activity {
 				wifiReceiver = new WifiStateUploadableDataReceiver();
 				registerReceiver(wifiReceiver, wifiFilter);
 				dataCollector = dataManager.getCurrentSession().getDataCollector();
+				Main.this.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						enableButtons();
+					}
+
+				});
 			}
 		};
 		Thread initThread = new Thread(r);
@@ -279,59 +286,55 @@ public class Main extends Activity {
 		Log.i(LOG_TAG, "App initialized successfully");
 	}
 
-    private void initButtons() {
-        // Temp Button init location
-        buttonTakePhoto = (Button) findViewById(R.id.buttonMainPhoto);
-        buttonTakePhoto.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Perform action on click
-                dispatchTakePictureIntent2();
-            }
-        });
+	private void initButtons() {
+		// Temp Button init location
+		buttonTakePhoto = (Button) findViewById(R.id.buttonMainPhoto);
+		buttonTakePhoto.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				// Perform action on click
+				dispatchTakePictureIntent2();
+			}
+		});
 
 
-        // Temp Button init location
-        buttonSync = (Button) findViewById(R.id.buttonMainSync);
-        buttonSync.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (Utils.isWifiConnected() || !ParkingTrackerPreferences.getNonWifiConnectionNotificationSetting()) {
-                    upload();
-                }
-                else
-                    wifiAlert.show();
-            }
-        });
+		// Temp Button init location
+		buttonSync = (Button) findViewById(R.id.buttonMainSync);
+		buttonSync.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				if (Utils.isWifiConnected() || !ParkingTrackerPreferences.getNonWifiConnectionNotificationSetting()) {
+					upload();
+				}
+				else
+					wifiAlert.show();
+			}
+		});
 
-        // Temp Button init location
-        buttonMap = (Button) findViewById(R.id.buttonMainMap);
-        buttonMap.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Log.i("Main", "Map Clicked!");
-            }
-        });
+		// Temp Button init location
+		buttonMap = (Button) findViewById(R.id.buttonMainMap);
+		buttonMap.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Log.i("Main", "Map Clicked!");
+			}
+		});
 
-        // Temp Button init location
-        buttonData = (Button) findViewById(R.id.buttonMainData);
-        buttonData.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Log.i("Main", "View Data Clicked!");
-                viewData();
-                showViewDataDialog();
-            }
-        });
+		// Temp Button init location
+		buttonData = (Button) findViewById(R.id.buttonMainData);
+		buttonData.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Log.i("Main", "View Data Clicked!");
+				viewData();
+				showViewDataDialog();
+			}
+		});
 
-        // Temp Button init location
-        buttonOptions = (Button) findViewById(R.id.buttonMainOptions);
-        buttonOptions.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Log.i("Main", "Options Clicked!");
-            }
-        });
-
-
-        // TODO: Temp location for enable Buttons
-        enableButtons();
-    }
+		// Temp Button init location
+		buttonOptions = (Button) findViewById(R.id.buttonMainOptions);
+		buttonOptions.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Log.i("Main", "Options Clicked!");
+			}
+		});
+	}
 
 	private void ChoosePlateInit() {
 
@@ -382,7 +385,7 @@ public class Main extends Activity {
 
 		setupLocationSelect();
 
-        initButtons();
+		initButtons();
 
 		currentResult = "";
 
@@ -516,21 +519,21 @@ public class Main extends Activity {
 		}
 	}
 
-    public void enableButtons() {
-        buttonTakePhoto.setEnabled(true);
-        buttonMap.setEnabled(true);
-        buttonSync.setEnabled(true);
-        buttonData.setEnabled(true);
-        buttonOptions.setEnabled(true);
-    }
+	public void enableButtons() {
+		buttonTakePhoto.setEnabled(true);
+		buttonMap.setEnabled(true);
+		buttonSync.setEnabled(true);
+		buttonData.setEnabled(true);
+		buttonOptions.setEnabled(true);
+	}
 
-    public void disableButtons() {
-        buttonTakePhoto.setEnabled(false);
-        buttonMap.setEnabled(false);
-        buttonSync.setEnabled(false);
-        buttonData.setEnabled(false);
-        buttonOptions.setEnabled(false);
-    }
+	public void disableButtons() {
+		buttonTakePhoto.setEnabled(false);
+		buttonMap.setEnabled(false);
+		buttonSync.setEnabled(false);
+		buttonData.setEnabled(false);
+		buttonOptions.setEnabled(false);
+	}
 
 	public void setupLocationSelect() {
 		// TODO remove hard code
