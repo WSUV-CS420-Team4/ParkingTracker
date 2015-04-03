@@ -1,8 +1,8 @@
 package com.southwaterfront.parkingtracker.data;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import com.southwaterfront.parkingtracker.jsonify.BlockFaceParser;
@@ -80,10 +80,10 @@ public class ParkingDataCollector {
 	}
 	
 	/**
-	 * {@link BlockFace} iterator
-	 * @return The iterator
+	 * {@link BlockFace} collection
+	 * @return The collection of blockfaces in this collector
 	 */
-	public Iterator<BlockFace> iterator() {
-		return data.values().iterator();
+	public Collection<BlockFace> getBlockFaces() {
+		return data.values();
 	}
 }

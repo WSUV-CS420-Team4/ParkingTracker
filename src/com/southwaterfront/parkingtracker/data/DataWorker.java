@@ -3,6 +3,7 @@ package com.southwaterfront.parkingtracker.data;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -103,7 +104,7 @@ class DataWorker implements Runnable {
 			t.waitOnResult();
 		}
 		File cacheFolder = sess.cacheFolder;
-		List<BlockFace> curData = sess.data;
+		Collection<BlockFace> curData = sess.getDataCollector().getBlockFaces();
 		File[] savedData = cacheFolder.listFiles(); 
 
 		if (savedData == null || savedData.length == 0) {

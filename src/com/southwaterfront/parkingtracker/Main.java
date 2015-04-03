@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -37,6 +36,7 @@ import com.southwaterfront.parkingtracker.alpr.AlprEngine;
 import com.southwaterfront.parkingtracker.data.BlockFace;
 import com.southwaterfront.parkingtracker.data.CallBack;
 import com.southwaterfront.parkingtracker.data.DataManager;
+import com.southwaterfront.parkingtracker.data.ParkingDataCollector;
 import com.southwaterfront.parkingtracker.data.ParkingStall;
 import com.southwaterfront.parkingtracker.dialog.AddLicenseDialogFragment;
 import com.southwaterfront.parkingtracker.dialog.ChoosePlateDialogFragment;
@@ -62,13 +62,13 @@ public class Main extends Activity {
 
 	private AssetManager assets;
 	private DataManager dataManager;
-	private List<BlockFace> data;
+	private ParkingDataCollector dataCollector;
 	private AlprEngine ocrEngine;
-	TextView textViewNotification;
-	AlertDialog.Builder wifiAlert;
-	WifiStateUploadableDataReceiver wifiReceiver;
-	IntentFilter wifiFilter;
-	File photoFile;
+	private TextView textViewNotification;
+	private AlertDialog.Builder wifiAlert;
+	private WifiStateUploadableDataReceiver wifiReceiver;
+	private IntentFilter wifiFilter;
+	private File photoFile;
 
 	List<String> licensePlates = new ArrayList<String>();
 	ArrayAdapter<String> arrayAdapter;
@@ -78,17 +78,17 @@ public class Main extends Activity {
 	Button takePhoto;
 	ProgressBar progressBar;
 
-    private CharSequence[] flagOptions = { "Handicap Placards", "Residential  Permit", "Employee Permit", "Student Permit", "Carpool Permit", "Other" };
-    private boolean[] flagSelections;
+	private CharSequence[] flagOptions = { "Handicap Placards", "Residential  Permit", "Employee Permit", "Student Permit", "Carpool Permit", "Other" };
+	private boolean[] flagSelections;
 
-    private List<Integer> blockArray = new ArrayList<Integer>();
-    private List<String> faceArray = new ArrayList<String>();
-    private List<Integer> stallArray = new ArrayList<Integer>();
+	private List<Integer> blockArray = new ArrayList<Integer>();
+	private List<String> faceArray = new ArrayList<String>();
+	private List<Integer> stallArray = new ArrayList<Integer>();
 
-    private String currentResult;
-    private int currentBlock;
-    private int currentFace;
-    private int currentStall;
+	private String currentResult;
+	private int currentBlock;
+	private int currentFace;
+	private int currentStall;
 
 	private File createImageFile() throws IOException {
 		// Create an image file name
@@ -194,7 +194,7 @@ public class Main extends Activity {
 
 	private void setOcrResult(String[] result) {
 		licensePlates.clear();
-        clearFlagSelections();
+		clearFlagSelections();
 		if (result != null) {
 			/*int i = 0;
 			for (; i < result.length - 1; i++)
@@ -265,7 +265,7 @@ public class Main extends Activity {
 				wifiFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 				wifiReceiver = new WifiStateUploadableDataReceiver();
 				registerReceiver(wifiReceiver, wifiFilter);
-				data = dataManager.getCurrentSession().data;
+				dataCollector = dataManager.getCurrentSession().getDataCollector();
 			}
 		};
 		Thread initThread = new Thread(r);
@@ -320,9 +320,9 @@ public class Main extends Activity {
 
 		ChoosePlateInit();
 
-        setupLocationSelect();
+		setupLocationSelect();
 
-        currentResult = "";
+		currentResult = "";
 
 		// Temp Button init location
 		takePhoto = (Button) findViewById(R.id.buttonMainPhoto);
@@ -346,24 +346,24 @@ public class Main extends Activity {
 			}
 		});
 
-        // Temp Button init location
-        final Button button3 = (Button) findViewById(R.id.buttonMainMap);
-        button3.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Log.i("Main", "Map Clicked!");
-                //showSetFlagsDialog();
-            }
-        });
+		// Temp Button init location
+		final Button button3 = (Button) findViewById(R.id.buttonMainMap);
+		button3.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Log.i("Main", "Map Clicked!");
+				//showSetFlagsDialog();
+			}
+		});
 
-        // Temp Button init location
-        final Button button4 = (Button) findViewById(R.id.buttonMainData);
-        button4.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Log.i("Main", "View Data Clicked!");
-                viewData();
-                showViewDataDialog();
-            }
-        });
+		// Temp Button init location
+		final Button button4 = (Button) findViewById(R.id.buttonMainData);
+		button4.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Log.i("Main", "View Data Clicked!");
+				viewData();
+				showViewDataDialog();
+			}
+		});
 
 		// Temp ProgressBar init location
 		progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -390,7 +390,7 @@ public class Main extends Activity {
 
 		wifiAlert = new AlertDialog.Builder(this);
 		wifiAlert.setMessage("You are not internet connected through wifi. Are you sure you want to continue?")
-                .setPositiveButton("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener);
+		.setPositiveButton("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener);
 
 	}
 
@@ -400,30 +400,30 @@ public class Main extends Activity {
 		newFragment.show(getFragmentManager(), "choosePlate");
 	}
 
-    public void showSetFlagsDialog() {
-        // Create the fragment and show it as a dialog.
-        SetFlagsDialogFragment newFragment = SetFlagsDialogFragment.newInstance();
-        newFragment.show(getFragmentManager(), "setFlags");
-    }
+	public void showSetFlagsDialog() {
+		// Create the fragment and show it as a dialog.
+		SetFlagsDialogFragment newFragment = SetFlagsDialogFragment.newInstance();
+		newFragment.show(getFragmentManager(), "setFlags");
+	}
 
 
-    public void showAddLicenseDialog() {
-        // Create the fragment and show it as a dialog.
-        AddLicenseDialogFragment newFragment = AddLicenseDialogFragment.newInstance();
-        newFragment.show(getFragmentManager(), "addLicense");
-    }
+	public void showAddLicenseDialog() {
+		// Create the fragment and show it as a dialog.
+		AddLicenseDialogFragment newFragment = AddLicenseDialogFragment.newInstance();
+		newFragment.show(getFragmentManager(), "addLicense");
+	}
 
-    public void showLocationSelectDialog() {
-        // Create the fragment and show it as a dialog.
-        LocationSelectDialogFragment newFragment = LocationSelectDialogFragment.newInstance();
-        newFragment.show(getFragmentManager(), "locationSelect");
-    }
+	public void showLocationSelectDialog() {
+		// Create the fragment and show it as a dialog.
+		LocationSelectDialogFragment newFragment = LocationSelectDialogFragment.newInstance();
+		newFragment.show(getFragmentManager(), "locationSelect");
+	}
 
-    public void showViewDataDialog() {
-        // Create the fragment and show it as a dialog.
-        ViewDataDialogFragment newFragment = ViewDataDialogFragment.newInstance();
-        newFragment.show(getFragmentManager(), "locationSelect");
-    }
+	public void showViewDataDialog() {
+		// Create the fragment and show it as a dialog.
+		ViewDataDialogFragment newFragment = ViewDataDialogFragment.newInstance();
+		newFragment.show(getFragmentManager(), "locationSelect");
+	}
 
 	public ArrayAdapter<String> getArrayAdapter() {
 		return arrayAdapter;
@@ -457,7 +457,7 @@ public class Main extends Activity {
 						TextView view = (TextView) findViewById(R.id.textViewMainNotification);
 						//view.setText("Result was a " + task.getResult());
 						if (task.getResult() == Result.SUCCESS) {
-							data = dataManager.getCurrentSession().data;
+							dataCollector = dataManager.getCurrentSession().getDataCollector();
 							view.setText("Successfully uploaded data");
 						} else
 							view.setText(task.getErrorMessage());
@@ -470,153 +470,155 @@ public class Main extends Activity {
 
 	}
 
-    public void addData() {
+	public void addData() {
 
-        // java.lang.UnsupportedOperationException
-        //data.add( new BlockFace(blockArray.get(currentBlock), faceArray.get(currentFace)) );
+		// java.lang.UnsupportedOperationException
+		//data.add( new BlockFace(blockArray.get(currentBlock), faceArray.get(currentFace)) );
 
-        // Currently doesn't add correctly
-        data.get(currentBlock).setStall(new ParkingStall(currentResult, new Date(System.currentTimeMillis()), null), currentStall);
-        Log.i("Main", "Added " + currentResult + " to block " + blockArray.get(currentBlock) +
-                ", face " + faceArray.get(currentFace) + ", stall " + stallArray.get(currentStall));
-    }
+		// Currently doesn't add correctly
+		// TODO: Joel take a look here too
+		dataCollector.setStall(currentBlock, "A", currentStall, new ParkingStall(currentResult, new Date(System.currentTimeMillis()), null));
+		Log.i("Main", "Added " + currentResult + " to block " + blockArray.get(currentBlock) +
+				", face " + faceArray.get(currentFace) + ", stall " + stallArray.get(currentStall));
+	}
 
-    public void viewData() {
-        // Logs all the stalls currently held in data
-        Log.i("viewData", "data size: " + data.size());
+	public void viewData() {
+		// Logs all the stalls currently held in data
+		Log.i("viewData", "data size: " + dataCollector.getBlockFaces().size());
 
-        for (BlockFace face : data) {
-            for (int i = 0; i < face.getParkingStalls().size(); i++) {
-                Log.i("stall", "block: " + face.block + " face: " + face.face + " stall: " + i +
-                        " plate: " + face.getParkingStalls().get(i).plate + " attr: " + face.getParkingStalls().get(i).attr);
-            }
+		for (BlockFace face : dataCollector.getBlockFaces()) {
+			for (int i = 0; i < face.getParkingStalls().size(); i++) {
+				Log.i("stall", "block: " + face.block + " face: " + face.face + " stall: " + i +
+						" plate: " + face.getParkingStalls().get(i).plate + " attr: " + face.getParkingStalls().get(i).attr);
+			}
 
-            // Results without stall data
-            /*for ( ParkingStall stall: face.getParkingStalls()) {
+			// Results without stall data
+			/*for ( ParkingStall stall: face.getParkingStalls()) {
                 Log.i("stall", "block: " + face.block + " face: " + face.face + " plate: " + stall.plate + " attr: " + stall.attr);
             }*/
-        }
-    }
+		}
+	}
 
-    public void setupLocationSelect() {
-        // TODO remove hard code
-        // assets.getStreetModel();
+	public void setupLocationSelect() {
+		// TODO remove hard code
+		// assets.getStreetModel();
 
-        blockArray = new ArrayList<Integer>() {{
-            add(1);
-            add(2);
-            add(3);
-            add(4);
-            add(5);
-            add(6);
-            add(7);
-            add(8);
-            add(9);
-            add(10);
-            add(11);
-            add(12);
-            add(13);
-            add(14);
-            add(15);
-            add(16);
-            add(17);
-            add(18);
-            add(19);
-            add(20);
-            add(21);
-            add(22);
-            add(23);
-            add(24);
-        }};
-        currentBlock = 0;
+		blockArray = new ArrayList<Integer>() {{
+			add(1);
+			add(2);
+			add(3);
+			add(4);
+			add(5);
+			add(6);
+			add(7);
+			add(8);
+			add(9);
+			add(10);
+			add(11);
+			add(12);
+			add(13);
+			add(14);
+			add(15);
+			add(16);
+			add(17);
+			add(18);
+			add(19);
+			add(20);
+			add(21);
+			add(22);
+			add(23);
+			add(24);
+		}};
+		currentBlock = 0;
 
-        faceArray = new ArrayList<String>() {{
-            add("A");
-            add("B");
-            add("C");
-            add("D");
-        }};
-        currentFace = 0;
+		faceArray = new ArrayList<String>() {{
+			add("A");
+			add("B");
+			add("C");
+			add("D");
+		}};
+		currentFace = 0;
 
-        stallArray = new ArrayList<Integer>() {{
-            add(1);
-            add(2);
-            add(3);
-            add(4);
-            add(5);
-            add(6);
-            add(7);
-            add(8);
-            add(9);
-            add(10);
-            add(11);
-            add(12);
-            add(13);
-            add(14);
-            add(15);
-        }};
-        currentStall = 0;
-    }
+		stallArray = new ArrayList<Integer>() {{
+			add(1);
+			add(2);
+			add(3);
+			add(4);
+			add(5);
+			add(6);
+			add(7);
+			add(8);
+			add(9);
+			add(10);
+			add(11);
+			add(12);
+			add(13);
+			add(14);
+			add(15);
+		}};
+		currentStall = 0;
+	}
 
-    public List<BlockFace> getData() {
-        return data;
-    }
+	public List<BlockFace> getData() {
+		// TODO: Joel take a look at this plz
+		return new ArrayList<BlockFace>(dataCollector.getBlockFaces());
+	}
 
-    public CharSequence[] getFlagOptions() {
-        return flagOptions;
-    }
+	public CharSequence[] getFlagOptions() {
+		return flagOptions;
+	}
 
-    public boolean[] getFlagSelections() {
-        return flagSelections;
-    }
+	public boolean[] getFlagSelections() {
+		return flagSelections;
+	}
 
-    public List<Integer> getBlockArray() {
-        return blockArray;
-    }
+	public List<Integer> getBlockArray() {
+		return blockArray;
+	}
 
-    public List<String> getFaceArray() {
-        return faceArray;
-    }
+	public List<String> getFaceArray() {
+		return faceArray;
+	}
 
-    public List<Integer> getStallArray() {
-        return stallArray;
-    }
+	public List<Integer> getStallArray() {
+		return stallArray;
+	}
 
-    public void setFlagSelections(boolean[] flagSelections) {
-        this.flagSelections = flagSelections;
-    }
+	public void setFlagSelections(boolean[] flagSelections) {
+		this.flagSelections = flagSelections;
+	}
 
-    public int getCurrentBlock() {
-        return currentBlock;
-    }
+	public int getCurrentBlock() {
+		return currentBlock;
+	}
 
-    public int getCurrentFace() {
-        return currentFace;
-    }
+	public int getCurrentFace() {
+		return currentFace;
+	}
 
-    public int getCurrentStall() {
-        return currentStall;
-    }
+	public int getCurrentStall() {
+		return currentStall;
+	}
 
-    public void setCurrentResult(String currentResult) {
-        this.currentResult = currentResult;
-    }
+	public void setCurrentResult(String currentResult) {
+		this.currentResult = currentResult;
+	}
 
-    public void setCurrentBlock(int currentBlock) {
-        this.currentBlock = currentBlock;
-    }
+	public void setCurrentBlock(int currentBlock) {
+		this.currentBlock = currentBlock;
+	}
 
-    public void setCurrentFace(int currentFace) {
-        this.currentFace = currentFace;
-    }
+	public void setCurrentFace(int currentFace) {
+		this.currentFace = currentFace;
+	}
 
-    public void setCurrentStall(int currentStall) {
-        this.currentStall = currentStall;
-    }
+	public void setCurrentStall(int currentStall) {
+		this.currentStall = currentStall;
+	}
 
-    private void clearFlagSelections() {
-        flagSelections =  new boolean[ flagOptions.length ];
-    }
+	private void clearFlagSelections() {
+		flagSelections =  new boolean[ flagOptions.length ];
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

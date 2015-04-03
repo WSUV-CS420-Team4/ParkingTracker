@@ -5,7 +5,6 @@ import java.io.File;
 import java.lang.Thread.State;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -18,7 +17,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import android.util.Log;
 
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
-import com.southwaterfront.parkingtracker.jsonify.BlockFaceParser;
 import com.southwaterfront.parkingtracker.util.AsyncTask;
 import com.southwaterfront.parkingtracker.util.Result;
 import com.southwaterfront.parkingtracker.util.Utils;
@@ -83,7 +81,7 @@ public class DataManager implements Closeable {
 		public final File 	cacheFolder;
 		public final Date 	loadTime;
 		public final File		masterDataFile;
-		public final List<BlockFace> data;
+		private final ParkingDataCollector dataCollector;
 		private boolean locked;
 
 		public Session(Date createTime, File cacheFolder) {
@@ -96,7 +94,7 @@ public class DataManager implements Closeable {
 			this.cacheFolder = cacheFolder;
 			this.loadTime = new Date(System.currentTimeMillis());
 
-			this.data = streetToDataModel(this.cacheFolder);
+			this.dataCollector = new ParkingDataCollector(DataManager.this.assetManager.getStreetModel() ,this.cacheFolder);
 
 			this.masterDataFile = new File(this.cacheFolder, DataManager.MASTER_DATA_FILE_NAME);
 			this.locked = false;
@@ -117,10 +115,19 @@ public class DataManager implements Closeable {
 			this.cacheFolder = cacheFolder;
 			this.loadTime = new Date(System.currentTimeMillis());
 
-			this.data = streetToDataModel(this.cacheFolder);
+			this.dataCollector = new ParkingDataCollector(DataManager.this.assetManager.getStreetModel() ,this.cacheFolder);
 
 			this.masterDataFile = new File(this.cacheFolder, DataManager.MASTER_DATA_FILE_NAME);
 			this.locked = false;
+		}
+		
+		/**
+		 * Getter for the data collector
+		 * 
+		 * @return The collector for this session
+		 */
+		public ParkingDataCollector getDataCollector() {
+			return this.dataCollector;
 		}
 
 		/**
@@ -298,27 +305,6 @@ public class DataManager implements Closeable {
 		checkNotClosed();
 
 		return this.currentSession.SESSION_ID;
-	}
-
-	/**
-	 * Converts the street model to a data model instance
-	 * 
-	 * @return The model as an unmodifiable list
-	 */
-	private List<BlockFace> streetToDataModel(File cacheFolder) {
-		ArrayList<BlockFace> l = new ArrayList<BlockFace>();
-		for (BlockFaceDefinition d : assetManager.getStreetModel()) {
-			String name = BlockFace.getName(d.block, d.face);
-			File f = new File(cacheFolder, name);
-			BlockFace b = null;
-			if (f.exists()) {
-				b = BlockFaceParser.parse(f);
-			} 
-			if (b == null)
-				b = BlockFace.emptyPaddedBlockFace(d.block, d.face, d.numStalls);
-			l.add(b);
-		}
-		return Collections.unmodifiableList(l);
 	}
 
 	/**
