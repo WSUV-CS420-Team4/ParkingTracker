@@ -71,12 +71,17 @@ public class ParkingDataCollector {
 	 * @param face Face name
 	 * @param stallNumber Stall position on block face
 	 * @param stall Corresponding {@link ParkingStall}
+	 * @return True if set, false if not
 	 */
-	public void setStall(int block, String face, int stallNumber, ParkingStall stall) {
+	public boolean setStall(int block, String face, int stallNumber, ParkingStall stall) {
 		if (block < 0 || face == null || stallNumber < 0 || stall == null)
 			throw new IllegalArgumentException("Arguments cannot be null");
 		BlockFace f = getBlockFace(block, face);
-		f.setStall(stall, stallNumber);
+		if (f != null) {
+			f.setStall(stall, stallNumber);
+			return true;
+		}
+		return false;
 	}
 	
 	/**
