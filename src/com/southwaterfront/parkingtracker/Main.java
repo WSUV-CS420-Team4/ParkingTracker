@@ -75,8 +75,14 @@ public class Main extends Activity {
 
 	FragmentManager fragmentManager;
 	FragmentTransaction fragmentTransaction;
-	Button takePhoto;
-	ProgressBar progressBar;
+
+	private Button buttonTakePhoto;
+	private Button buttonMap;
+    private Button buttonSync;
+    private Button buttonData;
+    private Button buttonOptions;
+
+    private ProgressBar progressBar;
 
 	private CharSequence[] flagOptions = { "Handicap Placards", "Residential  Permit", "Employee Permit", "Student Permit", "Carpool Permit", "Other" };
 	private boolean[] flagSelections;
@@ -170,7 +176,7 @@ public class Main extends Activity {
 
 		textViewNotification.setText("Waiting for OcrEngine");
 		progressBar.setVisibility(View.VISIBLE);
-		takePhoto.setVisibility(View.GONE);
+		buttonTakePhoto.setVisibility(View.GONE);
 
 		ocrEngine.runOcr(photoFile, new AlprCallBack() {
 
@@ -206,7 +212,7 @@ public class Main extends Activity {
 		}
 		textViewNotification.setText(""); // "OCR Demo App"
 		progressBar.setVisibility(View.GONE);
-		takePhoto.setVisibility(View.VISIBLE);
+		buttonTakePhoto.setVisibility(View.VISIBLE);
 		if (result != null) {
 			// TODO Change this so instead of best estimated result it is what the user clicks on
 			// Change this later Joel, I was just using for testing
@@ -273,6 +279,60 @@ public class Main extends Activity {
 		Log.i(LOG_TAG, "App initialized successfully");
 	}
 
+    private void initButtons() {
+        // Temp Button init location
+        buttonTakePhoto = (Button) findViewById(R.id.buttonMainPhoto);
+        buttonTakePhoto.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Perform action on click
+                dispatchTakePictureIntent2();
+            }
+        });
+
+
+        // Temp Button init location
+        buttonSync = (Button) findViewById(R.id.buttonMainSync);
+        buttonSync.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                if (Utils.isWifiConnected() || !ParkingTrackerPreferences.getNonWifiConnectionNotificationSetting()) {
+                    upload();
+                }
+                else
+                    wifiAlert.show();
+            }
+        });
+
+        // Temp Button init location
+        buttonMap = (Button) findViewById(R.id.buttonMainMap);
+        buttonMap.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Log.i("Main", "Map Clicked!");
+            }
+        });
+
+        // Temp Button init location
+        buttonData = (Button) findViewById(R.id.buttonMainData);
+        buttonData.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Log.i("Main", "View Data Clicked!");
+                viewData();
+                showViewDataDialog();
+            }
+        });
+
+        // Temp Button init location
+        buttonOptions = (Button) findViewById(R.id.buttonMainOptions);
+        buttonOptions.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Log.i("Main", "Options Clicked!");
+            }
+        });
+
+
+        // TODO: Temp location for enable Buttons
+        enableButtons();
+    }
+
 	private void ChoosePlateInit() {
 
 		//choosePlateDialogFragment = new ChoosePlateDialogFragment();
@@ -322,55 +382,12 @@ public class Main extends Activity {
 
 		setupLocationSelect();
 
+        initButtons();
+
 		currentResult = "";
-
-		// Temp Button init location
-		takePhoto = (Button) findViewById(R.id.buttonMainPhoto);
-		takePhoto.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				// Perform action on click
-				dispatchTakePictureIntent2(); 	
-			}
-		});
-
-
-		// Temp Button init location
-		final Button button2 = (Button) findViewById(R.id.buttonMainSync);
-		button2.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				if (Utils.isWifiConnected() || !ParkingTrackerPreferences.getNonWifiConnectionNotificationSetting()) {
-					upload();
-				}
-				else
-					wifiAlert.show();
-			}
-		});
-
-		// Temp Button init location
-		final Button button3 = (Button) findViewById(R.id.buttonMainMap);
-		button3.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				Log.i("Main", "Map Clicked!");
-				//showSetFlagsDialog();
-			}
-		});
-
-		// Temp Button init location
-		final Button button4 = (Button) findViewById(R.id.buttonMainData);
-		button4.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				Log.i("Main", "View Data Clicked!");
-				viewData();
-				showViewDataDialog();
-			}
-		});
 
 		// Temp ProgressBar init location
 		progressBar = (ProgressBar) findViewById(R.id.progressBar);
-
-		// Temp DialogFragment init location
-		//LoginDialogFragment loginDialogFragment = new LoginDialogFragment();
-		//loginDialogFragment.show(getFragmentManager(), "Login");
 
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
@@ -498,6 +515,22 @@ public class Main extends Activity {
             }*/
 		}
 	}
+
+    public void enableButtons() {
+        buttonTakePhoto.setEnabled(true);
+        buttonMap.setEnabled(true);
+        buttonSync.setEnabled(true);
+        buttonData.setEnabled(true);
+        buttonOptions.setEnabled(true);
+    }
+
+    public void disableButtons() {
+        buttonTakePhoto.setEnabled(false);
+        buttonMap.setEnabled(false);
+        buttonSync.setEnabled(false);
+        buttonData.setEnabled(false);
+        buttonOptions.setEnabled(false);
+    }
 
 	public void setupLocationSelect() {
 		// TODO remove hard code

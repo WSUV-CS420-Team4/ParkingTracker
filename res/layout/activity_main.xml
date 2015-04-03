@@ -73,7 +73,8 @@
             android:textSize="40dp"
             android:background="@drawable/button_light"
             android:textColor="#ffffff"
-            android:visibility="visible" />
+            android:visibility="visible"
+            android:enabled="false" />
 
         <LinearLayout
             android:orientation="horizontal"
@@ -90,7 +91,8 @@
                 android:id="@+id/buttonMainMap"
                 android:layout_weight="1"
                 android:background="@drawable/button_dark"
-                android:textColor="#ffffff" />
+                android:textColor="#ffffff"
+                android:enabled="false" />
 
             <Button
                 style="?android:attr/buttonStyleSmall"
@@ -100,7 +102,8 @@
                 android:id="@+id/buttonMainSync"
                 android:layout_weight="1"
                 android:background="@drawable/button_dark"
-                android:textColor="#ffffff" />
+                android:textColor="#ffffff"
+                android:enabled="false" />
         </LinearLayout>
 
         <LinearLayout
@@ -118,7 +121,8 @@
                 android:id="@+id/buttonMainData"
                 android:layout_weight="1"
                 android:background="@drawable/button_dark"
-                android:textColor="#ffffff" />
+                android:textColor="#ffffff"
+                android:enabled="false" />
 
             <Button
                 style="?android:attr/buttonStyleSmall"
@@ -128,7 +132,8 @@
                 android:id="@+id/buttonMainOptions"
                 android:layout_weight="1"
                 android:background="@drawable/button_dark"
-                android:textColor="#ffffff" />
+                android:textColor="#ffffff"
+                android:enabled="false" />
         </LinearLayout>
     </LinearLayout>
 
