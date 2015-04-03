@@ -38,7 +38,7 @@ public class ParkingDataCollector {
 	 */
 	private void streetToDataModel(List<BlockFaceDefinition> defs, File cacheFolder) {
 		for (BlockFaceDefinition d : defs) {
-			String name = BlockFace.getName(d.block, d.face);
+			String name = BlockFace.createName(d.block, d.face);
 			File f = new File(cacheFolder, name);
 			BlockFace b = null;
 			if (f.exists()) {
@@ -60,7 +60,7 @@ public class ParkingDataCollector {
 	public BlockFace getBlockFace(int block, String face) {
 		if (face == null || block < 0)
 			throw new IllegalArgumentException("Arguments cannot be null");
-		String name = BlockFace.getName(block, face);
+		String name = BlockFace.createName(block, face);
 		return data.get(name);
 	}
 	

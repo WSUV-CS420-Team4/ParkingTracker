@@ -19,6 +19,7 @@ import com.southwaterfront.parkingtracker.R;
 import com.southwaterfront.parkingtracker.data.BlockFace;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -47,7 +48,7 @@ public class ViewDataDialogFragment extends DialogFragment {
         if ( ((Main) getActivity()).getData() != null) {
             data  = new ArrayList<BlockFace>(((Main) getActivity()).getData());
         }
-
+        Collections.sort(data);
         ArrayAdapter<BlockFace> dataAdapter = new ArrayAdapter<BlockFace>(getActivity(), R.layout.listview_layout_data, data);
 
         dataList.setAdapter(dataAdapter);

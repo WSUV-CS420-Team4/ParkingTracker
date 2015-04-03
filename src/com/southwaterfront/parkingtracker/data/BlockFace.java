@@ -11,7 +11,7 @@ import java.util.List;
  * @author Vitaliy Gavrilov
  *
  */
-public final class BlockFace {
+public final class BlockFace implements Comparable<BlockFace> {
 
 	public final int 						block;
 	public final String 						face;
@@ -166,8 +166,24 @@ public final class BlockFace {
 	 * @param face Face string
 	 * @return Block face name
 	 */
-	public static String getName(int block, String face) {
+	public static String createName(int block, String face) {
 		return block + "_" + face;
+	}
+	
+	@Override
+	public String toString() {
+		return block + " " + face;
+	}
+
+	@Override
+	public int compareTo(BlockFace another) {
+		if (this.block < another.block)
+			return -1;
+		if (this.block > another.block)
+			return 1;
+		else {
+			return this.face.compareTo(another.face);
+		}
 	}
 	
 }
