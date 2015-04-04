@@ -68,11 +68,12 @@ public class ChoosePlateDialogFragment extends DialogFragment {
             }
         });
 
-        if ( ((Main)getActivity()).getLicensePlates().size() == 1 ) {
+        /*if ( ((Main)getActivity()).getLicensePlates().size() == 1 ) {
             plateNo.setText("1 Result");
         } else {
             plateNo.setText(((Main)getActivity()).getLicensePlates().size() + " Results");
-        }
+        }*/
+        plateNo.setText("");
 
         addLicense.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {

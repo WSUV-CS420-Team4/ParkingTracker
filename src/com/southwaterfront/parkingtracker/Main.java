@@ -70,11 +70,11 @@ public class Main extends Activity {
 	private IntentFilter wifiFilter;
 	private File photoFile;
 
-	List<String> licensePlates = new ArrayList<String>();
-	ArrayAdapter<String> arrayAdapter;
+	private List<String> licensePlates = new ArrayList<String>();
+	private ArrayAdapter<String> arrayAdapter;
 
-	FragmentManager fragmentManager;
-	FragmentTransaction fragmentTransaction;
+	private FragmentManager fragmentManager;
+	private FragmentTransaction fragmentTransaction;
 
 	private Button buttonTakePhoto;
 	private Button buttonMap;
@@ -196,8 +196,6 @@ public class Main extends Activity {
 		});
 	}
 
-	int stall = 0;
-
 	private void setOcrResult(String[] result) {
 		licensePlates.clear();
 		clearFlagSelections();
@@ -214,26 +212,20 @@ public class Main extends Activity {
 		progressBar.setVisibility(View.GONE);
 		buttonTakePhoto.setVisibility(View.VISIBLE);
 		if (result != null) {
-			// TODO Change this so instead of best estimated result it is what the user clicks on
-			// Change this later Joel, I was just using for testing
-			/*Random r = new Random();
-			int block = r.nextInt(data.size() - 1);
-			data.get(block).setStall(new ParkingStall(result[0], new Date(System.currentTimeMillis()), null), stall++);*/
-
-			/*String tempt[] = new String[licensePlates.size()];
-            tempt = licensePlates.toArray(tempt);*/
 			arrayAdapter = new ArrayAdapter<String>(Main.this, android.R.layout.simple_list_item_1, licensePlates );
 			arrayAdapter.setDropDownViewResource(R.layout.choose_plate);
 
 			Log.i("List", "licensePlates: " + licensePlates.size());
-			//choosePlateDialogFragment.setAdapter(arrayAdapter);
 
 			// ChoosePlateDialogFragment Show Here
 			showChoosePlateDialog();
-			//choosePlateDialogFragment.show(getFragmentManager(), "Login");
 
 			Toast.makeText(Main.this, licensePlates.size() + " Results", Toast.LENGTH_LONG).show();
-		}
+		} else {
+            showChoosePlateDialog();
+            textViewNotification.setText("0 Results");
+            Toast.makeText(Main.this, "0 Results", Toast.LENGTH_SHORT).show();
+        }
 	}
 	// -------------------------------------------------------------------------------------------------
 
@@ -333,32 +325,6 @@ public class Main extends Activity {
 		});
 	}
 
-	private void ChoosePlateInit() {
-
-		//choosePlateDialogFragment = new ChoosePlateDialogFragment();
-
-		// Old Popup window style
-		/*LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(this.LAYOUT_INFLATER_SERVICE);
-        popupLayout = layoutInflater.inflate(R.layout.choose_plate, null);
-
-        popupWindow = new PopupWindow(popupLayout, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        popupWindow.setContentView(popupLayout);
-        popupWindow.setFocusable(true);
-
-        listView = (ListView) popupLayout.findViewById(R.id.listViewChoosePlate);
-
-        listView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.i("ListView", "You clicked Item: " + id + " at position:" + position);
-                plateNo.setText((String) parent.getItemAtPosition(position));
-            }
-        });
-
-        plateNo = (TextView) popupLayout.findViewById(R.id.textViewChoosePlateResult);*/
-
-	}
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -377,8 +343,6 @@ public class Main extends Activity {
 
 		fragmentManager = getFragmentManager();
 		fragmentTransaction = fragmentManager.beginTransaction();
-
-		ChoosePlateInit();
 
 		setupLocationSelect();
 
@@ -488,9 +452,6 @@ public class Main extends Activity {
 	}
 
 	public void addData() {
-
-		// java.lang.UnsupportedOperationException
-		//data.add( new BlockFace(blockArray.get(currentBlock), faceArray.get(currentFace)) );
 
 		// Currently doesn't add correctly
 		// TODO: Still need to add Attr (need to convert Boolean[] to String[] and replace null)
