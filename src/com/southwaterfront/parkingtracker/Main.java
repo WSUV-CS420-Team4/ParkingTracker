@@ -287,7 +287,7 @@ public class Main extends Activity {
 	}
 
 	private void initButtons() {
-		// Temp Button init location
+
 		buttonTakePhoto = (Button) findViewById(R.id.buttonMainPhoto);
 		buttonTakePhoto.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -297,7 +297,6 @@ public class Main extends Activity {
 		});
 
 
-		// Temp Button init location
 		buttonSync = (Button) findViewById(R.id.buttonMainSync);
 		buttonSync.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -309,7 +308,6 @@ public class Main extends Activity {
 			}
 		});
 
-		// Temp Button init location
 		buttonMap = (Button) findViewById(R.id.buttonMainMap);
 		buttonMap.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -327,7 +325,6 @@ public class Main extends Activity {
 			}
 		});
 
-		// Temp Button init location
 		buttonOptions = (Button) findViewById(R.id.buttonMainOptions);
 		buttonOptions.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -496,8 +493,9 @@ public class Main extends Activity {
 		//data.add( new BlockFace(blockArray.get(currentBlock), faceArray.get(currentFace)) );
 
 		// Currently doesn't add correctly
-		// TODO: Joel take a look here too
-		dataCollector.setStall(currentBlock, "A", currentStall, new ParkingStall(currentResult, new Date(System.currentTimeMillis()), null));
+		// TODO: Still need to add Attr (need to convert Boolean[] to String[] and replace null)
+		dataCollector.setStall(blockArray.get(currentBlock), faceArray.get(currentFace), stallArray.get(currentStall),
+                new ParkingStall(currentResult, new Date(System.currentTimeMillis()), null));
 		Log.i("Main", "Added " + currentResult + " to block " + blockArray.get(currentBlock) +
 				", face " + faceArray.get(currentFace) + ", stall " + stallArray.get(currentStall));
 	}
@@ -506,9 +504,10 @@ public class Main extends Activity {
 		// Logs all the stalls currently held in data
 		Log.i("viewData", "data size: " + dataCollector.getBlockFaces().size());
 
-		for (BlockFace face : dataCollector.getBlockFaces()) {
+        // TODO: Check stall format 0-14 or 1-15
+		for (BlockFace face : getData()) {
 			for (int i = 0; i < face.getParkingStalls().size(); i++) {
-				Log.i("stall", "block: " + face.block + " face: " + face.face + " stall: " + i +
+				Log.i("stall", "block: " + face.block + " face: " + face.face + " stall: " + (i+1) +
 						" plate: " + face.getParkingStalls().get(i).plate + " attr: " + face.getParkingStalls().get(i).attr);
 			}
 

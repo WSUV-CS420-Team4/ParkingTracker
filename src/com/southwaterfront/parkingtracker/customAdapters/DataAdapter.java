@@ -35,9 +35,14 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
 
         for (BlockFace face : blockFaceArray) {
             for (int i = 0; i < face.getParkingStalls().size(); i++) {
-                temp.add( new ParkingData(face.block, face.face, i, face.getParkingStalls().get(i).plate, face.getParkingStalls().get(i).attr) );
-                Log.i("stall", "block: " + face.block + " face: " + face.face + " stall: " + i +
-                        " plate: " + face.getParkingStalls().get(i).plate + " attr: " + face.getParkingStalls().get(i).attr);
+                if ( face.getParkingStalls().get(i).plate.equals("") ||  face.getParkingStalls().get(i).plate == null ) {
+                    // Do nothing...
+                } else {
+                    temp.add( new ParkingData(face.block, face.face, i, face.getParkingStalls().get(i).plate, face.getParkingStalls().get(i).attr) );
+                    //Log.i("DataAdapter Added", "block: " + face.block + " face: " + face.face + " stall: " + i +
+                    //        " plate: " + face.getParkingStalls().get(i).plate + " attr: " + face.getParkingStalls().get(i).attr);
+                    //Log.i("DataAdapter Size", "" + temp.size());
+                }
             }
         }
 
@@ -48,7 +53,7 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
-        DataHolder holder = null;
+        DataHolder holder;
 
         if(row == null)
         {
@@ -66,6 +71,7 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
             holder = (DataHolder)row.getTag();
         }
 
+        //Log.i("getView position", "" + position);
         ParkingData parkingData = data[position];
 
         String title = "Block: " + parkingData.block + " Face: ";
@@ -82,7 +88,19 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
         return row;
     }
 
+    @Override
+    public int getCount() {
+        return data.length;
+    }
+
     static class ParkingData {
+
+        ParkingData() {
+            this.block = 0;
+            this.face = null;
+            this.stall = 0;
+            this.plate = null;
+        }
 
         ParkingData(int block, String face, int stall, String plate, String[] attr) {
             this.block = block;
