@@ -495,7 +495,7 @@ public class Main extends Activity {
 
 		// Currently doesn't add correctly
 		// TODO: Still need to add Attr (need to convert Boolean[] to String[] and replace null)
-		dataCollector.setStall(blockArray.get(currentBlock), faceArray.get(currentFace), stallArray.get(currentStall),
+		dataCollector.setStall(blockArray.get(currentBlock), faceArray.get(currentFace), stallArray.get(currentStall) - 1,
                 new ParkingStall(currentResult, new Date(System.currentTimeMillis()), generateFlags()));
 		Log.i("Main", "Added " + currentResult + " to block " + blockArray.get(currentBlock) +
 				", face " + faceArray.get(currentFace) + ", stall " + stallArray.get(currentStall));

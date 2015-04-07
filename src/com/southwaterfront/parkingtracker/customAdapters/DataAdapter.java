@@ -76,7 +76,7 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
 
         String title = "Block: " + parkingData.block + " Face: ";
         if ( parkingData.face != null ) { title += parkingData.face; } else { title += "-"; }
-        title += " Stall: " + parkingData.stall;
+        title += " Stall: " + (parkingData.stall + 1);
         holder.title.setText(title);
 
         String content = "License: ";
