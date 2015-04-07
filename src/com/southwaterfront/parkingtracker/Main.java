@@ -120,6 +120,8 @@ public class Main extends Activity {
 		// Ensure that there's a camera activity to handle the intent
 		if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
 			// Create the File where the photo should go
+			if (photoFile != null)
+				photoFile.delete();
 			photoFile = null;
 			try {
 				photoFile = createImageFile();
@@ -186,8 +188,8 @@ public class Main extends Activity {
 
 					@Override
 					public void run() {
-						setOcrResult(result);
 						photoFile.delete();
+						setOcrResult(result);
 					}
 
 				});
@@ -222,10 +224,10 @@ public class Main extends Activity {
 
 			Toast.makeText(Main.this, licensePlates.size() + " Results", Toast.LENGTH_LONG).show();
 		} else {
-            showChoosePlateDialog();
-            //textViewNotification.setText("0 Results");
-            Toast.makeText(Main.this, "0 Results", Toast.LENGTH_SHORT).show();
-        }
+			showChoosePlateDialog();
+			//textViewNotification.setText("0 Results");
+			Toast.makeText(Main.this, "0 Results", Toast.LENGTH_SHORT).show();
+		}
 	}
 	// -------------------------------------------------------------------------------------------------
 
@@ -321,7 +323,7 @@ public class Main extends Activity {
 		buttonOptions.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Log.i("Main", "Options Clicked!");
-                generateFlags();
+				generateFlags();
 			}
 		});
 	}
@@ -452,51 +454,51 @@ public class Main extends Activity {
 
 	}
 
-    private String[] generateFlags() {
+	private String[] generateFlags() {
 
-        String[] flagArray = {"", "", "", "", "", ""};
+		String[] flagArray = {"", "", "", "", "", ""};
 
-        //Log.i("flagSelections", "size: " + flagSelections.length);
+		//Log.i("flagSelections", "size: " + flagSelections.length);
 
-        int length = flagSelections.length;
-        for (int i = 0; i < length; i++) {
-            if ( flagSelections[i] ) {
-                switch (i) {
-                    case 0:
-                        flagArray[i] = "handicap";
-                        break;
-                    case 1:
-                        flagArray[i] = "residential";
-                        break;
-                    case 2:
-                        flagArray[i] = "employee";
-                        break;
-                    case 3:
-                        flagArray[i] = "student";
-                        break;
-                    case 4:
-                        flagArray[i] = "carpool";
-                        break;
-                    case 5:
-                        flagArray[i] = "other";
-                        break;
-                }
-            } else {
-                flagArray[i] = "";
-            }
+		int length = flagSelections.length;
+		for (int i = 0; i < length; i++) {
+			if ( flagSelections[i] ) {
+				switch (i) {
+				case 0:
+					flagArray[i] = "handicap";
+					break;
+				case 1:
+					flagArray[i] = "residential";
+					break;
+				case 2:
+					flagArray[i] = "employee";
+					break;
+				case 3:
+					flagArray[i] = "student";
+					break;
+				case 4:
+					flagArray[i] = "carpool";
+					break;
+				case 5:
+					flagArray[i] = "other";
+					break;
+				}
+			} else {
+				flagArray[i] = "";
+			}
 
-            //Log.i("generateFlags", "flag[" + i + "]: " + flagSelections[i]);
-        }
+			//Log.i("generateFlags", "flag[" + i + "]: " + flagSelections[i]);
+		}
 
-        return flagArray;
-    }
+		return flagArray;
+	}
 
 	public void addData() {
 
 		// Currently doesn't add correctly
 		// TODO: Still need to add Attr (need to convert Boolean[] to String[] and replace null)
 		dataCollector.setStall(blockArray.get(currentBlock), faceArray.get(currentFace), stallArray.get(currentStall) - 1,
-                new ParkingStall(currentResult, new Date(System.currentTimeMillis()), generateFlags()));
+				new ParkingStall(currentResult, new Date(System.currentTimeMillis()), generateFlags()));
 		Log.i("Main", "Added " + currentResult + " to block " + blockArray.get(currentBlock) +
 				", face " + faceArray.get(currentFace) + ", stall " + stallArray.get(currentStall));
 	}
@@ -505,7 +507,7 @@ public class Main extends Activity {
 		// Logs all the stalls currently held in data
 		Log.i("viewData", "data size: " + dataCollector.getBlockFaces().size());
 
-        // TODO: Check stall format 0-14 or 1-15
+		// TODO: Check stall format 0-14 or 1-15
 		for (BlockFace face : getData()) {
 			for (int i = 0; i < face.getParkingStalls().size(); i++) {
 				Log.i("stall", "block: " + face.block + " face: " + face.face + " stall: " + (i+1) +
