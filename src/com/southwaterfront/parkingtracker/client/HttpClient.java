@@ -11,7 +11,6 @@ import javax.json.Json;
 import javax.json.JsonObject;
 
 import android.app.Activity;
-import android.util.Log;
 
 import com.google.api.client.http.ByteArrayContent;
 import com.google.api.client.http.GenericUrl;
@@ -24,6 +23,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
 import com.southwaterfront.parkingtracker.dialog.LoginDialogFragment;
 import com.southwaterfront.parkingtracker.jsonify.Jsonify;
+import com.southwaterfront.parkingtracker.util.LogUtils;
 import com.southwaterfront.parkingtracker.util.Utils;
 
 //create a request factory
@@ -131,7 +131,7 @@ public class HttpClient {
 			}
 		}
 
-		Log.i(LOG_TAG, "The POST request response code is " + response.getStatusCode() + " with message " + response.getStatusMessage());
+		LogUtils.i(LOG_TAG, "The POST request response code is " + response.getStatusCode() + " with message " + response.getStatusMessage());
 
 		if (response.getStatusCode() == UNAUTHORIZED_STATUS_CODE)
 			initBlockingUILogin();

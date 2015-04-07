@@ -10,8 +10,6 @@ import java.util.concurrent.BlockingQueue;
 
 import javax.json.JsonObject;
 
-import android.util.Log;
-
 import com.southwaterfront.parkingtracker.client.HttpClient;
 import com.southwaterfront.parkingtracker.client.HttpClient.RequestFailedException;
 import com.southwaterfront.parkingtracker.data.DataManager.Session;
@@ -20,6 +18,7 @@ import com.southwaterfront.parkingtracker.jsonify.BlockFaceJsonBuilder;
 import com.southwaterfront.parkingtracker.jsonify.Jsonify;
 import com.southwaterfront.parkingtracker.jsonify.MasterDataJsonBuilder;
 import com.southwaterfront.parkingtracker.util.AsyncTask;
+import com.southwaterfront.parkingtracker.util.LogUtils;
 import com.southwaterfront.parkingtracker.util.Result;
 import com.southwaterfront.parkingtracker.util.Utils;
 
@@ -39,7 +38,7 @@ class DataWorker implements Runnable {
 
 	private static final String ERROR_SESSION_LOCKED = "Unable to complete the task because the session is locked and is in a read-only state";
 
-	private static final String ERROR_MASTER_CORRUPT = "The master data file with the upload data is corrupt";
+	//private static final String ERROR_MASTER_CORRUPT = "The master data file with the upload data is corrupt";
 	
 	private static final String ERROR_UPLOAD_IO = "Could not connect to server";
 
@@ -71,12 +70,12 @@ class DataWorker implements Runnable {
 					switch (task.type) {
 					case SAVE_DATA:
 						saveData(task);
-						Log.i(LOG_TAG, "Completed save data task for session " + task.sess);
+						LogUtils.i(LOG_TAG, "Completed save data task for session " + task.sess);
 						break;
 					case UPLOAD_DATA:
 						saveData(new DataTask(task.sess, null, Tasks.SAVE_DATA));
 						uploadData(task);
-						Log.i(LOG_TAG, "Completed upload task with result " + task.getResult() + " on session " + task.sess);
+						LogUtils.i(LOG_TAG, "Completed upload task with result " + task.getResult() + " on session " + task.sess);
 						break;
 					default:
 						break;
@@ -89,7 +88,7 @@ class DataWorker implements Runnable {
 				}
 			}
 		}
-		Log.i(LOG_TAG, "Worker for " + session.SESSION_ID + " interrupted and finished");
+		LogUtils.i(LOG_TAG, "Worker for " + session.SESSION_ID + " interrupted and finished");
 	}
 
 	private void saveData(DataTask task) {
@@ -131,7 +130,7 @@ class DataWorker implements Runnable {
 	private void uploadData(DataTask task) {
 		Session sess = task.sess;
 
-		Log.i(LOG_TAG, "Attempting to upload data for session " + sess.SESSION_ID);
+		LogUtils.i(LOG_TAG, "Attempting to upload data for session " + sess.SESSION_ID);
 
 		File cacheDir = sess.cacheFolder;
 
@@ -162,11 +161,11 @@ class DataWorker implements Runnable {
 		try {
 			HttpClient.postBlockFaceData(masterObject);
 		} catch (RequestFailedException e) {
-			Log.e(LOG_TAG, "Failed to post data", e);
+			LogUtils.e(LOG_TAG, "Failed to post data", e);
 			task.setResult(Result.FAIL, e.getMessage());
 			return;
 		} catch (IOException e) {
-			Log.e(LOG_TAG, "Failed to post data", e);
+			LogUtils.e(LOG_TAG, "Failed to post data", e);
 			task.setResult(Result.FAIL, ERROR_UPLOAD_IO);
 			return;
 		}
@@ -207,7 +206,7 @@ class DataWorker implements Runnable {
 				JsonObject obj = Jsonify.createJsonObjectFromStream(in);
 				jsonObjs.add(obj);
 			} catch (Exception e) {
-				Log.e(LOG_TAG, "Unable to create JsonObject from file", e);
+				LogUtils.e(LOG_TAG, "Unable to create JsonObject from file", e);
 			} finally {
 				if (in != null) {
 					try {

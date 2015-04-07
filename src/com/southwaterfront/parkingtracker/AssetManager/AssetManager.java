@@ -17,12 +17,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Environment;
-import android.util.Log;
 
 import com.southwaterfront.parkingtracker.client.HttpClient;
 import com.southwaterfront.parkingtracker.data.BlockFaceDefinition;
 import com.southwaterfront.parkingtracker.jsonify.Jsonify;
 import com.southwaterfront.parkingtracker.jsonify.StreetModelParser;
+import com.southwaterfront.parkingtracker.util.LogUtils;
 import com.southwaterfront.parkingtracker.util.Utils;
 
 /**
@@ -243,7 +243,7 @@ public class AssetManager {
 		try{
 			obj = Jsonify.createJsonObjectFromStream(in);
 		} catch(Exception e){
-			Log.e(LOG_TAG, "Parsing json object failed: " + in, e);
+			LogUtils.e(LOG_TAG, "Parsing json object failed: " + in, e);
 		} finally {
 			try {
 				in.close();
@@ -320,7 +320,7 @@ public class AssetManager {
 							toPath + File.separator + file);
 			return res;
 		} catch (Exception e) {
-			Log.e(LOG_TAG, e.getMessage(), e);
+			LogUtils.e(LOG_TAG, e.getMessage(), e);
 			return false;
 		}
 	}
@@ -344,7 +344,7 @@ public class AssetManager {
 			out = null;
 			return true;
 		} catch(Exception e) {
-			Log.e(LOG_TAG, e.getMessage(), e);
+			LogUtils.e(LOG_TAG, e.getMessage(), e);
 			return false;
 		}
 	}
