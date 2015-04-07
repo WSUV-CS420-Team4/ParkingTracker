@@ -223,7 +223,7 @@ public class Main extends Activity {
 			Toast.makeText(Main.this, licensePlates.size() + " Results", Toast.LENGTH_LONG).show();
 		} else {
             showChoosePlateDialog();
-            textViewNotification.setText("0 Results");
+            //textViewNotification.setText("0 Results");
             Toast.makeText(Main.this, "0 Results", Toast.LENGTH_SHORT).show();
         }
 	}
@@ -321,6 +321,7 @@ public class Main extends Activity {
 		buttonOptions.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Log.i("Main", "Options Clicked!");
+                generateFlags();
 			}
 		});
 	}
@@ -451,12 +452,51 @@ public class Main extends Activity {
 
 	}
 
+    private String[] generateFlags() {
+
+        String[] flagArray = {"", "", "", "", "", ""};
+
+        //Log.i("flagSelections", "size: " + flagSelections.length);
+
+        int length = flagSelections.length;
+        for (int i = 0; i < length; i++) {
+            if ( flagSelections[i] ) {
+                switch (i) {
+                    case 0:
+                        flagArray[i] = "handicap";
+                        break;
+                    case 1:
+                        flagArray[i] = "residential";
+                        break;
+                    case 2:
+                        flagArray[i] = "employee";
+                        break;
+                    case 3:
+                        flagArray[i] = "student";
+                        break;
+                    case 4:
+                        flagArray[i] = "carpool";
+                        break;
+                    case 5:
+                        flagArray[i] = "other";
+                        break;
+                }
+            } else {
+                flagArray[i] = "";
+            }
+
+            //Log.i("generateFlags", "flag[" + i + "]: " + flagSelections[i]);
+        }
+
+        return flagArray;
+    }
+
 	public void addData() {
 
 		// Currently doesn't add correctly
 		// TODO: Still need to add Attr (need to convert Boolean[] to String[] and replace null)
 		dataCollector.setStall(blockArray.get(currentBlock), faceArray.get(currentFace), stallArray.get(currentStall),
-                new ParkingStall(currentResult, new Date(System.currentTimeMillis()), null));
+                new ParkingStall(currentResult, new Date(System.currentTimeMillis()), generateFlags()));
 		Log.i("Main", "Added " + currentResult + " to block " + blockArray.get(currentBlock) +
 				", face " + faceArray.get(currentFace) + ", stall " + stallArray.get(currentStall));
 	}

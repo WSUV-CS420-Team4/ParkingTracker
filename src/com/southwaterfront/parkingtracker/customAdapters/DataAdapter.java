@@ -81,8 +81,59 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
 
         String content = "License: ";
         if ( parkingData.plate != null) { content += parkingData.plate; } else { content += "-"; }
-        content += " Attr: ";
-        if ( parkingData.attr != null) { content += parkingData.attr.toString(); } else { content += "-"; }
+        if ( parkingData.attr != null) {
+
+            // --------------------------------------------
+            // String Representation // TODO Could use some work...
+            // --------------------------------------------
+            String attr = "\n";
+            String c = "|";
+            int length = parkingData.attr.length;
+            for (int i = 0; i < length; i++) {
+                if ( parkingData.attr[i].toString().equals("") ) {
+                    // Do nothing
+                } else if ( parkingData.attr[i].toString().equals("|") && c.equals("|") ) {
+                    // Do nothing
+                } else if (parkingData.attr[i].toString().equals("|") ) {
+                    c = parkingData.attr[i].toString();
+                    attr += "\n";
+                } else {
+                    c = parkingData.attr[i].toString();
+                    attr += parkingData.attr[i].toString();
+                }
+            }
+            if ( attr.endsWith("other") ) {
+                Log.i("Other", "Ends with \"other\"");
+                attr += "\n";
+            }
+            if ( attr.endsWith("\n") ) {
+                Log.i("Other", "Ends with \\n");
+            }
+            content += attr;
+            // --------------------------------------------
+
+
+            // --------------------------------------------
+            // Boolean Array Representation // TODO Works initially but breaks after loading
+            // --------------------------------------------
+            /*content += " Attr: ";
+            String attr = "{";
+            int length = parkingData.attr.length;
+            for (int i = 0; i < length; i++) {
+                if ( parkingData.attr[i].equals("") ) {
+                    attr += "0";
+                } else {
+                    attr += "1";
+                }
+                if (i != length) {
+                    attr += ",";
+                }
+            }
+            attr += "}";
+            content += attr;*/
+            // --------------------------------------------
+
+        } else { content += " Attr: -"; }
         holder.content.setText(content);
 
         return row;
