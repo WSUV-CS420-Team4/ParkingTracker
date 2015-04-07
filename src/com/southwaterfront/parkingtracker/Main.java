@@ -174,7 +174,7 @@ public class Main extends Activity {
 		Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
 		imageView.setImageBitmap(bitmap);*/
 
-		textViewNotification.setText("Waiting for OcrEngine");
+		textViewNotification.setText("Recognizing license plate");
 		progressBar.setVisibility(View.VISIBLE);
 		buttonTakePhoto.setVisibility(View.GONE);
 
