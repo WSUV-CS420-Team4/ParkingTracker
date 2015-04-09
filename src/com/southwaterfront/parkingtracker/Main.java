@@ -323,7 +323,6 @@ public class Main extends Activity {
 		buttonOptions.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Log.i("Main", "Options Clicked!");
-				generateFlags();
 			}
 		});
 	}

@@ -31,4 +31,16 @@
         android:layout_weight="1"
         android:paddingLeft="5dp" />
 
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:textColor="#ffffff"
+        android:gravity="left"
+        android:textSize="14dp"
+        android:background="#969696"
+        android:text="Flags"
+        android:id="@+id/textViewDataLayoutFlags"
+        android:layout_weight="1"
+        android:paddingLeft="10dp" />
+
 </LinearLayout>

@@ -63,6 +63,7 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
             holder = new DataHolder();
             holder.title = (TextView)row.findViewById(R.id.textViewDataLayoutTitle);
             holder.content = (TextView)row.findViewById(R.id.textViewDataLayoutContent);
+            holder.flags = (TextView)row.findViewById(R.id.textViewDataLayoutFlags);
 
             row.setTag(holder);
         }
@@ -81,35 +82,51 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
 
         String content = "License: ";
         if ( parkingData.plate != null) { content += parkingData.plate; } else { content += "-"; }
+
+        String flags = "";
         if ( parkingData.attr != null) {
 
             // --------------------------------------------
             // String Representation // TODO Could use some work...
             // --------------------------------------------
-            String attr = "\n";
-            String c = "|";
+            String attr = "";
+            String prev = "|";
             int length = parkingData.attr.length;
+
             for (int i = 0; i < length; i++) {
-                if ( parkingData.attr[i].toString().equals("") ) {
-                    // Do nothing
-                } else if ( parkingData.attr[i].toString().equals("|") && c.equals("|") ) {
-                    // Do nothing
-                } else if (parkingData.attr[i].toString().equals("|") ) {
-                    c = parkingData.attr[i].toString();
-                    attr += "\n";
-                } else {
-                    c = parkingData.attr[i].toString();
+                Log.i("DataAdapter", "parkingData.attr = \"" + parkingData.attr[i].toString() + "\"");
+
+                if ( length == 6 ) {
+                    // data.attr contains 6 strings
                     attr += parkingData.attr[i].toString();
+                    if ( i != 5 && !parkingData.attr[i].toString().equals("") ) {
+                        attr += "\n";
+                    }
+                } else {
+                    // data.attr divided the 6 strings into strings of 1 character length
+                    // creating a lot of strings separated by |
+                    if ( parkingData.attr[i].toString().equals("|") && (prev.equals("|") || prev.equals("")) ) {
+                        prev = parkingData.attr[i].toString();
+                        // Do nothing
+                    } else if ( parkingData.attr[i].toString().equals("|")) {
+                        prev = parkingData.attr[i].toString();
+                        attr += "\n";
+                    } else {
+                        prev = parkingData.attr[i].toString();
+                        attr += parkingData.attr[i].toString();
+                    }
                 }
+
             }
+
             if ( attr.endsWith("other") ) {
                 Log.i("Other", "Ends with \"other\"");
-                attr += "\n";
+                //attr += "\n";
             }
             if ( attr.endsWith("\n") ) {
                 Log.i("Other", "Ends with \\n");
             }
-            content += attr;
+            flags += attr;
             // --------------------------------------------
 
 
@@ -133,8 +150,10 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
             content += attr;*/
             // --------------------------------------------
 
-        } else { content += " Attr: -"; }
+        } else { flags += " Attr: -"; }
+
         holder.content.setText(content);
+        holder.flags.setText(flags);
 
         return row;
     }
@@ -174,5 +193,6 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
     static class DataHolder {
         TextView title;
         TextView content;
+        TextView flags;
     }
 }
