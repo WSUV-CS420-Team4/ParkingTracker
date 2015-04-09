@@ -38,6 +38,12 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
                 if ( face.getParkingStalls().get(i).plate.equals("") ||  face.getParkingStalls().get(i).plate == null ) {
                     // Do nothing...
                 } else {
+
+                    int length = face.getParkingStalls().get(i).attr.length;
+                    for (int z = 0; z < length; z++) {
+                        Log.i("IMPORTANT", "attr = \"" + face.getParkingStalls().get(i).attr[z].toString() + "\"");
+                    }
+
                     temp.add( new ParkingData(face.block, face.face, i, face.getParkingStalls().get(i).plate, face.getParkingStalls().get(i).attr) );
                     //Log.i("DataAdapter Added", "block: " + face.block + " face: " + face.face + " stall: " + i +
                     //        " plate: " + face.getParkingStalls().get(i).plate + " attr: " + face.getParkingStalls().get(i).attr);
@@ -93,10 +99,16 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
             String prev = "|";
             int length = parkingData.attr.length;
 
-            for (int i = 0; i < length; i++) {
-                Log.i("DataAdapter", "parkingData.attr = \"" + parkingData.attr[i].toString() + "\"");
+            StringBuilder builder = new StringBuilder();
+            for(String s : parkingData.attr) {
+                builder.append(s);
+            }
+            Log.i("WHY", parkingData.block +":"+ parkingData.face +":"+ (parkingData.stall+1) + " = \"" + builder.toString() + "\"");
 
-                if ( length == 6 ) {
+            for (int i = 0; i < length; i++) {
+                //Log.i("DataAdapter", "parkingData.attr = \"" + parkingData.attr[i].toString() + "\"");
+
+                /*if ( length == 6 ) {
                     // data.attr contains 6 strings
                     attr += parkingData.attr[i].toString();
                     if ( i != 5 && !parkingData.attr[i].toString().equals("") ) {
@@ -115,7 +127,23 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
                         prev = parkingData.attr[i].toString();
                         attr += parkingData.attr[i].toString();
                     }
+                }*/
+
+                // TODO Quick Fix ----------
+                if ( parkingData.attr[i].toString().equals("h") ) {
+                    attr += "handicap\n";
+                } else if ( parkingData.attr[i].toString().equals("r") ) {
+                    attr += "residential\n";
+                } else if ( parkingData.attr[i].toString().equals("e") ) {
+                    attr += "employee\n";
+                } else if ( parkingData.attr[i].toString().equals("s") ) {
+                    attr += "student\n";
+                } else if ( parkingData.attr[i].toString().equals("c") ) {
+                    attr += "carpool\n";
+                } else if ( parkingData.attr[i].toString().equals("o") ) {
+                    attr += "other\n";
                 }
+                // -------------------------
 
             }
 
@@ -125,6 +153,11 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
             }
             if ( attr.endsWith("\n") ) {
                 Log.i("Other", "Ends with \\n");
+                // remove \n
+                StringBuilder temp = new StringBuilder(attr);
+                temp.setCharAt((attr.length()-1), ' ');
+
+                attr = String.valueOf(temp);
             }
             flags += attr;
             // --------------------------------------------
@@ -177,7 +210,8 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
             this.face = face;
             this.stall = stall;
             this.plate = plate;
-            this.attr = attr;
+            this.attr = new String[attr.length];
+            System.arraycopy(attr, 0, this.attr, 0, attr.length);
         }
 
         int block;

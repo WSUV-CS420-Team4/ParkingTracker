@@ -464,22 +464,22 @@ public class Main extends Activity {
 			if ( flagSelections[i] ) {
 				switch (i) {
 				case 0:
-					flagArray[i] = "handicap";
+					flagArray[i] = "h"; //"handicap";
 					break;
 				case 1:
-					flagArray[i] = "residential";
+					flagArray[i] = "r"; //"residential";
 					break;
 				case 2:
-					flagArray[i] = "employee";
+					flagArray[i] = "e"; //"employee";
 					break;
 				case 3:
-					flagArray[i] = "student";
+					flagArray[i] = "s"; //"student";
 					break;
 				case 4:
-					flagArray[i] = "carpool";
+					flagArray[i] = "c"; //"carpool";
 					break;
 				case 5:
-					flagArray[i] = "other";
+					flagArray[i] = "o"; //"other";
 					break;
 				}
 			} else {
