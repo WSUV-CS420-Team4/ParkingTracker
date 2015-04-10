@@ -21,212 +21,123 @@ import java.util.List;
  */
 public class DataAdapter extends ArrayAdapter<BlockFace> {
 
-    Context context;
-    int layoutResourceId;
-    ParkingData[] data;
+	Context context;
+	int layoutResourceId;
+	ParkingData[] data;
 
-    public DataAdapter(Context context, int layoutResourceId, BlockFace[] blockFaceArray) {
-        super(context, layoutResourceId, blockFaceArray);
-        this.layoutResourceId = layoutResourceId;
-        this.context = context;
-        //this.data = data;
+	public DataAdapter(Context context, int layoutResourceId, BlockFace[] blockFaceArray) {
+		super(context, layoutResourceId, blockFaceArray);
+		this.layoutResourceId = layoutResourceId;
+		this.context = context;
+		//this.data = data;
 
-        List<ParkingData> temp = new ArrayList<ParkingData>();
+		List<ParkingData> temp = new ArrayList<ParkingData>();
 
-        for (BlockFace face : blockFaceArray) {
-            for (int i = 0; i < face.getParkingStalls().size(); i++) {
-                if ( face.getParkingStalls().get(i).plate.equals("") ||  face.getParkingStalls().get(i).plate == null ) {
-                    // Do nothing...
-                } else {
+		for (BlockFace face : blockFaceArray) {
+			for (int i = 0; i < face.getParkingStalls().size(); i++) {
+				if ( face.getParkingStalls().get(i).plate.equals("") ||  face.getParkingStalls().get(i).plate == null ) {
+					// Do nothing...
+				} else {
 
-                    int length = face.getParkingStalls().get(i).attr.length;
-                    for (int z = 0; z < length; z++) {
-                        Log.i("IMPORTANT", "attr = \"" + face.getParkingStalls().get(i).attr[z].toString() + "\"");
-                    }
+					int length = face.getParkingStalls().get(i).attr.length;
+					for (int z = 0; z < length; z++) {
+						Log.i("IMPORTANT", "attr = \"" + face.getParkingStalls().get(i).attr[z].toString() + "\"");
+					}
 
-                    temp.add( new ParkingData(face.block, face.face, i, face.getParkingStalls().get(i).plate, face.getParkingStalls().get(i).attr) );
-                    //Log.i("DataAdapter Added", "block: " + face.block + " face: " + face.face + " stall: " + i +
-                    //        " plate: " + face.getParkingStalls().get(i).plate + " attr: " + face.getParkingStalls().get(i).attr);
-                    //Log.i("DataAdapter Size", "" + temp.size());
-                }
-            }
-        }
+					temp.add( new ParkingData(face.block, face.face, i, face.getParkingStalls().get(i).plate, face.getParkingStalls().get(i).attr) );
+					//Log.i("DataAdapter Added", "block: " + face.block + " face: " + face.face + " stall: " + i +
+					//        " plate: " + face.getParkingStalls().get(i).plate + " attr: " + face.getParkingStalls().get(i).attr);
+					//Log.i("DataAdapter Size", "" + temp.size());
+				}
+			}
+		}
 
-        data = new ParkingData[temp.size()];
-        temp.toArray( data );
-    }
+		data = new ParkingData[temp.size()];
+		temp.toArray( data );
+	}
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View row = convertView;
-        DataHolder holder;
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		View row = convertView;
+		DataHolder holder;
 
-        if(row == null)
-        {
-            LayoutInflater inflater = ((Activity)context).getLayoutInflater();
-            row = inflater.inflate(layoutResourceId, parent, false);
+		if(row == null)
+		{
+			LayoutInflater inflater = ((Activity)context).getLayoutInflater();
+			row = inflater.inflate(layoutResourceId, parent, false);
 
-            holder = new DataHolder();
-            holder.title = (TextView)row.findViewById(R.id.textViewDataLayoutTitle);
-            holder.content = (TextView)row.findViewById(R.id.textViewDataLayoutContent);
-            holder.flags = (TextView)row.findViewById(R.id.textViewDataLayoutFlags);
+			holder = new DataHolder();
+			holder.title = (TextView)row.findViewById(R.id.textViewDataLayoutTitle);
+			holder.content = (TextView)row.findViewById(R.id.textViewDataLayoutContent);
+			holder.flags = (TextView)row.findViewById(R.id.textViewDataLayoutFlags);
 
-            row.setTag(holder);
-        }
-        else
-        {
-            holder = (DataHolder)row.getTag();
-        }
+			row.setTag(holder);
+		}
+		else
+		{
+			holder = (DataHolder)row.getTag();
+		}
 
-        //Log.i("getView position", "" + position);
-        ParkingData parkingData = data[position];
+		//Log.i("getView position", "" + position);
+		ParkingData parkingData = data[position];
 
-        String title = "Block: " + parkingData.block + " Face: ";
-        if ( parkingData.face != null ) { title += parkingData.face; } else { title += "-"; }
-        title += " Stall: " + (parkingData.stall + 1);
-        holder.title.setText(title);
+		String title = "Block: " + parkingData.block + " Face: ";
+		if ( parkingData.face != null ) { title += parkingData.face; } else { title += "-"; }
+		title += " Stall: " + (parkingData.stall + 1);
+		holder.title.setText(title);
 
-        String content = "License: ";
-        if ( parkingData.plate != null) { content += parkingData.plate; } else { content += "-"; }
+		String content = "License: ";
+		if ( parkingData.plate != null) { content += parkingData.plate; } else { content += "-"; }
 
-        String flags = "";
-        if ( parkingData.attr != null) {
+		String flags = "";
+		if ( parkingData.attr != null) {
+			int length = parkingData.attr.length;
+			for (String s : parkingData.attr)
+				flags += s + " " ;
+		}
 
-            // --------------------------------------------
-            // String Representation // TODO Could use some work...
-            // --------------------------------------------
-            String attr = "";
-            String prev = "|";
-            int length = parkingData.attr.length;
+		holder.content.setText(content);
+		holder.flags.setText(flags);
 
-            StringBuilder builder = new StringBuilder();
-            for(String s : parkingData.attr) {
-                builder.append(s);
-            }
-            Log.i("WHY", parkingData.block +":"+ parkingData.face +":"+ (parkingData.stall+1) + " = \"" + builder.toString() + "\"");
+		return row;
+	}
 
-            for (int i = 0; i < length; i++) {
-                //Log.i("DataAdapter", "parkingData.attr = \"" + parkingData.attr[i].toString() + "\"");
+	@Override
+	public int getCount() {
+		return data.length;
+	}
 
-                /*if ( length == 6 ) {
-                    // data.attr contains 6 strings
-                    attr += parkingData.attr[i].toString();
-                    if ( i != 5 && !parkingData.attr[i].toString().equals("") ) {
-                        attr += "\n";
-                    }
-                } else {
-                    // data.attr divided the 6 strings into strings of 1 character length
-                    // creating a lot of strings separated by |
-                    if ( parkingData.attr[i].toString().equals("|") && (prev.equals("|") || prev.equals("")) ) {
-                        prev = parkingData.attr[i].toString();
-                        // Do nothing
-                    } else if ( parkingData.attr[i].toString().equals("|")) {
-                        prev = parkingData.attr[i].toString();
-                        attr += "\n";
-                    } else {
-                        prev = parkingData.attr[i].toString();
-                        attr += parkingData.attr[i].toString();
-                    }
-                }*/
+	static class ParkingData {
 
-                // TODO Quick Fix ----------
-                if ( parkingData.attr[i].toString().equals("h") ) {
-                    attr += "handicap\n";
-                } else if ( parkingData.attr[i].toString().equals("r") ) {
-                    attr += "residential\n";
-                } else if ( parkingData.attr[i].toString().equals("e") ) {
-                    attr += "employee\n";
-                } else if ( parkingData.attr[i].toString().equals("s") ) {
-                    attr += "student\n";
-                } else if ( parkingData.attr[i].toString().equals("c") ) {
-                    attr += "carpool\n";
-                } else if ( parkingData.attr[i].toString().equals("o") ) {
-                    attr += "other\n";
-                }
-                // -------------------------
+		ParkingData() {
+			this.block = 0;
+			this.face = null;
+			this.stall = 0;
+			this.plate = null;
+		}
 
-            }
+		ParkingData(int block, String face, int stall, String plate, String[] attr) {
+			this.block = block;
+			this.face = face;
+			this.stall = stall;
+			this.plate = plate;
+			this.attr = new String[attr.length];
+			System.arraycopy(attr, 0, this.attr, 0, attr.length);
+		}
 
-            if ( attr.endsWith("other") ) {
-                Log.i("Other", "Ends with \"other\"");
-                //attr += "\n";
-            }
-            if ( attr.endsWith("\n") ) {
-                Log.i("Other", "Ends with \\n");
-                // remove \n
-                StringBuilder temp = new StringBuilder(attr);
-                temp.setCharAt((attr.length()-1), ' ');
+		int block;
+		String face;
+		int stall;
+		boolean modifiedSince;
 
-                attr = String.valueOf(temp);
-            }
-            flags += attr;
-            // --------------------------------------------
+		String plate;
+		Date dTStamp;
+		String[] attr;
+	}
 
-
-            // --------------------------------------------
-            // Boolean Array Representation // TODO Works initially but breaks after loading
-            // --------------------------------------------
-            /*content += " Attr: ";
-            String attr = "{";
-            int length = parkingData.attr.length;
-            for (int i = 0; i < length; i++) {
-                if ( parkingData.attr[i].equals("") ) {
-                    attr += "0";
-                } else {
-                    attr += "1";
-                }
-                if (i != length) {
-                    attr += ",";
-                }
-            }
-            attr += "}";
-            content += attr;*/
-            // --------------------------------------------
-
-        } else { flags += " Attr: -"; }
-
-        holder.content.setText(content);
-        holder.flags.setText(flags);
-
-        return row;
-    }
-
-    @Override
-    public int getCount() {
-        return data.length;
-    }
-
-    static class ParkingData {
-
-        ParkingData() {
-            this.block = 0;
-            this.face = null;
-            this.stall = 0;
-            this.plate = null;
-        }
-
-        ParkingData(int block, String face, int stall, String plate, String[] attr) {
-            this.block = block;
-            this.face = face;
-            this.stall = stall;
-            this.plate = plate;
-            this.attr = new String[attr.length];
-            System.arraycopy(attr, 0, this.attr, 0, attr.length);
-        }
-
-        int block;
-        String face;
-        int stall;
-        boolean modifiedSince;
-
-        String plate;
-        Date dTStamp;
-        String[] attr;
-    }
-
-    static class DataHolder {
-        TextView title;
-        TextView content;
-        TextView flags;
-    }
+	static class DataHolder {
+		TextView title;
+		TextView content;
+		TextView flags;
+	}
 }

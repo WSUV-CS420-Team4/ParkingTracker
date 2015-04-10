@@ -120,8 +120,6 @@ public class Main extends Activity {
 		// Ensure that there's a camera activity to handle the intent
 		if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
 			// Create the File where the photo should go
-			if (photoFile != null)
-				photoFile.delete();
 			photoFile = null;
 			try {
 				photoFile = createImageFile();
@@ -179,7 +177,6 @@ public class Main extends Activity {
 		textViewNotification.setText("Recognizing license plate");
 		progressBar.setVisibility(View.VISIBLE);
 		buttonTakePhoto.setVisibility(View.GONE);
-
 		ocrEngine.runOcr(photoFile, new AlprCallBack() {
 
 			@Override
@@ -188,8 +185,11 @@ public class Main extends Activity {
 
 					@Override
 					public void run() {
-						photoFile.delete();
-						setOcrResult(result);
+						try {
+							setOcrResult(result);
+						} finally {
+							photoFile.delete();
+						}
 					}
 
 				});
@@ -455,42 +455,29 @@ public class Main extends Activity {
 
 	private String[] generateFlags() {
 
-		String[] flagArray = {"", "", "", "", "", ""};
+		String[] flagArray;
 
 		//Log.i("flagSelections", "size: " + flagSelections.length);
 
-		int length = flagSelections.length;
-		for (int i = 0; i < length; i++) {
+		int length = 0;
+		for (int i = 0; i < flagSelections.length; i++) {
 			if ( flagSelections[i] ) {
-				switch (i) {
-				case 0:
-					flagArray[i] = "h"; //"handicap";
-					break;
-				case 1:
-					flagArray[i] = "r"; //"residential";
-					break;
-				case 2:
-					flagArray[i] = "e"; //"employee";
-					break;
-				case 3:
-					flagArray[i] = "s"; //"student";
-					break;
-				case 4:
-					flagArray[i] = "c"; //"carpool";
-					break;
-				case 5:
-					flagArray[i] = "o"; //"other";
-					break;
-				}
-			} else {
-				flagArray[i] = "";
+				length++;
 			}
+		}
 
-			//Log.i("generateFlags", "flag[" + i + "]: " + flagSelections[i]);
+		//Log.i("generateFlags", "flag[" + i + "]: " + flagSelections[i]);
+		flagArray = new String[length];
+		length = 0;
+		for (int i = 0; i < flagSelections.length; i++) {
+			if ( flagSelections[i] ) {
+				flagArray[length++] = (String) flagOptions[length];
+			}
 		}
 
 		return flagArray;
 	}
+
 
 	public void addData() {
 
