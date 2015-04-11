@@ -177,10 +177,11 @@ public class Main extends Activity {
 		textViewNotification.setText("Recognizing license plate");
 		progressBar.setVisibility(View.VISIBLE);
 		buttonTakePhoto.setVisibility(View.GONE);
-		ocrEngine.runOcr(photoFile, new AlprCallBack() {
-
+		ocrEngine.runAlpr(photoFile, new AlprCallBack() {
+			// TODO : also why are we making a new anonymous class for every alpr call?
 			@Override
 			public void call(final String[] result) {
+				// TODO : Work with Joel to update the view data adapter HERE
 				Main.this.runOnUiThread(new Runnable() {
 
 					@Override

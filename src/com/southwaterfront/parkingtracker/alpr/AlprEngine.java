@@ -10,6 +10,7 @@ import org.openalpr.Alpr;
 import android.util.Log;
 
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
+import com.southwaterfront.parkingtracker.data.DataManager;
 import com.southwaterfront.parkingtracker.jsonify.AlprParser;
 
 /**
@@ -58,12 +59,14 @@ public class AlprEngine implements Closeable {
 		//private static final String resultPlateNotFound = "License Plate not recognized";
 		private final Alpr alpr;
 		private final BlockingQueue<TaskWrapper> images;
+		private final DataManager dataManager;
 
 		public AlprWorker(Alpr alpr, BlockingQueue<TaskWrapper> i) {
 			if (i == null || alpr == null)
 				throw new IllegalArgumentException("Arguments cannot be null");
 			this.alpr = alpr;
 			this.images = i;
+			this.dataManager = DataManager.getInstance();
 		}
 
 		@Override
@@ -145,9 +148,9 @@ public class AlprEngine implements Closeable {
 	 * result from the image
 	 * 
 	 * @param image File containing the image to be processed
-	 * @param rect Rectangle defining processing area in image
+	 * @param resultCallBack Callback to call when done processing
 	 */
-	public void runOcr(File image, AlprCallBack resultCallBack) {
+	public void runAlpr(File image, AlprCallBack resultCallBack) {
 		checkNotClosed();
 		if (image == null || !image.exists() || !image.canRead())
 			throw new IllegalArgumentException("Image file must exist and be readable");
