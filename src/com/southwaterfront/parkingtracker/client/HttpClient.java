@@ -10,8 +10,6 @@ import java.net.URL;
 import javax.json.Json;
 import javax.json.JsonObject;
 
-import android.app.Activity;
-
 import com.google.api.client.http.ByteArrayContent;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpHeaders;
@@ -33,18 +31,38 @@ import com.southwaterfront.parkingtracker.util.Utils;
 public class HttpClient {
 
 	private static String LOG_TAG = "HttpClient";
-	private static final File authTokenFile = AssetManager.getInstance().getAuthToken();
+	private static final File authTokenFile = AssetManager.getInstance().getAuthTokenFile();
 	private static final String authTokenKeyName = "X-Auth-Token";
 	private static final String TOKEN_GET_KEY = "Token";
 	private static String authToken = readAuthFile(authTokenFile);
 
 	private static final String POST_BLOCKFACE_DATA_URL = "https://bend.encs.vancouver.wsu.edu/~jason_moss/api/v1/blockfaces";
+	private static GenericUrl postBlockFaceDataUrl;
 	private static final String LOGIN_URL = "https://bend.encs.vancouver.wsu.edu/~jason_moss/api/v1/login";
+	private static GenericUrl loginUrl;
 	private static final String GET_STREET_MODEL_URL = "https://bend.encs.vancouver.wsu.edu/~jason_moss/api/v1/streetmodel";
+	private static GenericUrl getStreetModelUrl;
 	private static final NetHttpTransport transport = new NetHttpTransport();
 	private static final HttpRequestFactory requestFactory = transport.createRequestFactory();
 	private static final int UNAUTHORIZED_STATUS_CODE = 401;
 
+	static {
+		try {
+			postBlockFaceDataUrl = new GenericUrl(new URL(POST_BLOCKFACE_DATA_URL));
+		} catch (MalformedURLException e) {
+		} 
+		
+		try {
+			loginUrl = new GenericUrl(new URL(LOGIN_URL));
+		} catch (MalformedURLException e) {
+		} 
+		
+		try {
+			getStreetModelUrl = new GenericUrl(new URL(GET_STREET_MODEL_URL));
+		} catch (MalformedURLException e) {
+		} 
+	}
+	
 	//private static final Activity main = AssetManager.getInstance().getMainActivity();
 
 	private static final String ERROR_LOGIN = "Failed to login";
@@ -62,12 +80,7 @@ public class HttpClient {
 	}
 
 	public static InputStream getStreetModel() throws RequestFailedException, IOException {
-		GenericUrl url = null;
-		try {
-			url = new GenericUrl(new URL(GET_STREET_MODEL_URL));
-		} catch (MalformedURLException e) {
-			// Not possible
-		} 
+		
 
 		if (authToken == null)
 			initBlockingUILogin();
@@ -75,7 +88,7 @@ public class HttpClient {
 		InputStream data = null;
 		HttpRequest getRequest;
 		HttpResponse response;
-		getRequest = requestFactory.buildGetRequest(url);
+		getRequest = requestFactory.buildGetRequest(getStreetModelUrl);
 		HttpHeaders headers = getRequest.getHeaders();
 		headers.set(authTokenKeyName, authToken);
 		getRequest.setHeaders(headers);
@@ -100,13 +113,6 @@ public class HttpClient {
 		if (d == null)
 			throw new IllegalArgumentException("Bytes to send cannot be null");
 
-		GenericUrl url = null;
-		try {
-			url = new GenericUrl(new URL(POST_BLOCKFACE_DATA_URL));
-		} catch (MalformedURLException e) {
-			// Not possible
-		} 
-
 		if (authToken == null)
 			initBlockingUILogin();
 
@@ -114,7 +120,7 @@ public class HttpClient {
 		HttpRequest postRequest;
 		HttpResponse response = null;
 
-		postRequest = requestFactory.buildPostRequest(url, data);
+		postRequest = requestFactory.buildPostRequest(postBlockFaceDataUrl, data);
 		HttpHeaders headers = postRequest.getHeaders();
 		headers.set(authTokenKeyName, authToken);
 		postRequest.setHeaders(headers);
@@ -167,19 +173,14 @@ public class HttpClient {
 		if (username == null || password == null)
 			throw new IllegalArgumentException("Arguments cannot be null");
 		JsonObject credentials = Json.createObjectBuilder().add("Username", username).add("Password", password).build();
-		GenericUrl url = null;
 		HttpRequest loginRequest;
 		HttpResponse response;
-		try {
-			url = new GenericUrl(new URL(LOGIN_URL));
-		} catch (MalformedURLException e) {
-			// Not possible
-		} 
+
 		ByteArrayOutputStream temp = new ByteArrayOutputStream();
 		Jsonify.writeJsonObjectToStream(credentials, temp);
 		ByteArrayContent out = new ByteArrayContent(null, temp.toByteArray()); 
 
-		loginRequest = requestFactory.buildPostRequest(url, out);
+		loginRequest = requestFactory.buildPostRequest(loginUrl, out);
 		try {
 			response = loginRequest.execute();
 		}	catch (HttpResponseException e) {

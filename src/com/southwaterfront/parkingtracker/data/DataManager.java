@@ -154,6 +154,14 @@ public class DataManager implements Closeable {
 		public String toString() {
 			return this.SESSION_ID;
 		}
+		
+		public boolean isEmpty() {
+			for (BlockFace b : this.dataCollector.getBlockFaces()) {
+				if (b.getNumNonEmptyStalls() > 0)
+					return false;
+			}
+			return true;
+		}
 
 	}
 
@@ -278,7 +286,6 @@ public class DataManager implements Closeable {
 		this.dataTasks = new LinkedBlockingQueue<DataTask>();
 		this.dataWorker = new DataWorker(this, this.currentSession, this.dataTasks);
 		this.dataThread = new Thread(dataWorker);
-		//this.dataThread.setDaemon(true);
 		this.dataThread.setName("Data Worker for " + this.currentSession);
 		this.dataThread.start();
 	}
@@ -420,10 +427,8 @@ public class DataManager implements Closeable {
 	 */
 	public boolean existsUploadableSessions() {
 		for (Session s : this.sessions) {
-			ParkingDataCollector d = s.dataCollector;
-			for (BlockFace b : d.getBlockFaces())
-				if (b.getNumNonEmptyStalls() > 0)
-					return true;
+			if (!s.isEmpty())
+				return true;
 		}
 		return false;
 	}
@@ -438,8 +443,7 @@ public class DataManager implements Closeable {
 			DataManager.instance = null;
 			for (Session s : this.sessions) {
 				File cacheFolder = s.cacheFolder;
-				File[] files = cacheFolder.listFiles();
-				if (files.length == 0) {
+				if (s.isEmpty()) {
 					LogUtils.i(LOG_TAG, "Deleting empty session " + s);
 					AsyncTask t = Utils.asyncFileDelete(cacheFolder);
 					t.waitOnResult();

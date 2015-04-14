@@ -222,12 +222,12 @@ public class AssetManager {
 	}
 
 	/**
-	 * Getter for authToken
+	 * Getter for authToken file
 	 * 
 	 * 
-	 * @return authToken
+	 * @return authToken storage file
 	 */
-	public File getAuthToken() {
+	public File getAuthTokenFile() {
 		return this.authToken;
 	}
 
