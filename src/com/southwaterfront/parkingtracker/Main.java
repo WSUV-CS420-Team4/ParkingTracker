@@ -41,6 +41,7 @@ import com.southwaterfront.parkingtracker.data.ParkingStall;
 import com.southwaterfront.parkingtracker.dialog.AddLicenseDialogFragment;
 import com.southwaterfront.parkingtracker.dialog.ChoosePlateDialogFragment;
 import com.southwaterfront.parkingtracker.dialog.LocationSelectDialogFragment;
+import com.southwaterfront.parkingtracker.dialog.OptionsDialogFragment;
 import com.southwaterfront.parkingtracker.dialog.SetFlagsDialogFragment;
 import com.southwaterfront.parkingtracker.dialog.ViewDataDialogFragment;
 import com.southwaterfront.parkingtracker.prefs.ParkingTrackerPreferences;
@@ -95,6 +96,8 @@ public class Main extends Activity {
 	private int currentBlock;
 	private int currentFace;
 	private int currentStall;
+
+    private int OCRResults;
 
 	private File createImageFile() throws IOException {
 		// Create an image file name
@@ -178,25 +181,25 @@ public class Main extends Activity {
 		progressBar.setVisibility(View.VISIBLE);
 		buttonTakePhoto.setVisibility(View.GONE);
 		ocrEngine.runAlpr(photoFile, new AlprCallBack() {
-			// TODO : also why are we making a new anonymous class for every alpr call?
-			@Override
-			public void call(final String[] result) {
-				// TODO : Work with Joel to update the view data adapter HERE
-				Main.this.runOnUiThread(new Runnable() {
+            // TODO : also why are we making a new anonymous class for every alpr call?
+            @Override
+            public void call(final String[] result) {
+                // TODO : Work with Joel to update the view data adapter HERE
+                Main.this.runOnUiThread(new Runnable() {
 
-					@Override
-					public void run() {
-						try {
-							setOcrResult(result);
-						} finally {
-							photoFile.delete();
-						}
-					}
+                    @Override
+                    public void run() {
+                        try {
+                            setOcrResult(result);
+                        } finally {
+                            photoFile.delete();
+                        }
+                    }
 
-				});
-			}
+                });
+            }
 
-		});
+        });
 	}
 
 	private void setOcrResult(String[] result) {
@@ -316,7 +319,7 @@ public class Main extends Activity {
 		buttonData.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Log.i("Main", "View Data Clicked!");
-				viewData();
+				//viewData();
 				showViewDataDialog();
 			}
 		});
@@ -325,6 +328,7 @@ public class Main extends Activity {
 		buttonOptions.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Log.i("Main", "Options Clicked!");
+                showOptionsDialog();
 			}
 		});
 	}
@@ -353,6 +357,7 @@ public class Main extends Activity {
 		initButtons();
 
 		currentResult = "";
+        OCRResults = 5;
 
 		// Temp ProgressBar init location
 		progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -409,6 +414,12 @@ public class Main extends Activity {
 		ViewDataDialogFragment newFragment = ViewDataDialogFragment.newInstance();
 		newFragment.show(getFragmentManager(), "locationSelect");
 	}
+
+    public void showOptionsDialog() {
+        // Create the fragment and show it as a dialog.
+        OptionsDialogFragment newFragment = OptionsDialogFragment.newInstance();
+        newFragment.show(getFragmentManager(), "options");
+    }
 
 	public ArrayAdapter<String> getArrayAdapter() {
 		return arrayAdapter;
@@ -648,7 +659,18 @@ public class Main extends Activity {
 		flagSelections =  new boolean[ flagOptions.length ];
 	}
 
-	@Override
+    public int getOCRResults() {
+        return OCRResults;
+    }
+
+    public void setOCRResults(int OCRResults) {
+        this.OCRResults = OCRResults;
+
+        ocrEngine.setNumberOfResults(OCRResults);
+        Log.i("setOCRResults", "ocrEngine.setNumberOfResults( " + OCRResults + " );");
+    }
+
+    @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
