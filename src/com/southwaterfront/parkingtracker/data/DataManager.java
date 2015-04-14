@@ -414,15 +414,16 @@ public class DataManager implements Closeable {
 
 	/**
 	 * Method to check if there are available sessions to upload, determined
-	 * by the existence of a session that has a block face saved.
+	 * by the existence of a session that has non empty block faces
 	 * 
 	 * @return True if uploaded session exists, false otherwise
 	 */
 	public boolean existsUploadableSessions() {
 		for (Session s : this.sessions) {
-			String[] files = s.cacheFolder.list();
-			if (s.isLocked() || (files != null && files.length > 0))
-				return true;
+			ParkingDataCollector d = s.dataCollector;
+			for (BlockFace b : d.getBlockFaces())
+				if (b.getNumNonEmptyStalls() > 0)
+					return true;
 		}
 		return false;
 	}
