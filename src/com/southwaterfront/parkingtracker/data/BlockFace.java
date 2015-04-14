@@ -19,6 +19,8 @@ public final class BlockFace implements Comparable<BlockFace> {
 	private boolean modifiedSince;
 	private final String name;
 
+	private int nonEmptyStalls;
+	
 	public BlockFace(int block, String face) {
 		if (face == null)
 			throw new IllegalArgumentException("Arguments cannot be null");
@@ -27,7 +29,8 @@ public final class BlockFace implements Comparable<BlockFace> {
 		this.face = face;
 		this.stalls = new ArrayList<ParkingStall>();
 		this.modifiedSince = false;
-		this.name = this.block + "_" + this.face;
+		this.name = createName(block, face);
+		this.nonEmptyStalls = 0;
 	}
 
 	/**
@@ -64,6 +67,8 @@ public final class BlockFace implements Comparable<BlockFace> {
 			return;
 		
 		this.stalls.add(stall);
+		if (stall != ParkingStall.EmptyStall)
+			nonEmptyStalls++;
 		this.modifiedSince = true;
 	}
 	
@@ -84,6 +89,8 @@ public final class BlockFace implements Comparable<BlockFace> {
 			this.stalls.add(ParkingStall.EmptyStall);
 		
 		this.stalls.set(position, stall);
+		if (stall != ParkingStall.EmptyStall)
+			nonEmptyStalls++;
 		this.modifiedSince = true;
 	}
 
@@ -98,6 +105,8 @@ public final class BlockFace implements Comparable<BlockFace> {
 			return false;
 		
 		boolean modified = this.stalls.remove(obj);
+		if (modified && obj != ParkingStall.EmptyStall)
+			nonEmptyStalls--;
 		this.modifiedSince |= modified;
 		return modified;
 	}
@@ -181,9 +190,17 @@ public final class BlockFace implements Comparable<BlockFace> {
 			return -1;
 		if (this.block > another.block)
 			return 1;
-		else {
+		else
 			return this.face.compareTo(another.face);
-		}
+	}
+	
+	/**
+	 * Getter for number of non empty stalls in this block face
+	 * 
+	 * @return Integer
+	 */
+	public int getNumNonEmptyStalls() {
+		return this.nonEmptyStalls;
 	}
 	
 }

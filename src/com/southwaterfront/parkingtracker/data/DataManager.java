@@ -14,10 +14,9 @@ import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import android.util.Log;
-
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
 import com.southwaterfront.parkingtracker.util.AsyncTask;
+import com.southwaterfront.parkingtracker.util.LogUtils;
 import com.southwaterfront.parkingtracker.util.Result;
 import com.southwaterfront.parkingtracker.util.Utils;
 
@@ -109,7 +108,7 @@ public class DataManager implements Closeable {
 			try {
 				this.createTime = dateFormat.parse(createTime);
 			} catch (ParseException e) {
-				Log.i(LOG_TAG, "Parsing data string failed, this is not a valid session");
+				LogUtils.i(LOG_TAG, "Parsing data string failed, this is not a valid session");
 				throw new RuntimeException("Session could not be created from string " + createTime);
 			}
 			this.cacheFolder = cacheFolder;
@@ -192,10 +191,10 @@ public class DataManager implements Closeable {
 				startNewSession();
 			else {
 				setNewDataWorker();
-				Log.i(LOG_TAG, "Using already existing session " + this.currentSession);
+				LogUtils.i(LOG_TAG, "Using already existing session " + this.currentSession);
 			}
 		}
-		Log.i(LOG_TAG, "The data manager initialized with session " + this.currentSession + " out of " + this.sessions.size() + " available sessions.");
+		LogUtils.i(LOG_TAG, "The data manager initialized with session " + this.currentSession + " out of " + this.sessions.size() + " available sessions.");
 	}
 
 	private void loadSessions() {
@@ -213,20 +212,20 @@ public class DataManager implements Closeable {
 					try {
 						sess = new Session(f.getName(), f);
 					} catch (Exception e) {
-						Log.i(LOG_TAG, "Attempted to create session from invalid folder, how did this get here?");
+						LogUtils.i(LOG_TAG, "Attempted to create session from invalid folder, how did this get here?");
 						continue;
 					}
 					if (sess.masterDataFile.exists() && sess.masterDataFile.length() == 0)
 						sessLoaderDelHelper(f);
 					this.sessions.add(sess);
-					Log.i(LOG_TAG, "Adding session " + sess.SESSION_ID + " to available sessions");
+					LogUtils.i(LOG_TAG, "Adding session " + sess.SESSION_ID + " to available sessions");
 				}
 			}
 		}
 	}
 
 	private void sessLoaderDelHelper(File f) {
-		Log.i(LOG_TAG, "Found file " + f.getName() + " in data cache folder that has no data, deleting");
+		LogUtils.i(LOG_TAG, "Found file " + f.getName() + " in data cache folder that has no data, deleting");
 		AsyncTask task = Utils.asyncFileDelete(f);
 		task.waitOnResult();
 	}
@@ -249,7 +248,7 @@ public class DataManager implements Closeable {
 		File dir = new File(this.dataCacheDir, dirName);
 
 		if (dir.exists()) {
-			Log.e(LOG_TAG, "Trying to create a new session failed because a session with a start date within a minute already exists");
+			LogUtils.e(LOG_TAG, "Trying to create a new session failed because a session with a start date within a minute already exists");
 			throw new RuntimeException("Attemp to create a new session has failed");
 		}
 
@@ -257,7 +256,7 @@ public class DataManager implements Closeable {
 
 		Session newSess = new Session(now, dir);
 
-		Log.i(LOG_TAG, "Successfully created new session " + newSess);
+		LogUtils.i(LOG_TAG, "Successfully created new session " + newSess);
 
 		this.sessions.add(newSess);
 
@@ -354,7 +353,7 @@ public class DataManager implements Closeable {
 		checkNotClosed();
 
 		File cacheDir = session.cacheFolder;
-		Log.i(LOG_TAG, "Removing cache folder " + cacheDir + " created at " + session.SESSION_ID);
+		LogUtils.i(LOG_TAG, "Removing cache folder " + cacheDir + " created at " + session.SESSION_ID);
 
 		AsyncTask cacheDel = Utils.asyncFileDelete(cacheDir);
 
@@ -415,15 +414,16 @@ public class DataManager implements Closeable {
 
 	/**
 	 * Method to check if there are available sessions to upload, determined
-	 * by the existence of a session that has a block face saved.
+	 * by the existence of a session that has non empty block faces
 	 * 
 	 * @return True if uploaded session exists, false otherwise
 	 */
 	public boolean existsUploadableSessions() {
 		for (Session s : this.sessions) {
-			String[] files = s.cacheFolder.list();
-			if (s.isLocked() || (files != null && files.length > 0))
-				return true;
+			ParkingDataCollector d = s.dataCollector;
+			for (BlockFace b : d.getBlockFaces())
+				if (b.getNumNonEmptyStalls() > 0)
+					return true;
 		}
 		return false;
 	}
@@ -440,7 +440,7 @@ public class DataManager implements Closeable {
 				File cacheFolder = s.cacheFolder;
 				File[] files = cacheFolder.listFiles();
 				if (files.length == 0) {
-					Log.i(LOG_TAG, "Deleting empty session " + s);
+					LogUtils.i(LOG_TAG, "Deleting empty session " + s);
 					AsyncTask t = Utils.asyncFileDelete(cacheFolder);
 					t.waitOnResult();
 				}

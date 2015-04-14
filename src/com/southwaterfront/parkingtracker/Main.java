@@ -20,7 +20,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,6 +47,7 @@ import com.southwaterfront.parkingtracker.dialog.SetFlagsDialogFragment;
 import com.southwaterfront.parkingtracker.dialog.ViewDataDialogFragment;
 import com.southwaterfront.parkingtracker.prefs.ParkingTrackerPreferences;
 import com.southwaterfront.parkingtracker.util.AsyncTask;
+import com.southwaterfront.parkingtracker.util.LogUtils;
 import com.southwaterfront.parkingtracker.util.Result;
 import com.southwaterfront.parkingtracker.util.Utils;
 import com.southwaterfront.parkingtracker.util.WifiStateUploadableDataReceiver;
@@ -237,7 +237,7 @@ public class Main extends Activity {
 			arrayAdapter = new ArrayAdapter<String>(Main.this, android.R.layout.simple_list_item_1, licensePlates );
 			arrayAdapter.setDropDownViewResource(R.layout.choose_plate);
 
-			Log.i("List", "licensePlates: " + licensePlates.size());
+			LogUtils.i("List", "licensePlates: " + licensePlates.size());
 
 			// ChoosePlateDialogFragment Show Here
 			showChoosePlateDialog();
@@ -303,7 +303,7 @@ public class Main extends Activity {
 		};
 		Thread initThread = new Thread(r);
 		initThread.start();
-		Log.i(LOG_TAG, "App initialized successfully");
+		LogUtils.i(LOG_TAG, "App initialized successfully");
 	}
 
 	private void initButtons() {
@@ -331,7 +331,7 @@ public class Main extends Activity {
 		buttonMap = (Button) findViewById(R.id.buttonMainMap);
 		buttonMap.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Log.i("Main", "Map Clicked!");
+				LogUtils.i("Main", "Map Clicked!");
 			}
 		});
 
@@ -339,8 +339,7 @@ public class Main extends Activity {
 		buttonData = (Button) findViewById(R.id.buttonMainData);
 		buttonData.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Log.i("Main", "View Data Clicked!");
-				//viewData();
+				LogUtils.i("Main", "View Data Clicked!");
 				showViewDataDialog();
 			}
 		});
@@ -348,7 +347,7 @@ public class Main extends Activity {
 		buttonOptions = (Button) findViewById(R.id.buttonMainOptions);
 		buttonOptions.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Log.i("Main", "Options Clicked!");
+				LogUtils.i("Main", "Options Clicked!");
 				showOptionsDialog();
 			}
 		});
@@ -523,19 +522,19 @@ public class Main extends Activity {
 		// Currently doesn't add correctly
 		dataCollector.setStall(blockArray.get(currentBlock), faceArray.get(currentFace), stallArray.get(currentStall) - 1,
 				new ParkingStall(currentResult, new Date(System.currentTimeMillis()), generateFlags()));
-		Log.i("Main", "Added " + currentResult + " to block " + blockArray.get(currentBlock) +
+		LogUtils.i("Main", "Added " + currentResult + " to block " + blockArray.get(currentBlock) +
 				", face " + faceArray.get(currentFace) + ", stall " + stallArray.get(currentStall));
 	}
 
 	/*
 	public void viewData() {
 		// Logs all the stalls currently held in data
-		Log.i("viewData", "data size: " + dataCollector.getBlockFaces().size());
+		LogUtils.i("viewData", "data size: " + dataCollector.getBlockFaces().size());
 
 		// Check stall format 0-14 or 1-15
 		for (BlockFace face : getData()) {
 			for (int i = 0; i < face.getParkingStalls().size(); i++) {
-				Log.i("stall", "block: " + face.block + " face: " + face.face + " stall: " + (i+1) +
+				LogUtils.i("stall", "block: " + face.block + " face: " + face.face + " stall: " + (i+1) +
 						" plate: " + face.getParkingStalls().get(i).plate + " attr: " + face.getParkingStalls().get(i).attr);
 			}
 
@@ -667,7 +666,7 @@ public class Main extends Activity {
 		this.OCRResults = OCRResults;
 
 		ocrEngine.setNumberOfResults(OCRResults);
-		Log.i("setOCRResults", "ocrEngine.setNumberOfResults( " + OCRResults + " );");
+		LogUtils.i("setOCRResults", "ocrEngine.setNumberOfResults( " + OCRResults + " );");
 	}
 
 	@Override

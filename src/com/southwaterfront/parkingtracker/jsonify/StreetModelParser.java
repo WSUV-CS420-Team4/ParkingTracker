@@ -7,10 +7,8 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
-import android.util.Log;
-
-import com.southwaterfront.parkingtracker.data.BlockFace;
 import com.southwaterfront.parkingtracker.data.BlockFaceDefinition;
+import com.southwaterfront.parkingtracker.util.LogUtils;
 
 /***********
  * 
@@ -42,7 +40,7 @@ public class StreetModelParser {
 					int numStalls = vO.getInt(Jsonify.NUM_STALLS_ID);			
 					result.add(new BlockFaceDefinition(block, face, numStalls));
 				} catch(Exception e){
-					Log.e(LOG_TAG, "Parsing json object failed: " + obj, e);
+					LogUtils.e(LOG_TAG, "Parsing json object failed: " + obj, e);
 				}
 			}
 		}

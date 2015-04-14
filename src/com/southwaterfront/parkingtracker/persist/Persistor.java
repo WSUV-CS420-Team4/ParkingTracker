@@ -7,9 +7,8 @@ import java.io.IOException;
 
 import javax.json.JsonObject;
 
-import android.util.Log;
-
 import com.southwaterfront.parkingtracker.jsonify.Jsonify;
+import com.southwaterfront.parkingtracker.util.LogUtils;
 import com.southwaterfront.parkingtracker.util.Utils;
 
 /**
@@ -85,12 +84,12 @@ public class Persistor {
 		
 		if (Utils.isCacheFile(f))
 			Utils.updateCacheSize(f.length());
-		Log.i(LOG_TAG, "Successfully wrote a JsonObject to " + f.getAbsolutePath());
+		LogUtils.i(LOG_TAG, "Successfully wrote a JsonObject to " + f.getAbsolutePath());
 
 		try {
 			out.close();
 		} catch (IOException e) {
-			Log.e(LOG_TAG, "OutputStream could not close", e);
+			LogUtils.e(LOG_TAG, "OutputStream could not close", e);
 		}
 	}
 
@@ -116,9 +115,9 @@ public class Persistor {
 			if (Utils.isCacheFile(f))
 				Utils.updateCacheSize(f.length());
 
-			Log.i(LOG_TAG, "Successfully wrote " + bytes.length + " bytes to " + f.getAbsolutePath());
+			LogUtils.i(LOG_TAG, "Successfully wrote " + bytes.length + " bytes to " + f.getAbsolutePath());
 		} catch (IOException e) {
-			Log.e(LOG_TAG, "Write of file to " + f.getAbsolutePath() + " failed", e);
+			LogUtils.e(LOG_TAG, "Write of file to " + f.getAbsolutePath() + " failed", e);
 		}
 	}
 

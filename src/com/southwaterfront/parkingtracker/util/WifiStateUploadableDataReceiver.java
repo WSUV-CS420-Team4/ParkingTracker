@@ -22,7 +22,7 @@ import com.southwaterfront.parkingtracker.prefs.ParkingTrackerPreferences;
  * <br>
  * 
  * The behavior of this receiver is such that if it is called when the wifi is connected
- * and the app is in the background_light, a notification will be posted to the phone
+ * and the app is in the background, a notification will be posted to the phone
  * 
  * @author Vitaliy Gavrilov
  *

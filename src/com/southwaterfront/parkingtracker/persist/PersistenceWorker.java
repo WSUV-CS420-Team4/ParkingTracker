@@ -6,8 +6,7 @@ import java.util.concurrent.BlockingQueue;
 
 import javax.json.JsonObject;
 
-import android.util.Log;
-
+import com.southwaterfront.parkingtracker.util.LogUtils;
 import com.southwaterfront.parkingtracker.util.Result;
 import com.southwaterfront.parkingtracker.util.Utils;
 
@@ -63,9 +62,9 @@ public class PersistenceWorker implements Runnable {
 					break;
 
 				}
-				Log.i(LOG_TAG, "Task " + taskWrapper.task + " on file " + taskWrapper.file.getAbsolutePath() +" completed with result " + taskWrapper.getResult() + "\t Error message: " + taskWrapper.getErrorMessage() + "\tThe updated cache size is " + Utils.getCacheSize() + " bytes");
+				LogUtils.i(LOG_TAG, "Task " + taskWrapper.task + " on file " + taskWrapper.file.getAbsolutePath() +" completed with result " + taskWrapper.getResult() + "\t Error message: " + taskWrapper.getErrorMessage() + "\tThe updated cache size is " + Utils.getCacheSize() + " bytes");
 			} catch (InterruptedException e) {
-				Log.i(LOG_TAG, "PersistanceWorker was interrupted", e);
+				LogUtils.i(LOG_TAG, "PersistanceWorker was interrupted", e);
 				throw new RuntimeException(e);
 			}
 
@@ -180,7 +179,7 @@ public class PersistenceWorker implements Runnable {
 
 	private void validateWriteFile(File file, PersistenceTask t, boolean append) {
 		if (file.isDirectory()) {
-			Log.i(LOG_TAG, "Could not write file " + file.getAbsolutePath());
+			LogUtils.i(LOG_TAG, "Could not write file " + file.getAbsolutePath());
 			setTaskFailure(t, ERROR_WRITE_DIR);
 			return;
 		}
@@ -189,20 +188,20 @@ public class PersistenceWorker implements Runnable {
 			try {
 				file.createNewFile();
 			} catch (IOException e) {
-				Log.i(LOG_TAG, "Could not create file " + file.getAbsolutePath(), e);
+				LogUtils.i(LOG_TAG, "Could not create file " + file.getAbsolutePath(), e);
 				setTaskFailure(t, ERROR_CREATE_FILE);
 				return;
 			}
 		}
 
 		if (!file.canWrite()) {
-			Log.i(LOG_TAG, "Cannot write to file " + file.getAbsolutePath());
+			LogUtils.i(LOG_TAG, "Cannot write to file " + file.getAbsolutePath());
 			setTaskFailure(t, ERROR_WRITE_FILE);
 			return;
 		}
 		
 		if (!append && file.length() > 0) {
-			Log.i(LOG_TAG, "Cannot write to file " + file.getAbsolutePath());
+			LogUtils.i(LOG_TAG, "Cannot write to file " + file.getAbsolutePath());
 			setTaskFailure(t, ERROR_WRITE_NOT_EMPTY);
 			return;
 		}

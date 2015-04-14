@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.southwaterfront.parkingtracker.R;
 import com.southwaterfront.parkingtracker.data.BlockFace;
 
+
 /**
  * Created by Joel on 4/3/2015.
  */
@@ -39,9 +40,9 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
 				} else {
 
 					temp.add( new ParkingData(face.block, face.face, i, face.getParkingStalls().get(i).plate, face.getParkingStalls().get(i).attr) );
-					//Log.i("DataAdapter Added", "block: " + face.block + " face: " + face.face + " stall: " + i +
+					//LogUtils..i("DataAdapter Added", "block: " + face.block + " face: " + face.face + " stall: " + i +
 					//        " plate: " + face.getParkingStalls().get(i).plate + " attr: " + face.getParkingStalls().get(i).attr);
-					//Log.i("DataAdapter Size", "" + temp.size());
+					//LogUtils.i("DataAdapter Size", "" + temp.size());
 				}
 			}
 		}
@@ -72,7 +73,7 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
 			holder = (DataHolder)row.getTag();
 		}
 
-		//Log.i("getView position", "" + position);
+		//LogUtils.i("getView position", "" + position);
 		ParkingData parkingData = data[position];
 
 		String title = "Block: " + parkingData.block + " Face: ";

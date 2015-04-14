@@ -9,8 +9,7 @@ import javax.json.JsonObject;
 import javax.json.JsonValue;
 
 import com.southwaterfront.parkingtracker.alpr.AlprEngine;
-
-import android.util.Log;
+import com.southwaterfront.parkingtracker.util.LogUtils;
 
 /**
  * Helper to parse the JSON results from the Alpr engine
@@ -30,7 +29,7 @@ public class AlprParser {
 		try {
 			obj = Jsonify.createJsonObjectFromStream(in);
 		} catch (Exception e) {
-			Log.e(LOG_TAG, "Parsing json object failed: " + message, e);
+			LogUtils.e(LOG_TAG, "Parsing json object failed: " + message, e);
 			return null;
 		} finally {
 			try {

@@ -7,10 +7,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.openalpr.Alpr;
 
-import android.util.Log;
-
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
 import com.southwaterfront.parkingtracker.jsonify.AlprParser;
+import com.southwaterfront.parkingtracker.util.LogUtils;
 
 /**
  * This is a secondary abstraction of the Alpr engine. Done as a sort of adapter
@@ -55,7 +54,6 @@ public class AlprEngine implements Closeable {
 
 	private class AlprWorker implements Runnable {
 		private static final String LOG_TAG = "AlprWorker";
-		//private static final String resultPlateNotFound = "License Plate not recognized";
 		private final Alpr alpr;
 		private final BlockingQueue<TaskWrapper> images;
 
@@ -170,7 +168,7 @@ public class AlprEngine implements Closeable {
 	public void close() {
 		if (!this.closed) {
 			AlprEngine.instance = null;
-			Log.i(LOG_TAG, "Shutting down Alpr");
+			LogUtils.i(LOG_TAG, "Shutting down Alpr");
 			this.worker.interrupt();
 			this.closed = true;
 		}
