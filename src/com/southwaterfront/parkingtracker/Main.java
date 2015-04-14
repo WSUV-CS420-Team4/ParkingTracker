@@ -100,8 +100,8 @@ public class Main extends Activity {
 	private int currentFace;
 	private int currentStall;
 
-    private int OCRResults;
-    private boolean alprRunning = false;
+	private int OCRResults;
+	private boolean alprRunning = false;
 
 	private File createImageFile() throws IOException {
 		// Create an image file name
@@ -187,27 +187,26 @@ public class Main extends Activity {
 		disableButtons();
 		alprRunning = true;
 		ocrEngine.runAlpr(photoFile, new AlprCallBack() {
-            // TODO : also why are we making a new anonymous class for every alpr call?
-            @Override
-            public void call(final String[] result) {
-                // TODO : Work with Joel to update the view data adapter HERE
-                Main.this.runOnUiThread(new Runnable() {
+			@Override
+			public void call(final String[] result) {
 
-                    @Override
-                    public void run() {
-                    	enableButtons();
-                        try {
-                            setOcrResult(result);
-                        } finally {
-                        	alprRunning = false;
-                            photoFile.delete();
-                        }
-                    }
+				Main.this.runOnUiThread(new Runnable() {
 
-                });
-            }
+					@Override
+					public void run() {
+						enableButtons();
+						try {
+							setOcrResult(result);
+						} finally {
+							alprRunning = false;
+							photoFile.delete();
+						}
+					}
 
-        });
+				});
+			}
+
+		});
 	}
 
 	@Override
@@ -217,7 +216,7 @@ public class Main extends Activity {
 		else
 			super.onBackPressed();
 	}
-	
+
 	private void setOcrResult(String[] result) {
 		licensePlates.clear();
 		clearFlagSelections();
@@ -247,7 +246,7 @@ public class Main extends Activity {
 			showChoosePlateDialog();
 			//textViewNotification.setText("0 Results");
 			//Toast.makeText(Main.this, "0 Results", Toast.LENGTH_SHORT).show();
-            Toast.makeText(Main.this, "OCR unable to detect license plate", Toast.LENGTH_SHORT).show();
+			Toast.makeText(Main.this, "OCR unable to detect license plate", Toast.LENGTH_SHORT).show();
 		}
 	}
 	// -------------------------------------------------------------------------------------------------
@@ -287,9 +286,9 @@ public class Main extends Activity {
 				wifiReceiver = new WifiStateUploadableDataReceiver();
 				registerReceiver(wifiReceiver, wifiFilter);
 				dataCollector = dataManager.getCurrentSession().getDataCollector();
-				
+
 				setupLocationSelect();
-				
+
 				Main.this.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -347,7 +346,7 @@ public class Main extends Activity {
 		buttonOptions.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Log.i("Main", "Options Clicked!");
-                showOptionsDialog();
+				showOptionsDialog();
 			}
 		});
 	}
@@ -374,7 +373,7 @@ public class Main extends Activity {
 		initButtons();
 
 		currentResult = "";
-        OCRResults = 5;
+		OCRResults = 5;
 
 		// Temp ProgressBar init location
 		progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -432,11 +431,11 @@ public class Main extends Activity {
 		newFragment.show(getFragmentManager(), "locationSelect");
 	}
 
-    public void showOptionsDialog() {
-        // Create the fragment and show it as a dialog.
-        OptionsDialogFragment newFragment = OptionsDialogFragment.newInstance();
-        newFragment.show(getFragmentManager(), "options");
-    }
+	public void showOptionsDialog() {
+		// Create the fragment and show it as a dialog.
+		OptionsDialogFragment newFragment = OptionsDialogFragment.newInstance();
+		newFragment.show(getFragmentManager(), "options");
+	}
 
 	public ArrayAdapter<String> getArrayAdapter() {
 		return arrayAdapter;
@@ -495,14 +494,15 @@ public class Main extends Activity {
 				length++;
 			}
 		}
-
+		if (length == 0)
+			return null;
 		//Log.i("generateFlags", "flag[" + i + "]: " + flagSelections[i]);
 		flagArray = new String[length];
 		length = 0;
 		for (int i = 0; i < flagSelections.length; i++) {
 			if ( flagSelections[i] ) {
 				//flagArray[length++] = (String) flagOptions[length];
-                flagArray[length++] = (String) flagOptions[i];
+				flagArray[length++] = (String) flagOptions[i];
 			}
 		}
 
@@ -513,18 +513,18 @@ public class Main extends Activity {
 	public void addData() {
 
 		// Currently doesn't add correctly
-		// TODO: Still need to add Attr (need to convert Boolean[] to String[] and replace null)
 		dataCollector.setStall(blockArray.get(currentBlock), faceArray.get(currentFace), stallArray.get(currentStall) - 1,
 				new ParkingStall(currentResult, new Date(System.currentTimeMillis()), generateFlags()));
 		Log.i("Main", "Added " + currentResult + " to block " + blockArray.get(currentBlock) +
 				", face " + faceArray.get(currentFace) + ", stall " + stallArray.get(currentStall));
 	}
 
+	/*
 	public void viewData() {
 		// Logs all the stalls currently held in data
 		Log.i("viewData", "data size: " + dataCollector.getBlockFaces().size());
 
-		// TODO: Check stall format 0-14 or 1-15
+		// Check stall format 0-14 or 1-15
 		for (BlockFace face : getData()) {
 			for (int i = 0; i < face.getParkingStalls().size(); i++) {
 				Log.i("stall", "block: " + face.block + " face: " + face.face + " stall: " + (i+1) +
@@ -534,10 +534,10 @@ public class Main extends Activity {
 			// Results without stall data
 			/*for ( ParkingStall stall: face.getParkingStalls()) {
                 Log.i("stall", "block: " + face.block + " face: " + face.face + " plate: " + stall.plate + " attr: " + stall.attr);
-            }*/
+            }
 		}
 	}
-
+	 */
 	public void enableButtons() {
 		buttonTakePhoto.setEnabled(true);
 		buttonMap.setEnabled(true);
@@ -555,7 +555,6 @@ public class Main extends Activity {
 	}
 
 	public void setupLocationSelect() {
-		// TODO remove hard code
 		List<BlockFaceDefinition> m = assets.getStreetModel();
 		HashSet<Integer> d = new HashSet<Integer>();
 		for (BlockFaceDefinition b : m)
@@ -564,31 +563,31 @@ public class Main extends Activity {
 		Collections.sort(blockArray);
 		currentBlock = 0;
 
-		faceArray = new ArrayList<String>() {{
-			add("A");
-			add("B");
-			add("C");
-			add("D");
-		}};
+		faceArray = new ArrayList<String>();
+		faceArray.add("A");
+		faceArray.add("B");
+		faceArray.add("C");
+		faceArray.add("D");
+
 		currentFace = 0;
 
-		stallArray = new ArrayList<Integer>() {{
-			add(1);
-			add(2);
-			add(3);
-			add(4);
-			add(5);
-			add(6);
-			add(7);
-			add(8);
-			add(9);
-			add(10);
-			add(11);
-			add(12);
-			add(13);
-			add(14);
-			add(15);
-		}};
+		stallArray = new ArrayList<Integer>();
+		stallArray.add(1);
+		stallArray.add(2);
+		stallArray.add(3);
+		stallArray.add(4);
+		stallArray.add(5);
+		stallArray.add(6);
+		stallArray.add(7);
+		stallArray.add(8);
+		stallArray.add(9);
+		stallArray.add(10);
+		stallArray.add(11);
+		stallArray.add(12);
+		stallArray.add(13);
+		stallArray.add(14);
+		stallArray.add(15);
+
 		currentStall = 0;
 	}
 
@@ -652,18 +651,18 @@ public class Main extends Activity {
 		flagSelections =  new boolean[ flagOptions.length ];
 	}
 
-    public int getOCRResults() {
-        return OCRResults;
-    }
+	public int getOCRResults() {
+		return OCRResults;
+	}
 
-    public void setOCRResults(int OCRResults) {
-        this.OCRResults = OCRResults;
+	public void setOCRResults(int OCRResults) {
+		this.OCRResults = OCRResults;
 
-        ocrEngine.setNumberOfResults(OCRResults);
-        Log.i("setOCRResults", "ocrEngine.setNumberOfResults( " + OCRResults + " );");
-    }
+		ocrEngine.setNumberOfResults(OCRResults);
+		Log.i("setOCRResults", "ocrEngine.setNumberOfResults( " + OCRResults + " );");
+	}
 
-    @Override
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
