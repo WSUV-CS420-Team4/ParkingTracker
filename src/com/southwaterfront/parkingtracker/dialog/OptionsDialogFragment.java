@@ -1,5 +1,8 @@
 package com.southwaterfront.parkingtracker.dialog;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -20,9 +23,7 @@ import android.widget.TextView;
 
 import com.southwaterfront.parkingtracker.Main;
 import com.southwaterfront.parkingtracker.R;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.southwaterfront.parkingtracker.client.HttpClient;
 
 /**
  * Created by Joel on 4/13/2015.
@@ -124,6 +125,12 @@ public class OptionsDialogFragment extends DialogFragment {
             public void onClick(View v) {
                 // TODO Login / Logout
                 Log.i("loginOut", "Button Pressed!");
+                if(!HttpClient.isLoggedIn()) {
+                	final LoginDialogFragment loginDialogFragment = new LoginDialogFragment();
+            		loginDialogFragment.show(getActivity().getFragmentManager(), "Login");
+                } else {
+                	HttpClient.logout();
+                }
             }
         });
 

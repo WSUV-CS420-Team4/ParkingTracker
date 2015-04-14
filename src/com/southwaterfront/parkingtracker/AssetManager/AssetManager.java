@@ -140,8 +140,7 @@ public class AssetManager {
 	public static void init(Activity main) {
 		if (main == null)
 			throw new IllegalArgumentException("The main context cannot be null");
-		if (instance == null)
-			instance = new AssetManager(main);
+		instance = new AssetManager(main);
 	}
 
 	/**
@@ -184,6 +183,7 @@ public class AssetManager {
 
 			// failed to download, using backup	
 		} catch (Exception e1) {
+			
 		}	
 
 		if (streetModel == null) {

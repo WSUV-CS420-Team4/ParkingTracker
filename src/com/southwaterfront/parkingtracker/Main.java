@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 import android.app.Activity;
@@ -34,6 +36,7 @@ import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
 import com.southwaterfront.parkingtracker.alpr.AlprCallBack;
 import com.southwaterfront.parkingtracker.alpr.AlprEngine;
 import com.southwaterfront.parkingtracker.data.BlockFace;
+import com.southwaterfront.parkingtracker.data.BlockFaceDefinition;
 import com.southwaterfront.parkingtracker.data.CallBack;
 import com.southwaterfront.parkingtracker.data.DataManager;
 import com.southwaterfront.parkingtracker.data.ParkingDataCollector;
@@ -98,6 +101,7 @@ public class Main extends Activity {
 	private int currentStall;
 
     private int OCRResults;
+    private boolean alprRunning = false;
 
 	private File createImageFile() throws IOException {
 		// Create an image file name
@@ -180,6 +184,8 @@ public class Main extends Activity {
 		textViewNotification.setText("Recognizing license plate");
 		progressBar.setVisibility(View.VISIBLE);
 		buttonTakePhoto.setVisibility(View.GONE);
+		disableButtons();
+		alprRunning = true;
 		ocrEngine.runAlpr(photoFile, new AlprCallBack() {
             // TODO : also why are we making a new anonymous class for every alpr call?
             @Override
@@ -189,9 +195,11 @@ public class Main extends Activity {
 
                     @Override
                     public void run() {
+                    	enableButtons();
                         try {
                             setOcrResult(result);
                         } finally {
+                        	alprRunning = false;
                             photoFile.delete();
                         }
                     }
@@ -202,6 +210,14 @@ public class Main extends Activity {
         });
 	}
 
+	@Override
+	public void onBackPressed() {
+		if (alprRunning)
+			moveTaskToBack(true);
+		else
+			super.onBackPressed();
+	}
+	
 	private void setOcrResult(String[] result) {
 		licensePlates.clear();
 		clearFlagSelections();
@@ -271,6 +287,9 @@ public class Main extends Activity {
 				wifiReceiver = new WifiStateUploadableDataReceiver();
 				registerReceiver(wifiReceiver, wifiFilter);
 				dataCollector = dataManager.getCurrentSession().getDataCollector();
+				
+				setupLocationSelect();
+				
 				Main.this.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -351,8 +370,6 @@ public class Main extends Activity {
 
 		fragmentManager = getFragmentManager();
 		fragmentTransaction = fragmentManager.beginTransaction();
-
-		setupLocationSelect();
 
 		initButtons();
 
@@ -485,8 +502,7 @@ public class Main extends Activity {
 		for (int i = 0; i < flagSelections.length; i++) {
 			if ( flagSelections[i] ) {
 				//flagArray[length++] = (String) flagOptions[length];
-                flagArray[length] = (String) flagOptions[length];
-                length++;
+                flagArray[length++] = (String) flagOptions[i];
 			}
 		}
 
@@ -540,34 +556,12 @@ public class Main extends Activity {
 
 	public void setupLocationSelect() {
 		// TODO remove hard code
-		// assets.getStreetModel();
-
-		blockArray = new ArrayList<Integer>() {{
-			add(1);
-			add(2);
-			add(3);
-			add(4);
-			add(5);
-			add(6);
-			add(7);
-			add(8);
-			add(9);
-			add(10);
-			add(11);
-			add(12);
-			add(13);
-			add(14);
-			add(15);
-			add(16);
-			add(17);
-			add(18);
-			add(19);
-			add(20);
-			add(21);
-			add(22);
-			add(23);
-			add(24);
-		}};
+		List<BlockFaceDefinition> m = assets.getStreetModel();
+		HashSet<Integer> d = new HashSet<Integer>();
+		for (BlockFaceDefinition b : m)
+			d.add(b.block);
+		blockArray = new ArrayList<Integer>(d);
+		Collections.sort(blockArray);
 		currentBlock = 0;
 
 		faceArray = new ArrayList<String>() {{
@@ -599,7 +593,6 @@ public class Main extends Activity {
 	}
 
 	public List<BlockFace> getData() {
-		// TODO: Joel take a look at this plz
 		return new ArrayList<BlockFace>(dataCollector.getBlockFaces());
 	}
 

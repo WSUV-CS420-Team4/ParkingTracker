@@ -13,6 +13,7 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -68,6 +69,22 @@ public class LoginDialogFragment extends DialogFragment {
 		final TextView textViewLoginTitle = (TextView) dialogView.findViewById(R.id.textViewLoginTitle);
 
 		builder.setView(dialogView)
+		.setOnKeyListener(new DialogInterface.OnKeyListener() {
+	        @Override
+	        public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+	            if (keyCode == KeyEvent.KEYCODE_BACK && !event.isCanceled()) {
+	                dialog.cancel();
+	                try {
+						lock.lock();
+						done.signal();
+					} finally {
+						lock.unlock();
+					}
+	                return true;
+	            }
+	            return false;
+	        }
+	    })
 		.setPositiveButton("Sign In", null)
 
 		.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

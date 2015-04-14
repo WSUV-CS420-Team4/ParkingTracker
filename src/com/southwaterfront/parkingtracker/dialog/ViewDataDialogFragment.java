@@ -47,7 +47,7 @@ public class ViewDataDialogFragment extends DialogFragment {
 
         // TODO
         if ( ((Main) getActivity()).getData() != null) {
-            data  = new ArrayList<BlockFace>(((Main) getActivity()).getData());
+            data  = ((Main) getActivity()).getData();
         }
         Collections.sort(data);
         BlockFace[] temp = new BlockFace[data.size()];
