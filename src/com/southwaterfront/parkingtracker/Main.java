@@ -283,7 +283,7 @@ public class Main extends Activity {
 				assets.assetSanityCheck();
 				dataManager = DataManager.getInstance();
 				ocrEngine = AlprEngine.getInstance();
-				Utils.resetCacheSize();
+				Utils.resetUtils();
 				wifiFilter = new IntentFilter();
 				wifiFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 				wifiReceiver = new WifiStateUploadableDataReceiver();
@@ -462,6 +462,7 @@ public class Main extends Activity {
 		this.unregisterReceiver(this.wifiReceiver);
 		dataManager.close();
 		ocrEngine.close();
+		Utils.shutdownThreads();
 	}
 
 	private void upload() {

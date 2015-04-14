@@ -1,6 +1,7 @@
 package com.southwaterfront.parkingtracker.util;
 
 import java.io.File;
+import java.lang.Thread.State;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -30,25 +31,41 @@ public class Utils {
 	
 	private Utils() {}
 	
-	private static final BlockingQueue<PersistenceTask> persistenceTasks;
+	private static BlockingQueue<PersistenceTask> persistenceTasks;
 
-	private static final Thread persistenceThread;
+	private static Thread persistenceThread;
+	private static PersistenceWorker worker;
 	
-	private static long cacheSize = 0;
+	private static long cacheSize;
 	
-	private static final String cacheDirName;
+	private static String cacheDirName;
 	
-	private static final File cacheDir;
+	private static File cacheDir;
 	
-	private static final ConnectivityManager connManager;
+	private static ConnectivityManager connManager;
 	
-	private static final Activity main;
+	private static Activity main;
 	
-	static {
+	public static void resetUtils() {
+		initUtils();
+	}
+	
+	public static void shutdownThreads() {
+		if (persistenceThread != null) {
+			worker.induceStop();
+			State state = persistenceThread.getState();
+			int tasks = worker.getNumTasks();
+			if (tasks == 0 && (state == State.BLOCKED || state == State.WAITING))
+				persistenceThread.interrupt();
+		}
+	}
+	
+	private static void initUtils() {
+		shutdownThreads();
 		persistenceTasks = new LinkedBlockingQueue<PersistenceTask>();
-		PersistenceWorker worker = new PersistenceWorker(persistenceTasks);
+		worker = new PersistenceWorker(persistenceTasks);
 		persistenceThread = new Thread(worker);
-		//persistenceThread.setDaemon(true);
+		
 		persistenceThread.setName("Persistence Thread");
 		persistenceThread.start();
 		
@@ -62,6 +79,10 @@ public class Utils {
 		connManager = (ConnectivityManager) assets.getMainContext().getSystemService(Context.CONNECTIVITY_SERVICE);
 		
 		main = assets.getMainActivity();
+	}
+	
+	public static void closeUtils () {
+		
 	}
 	
 	/**

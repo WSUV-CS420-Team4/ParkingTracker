@@ -23,7 +23,7 @@ public class PersistenceWorker implements Runnable {
 	private static final String ERROR_CREATE_FILE = "The file could not be created for the write task";
 
 	private static final String ERROR_WRITE_FILE = "The data could not be written to because access was denied";
-	
+
 	private static final String ERROR_WRITE_NOT_EMPTY = "The file was not written to because it is not empty";
 
 	private static final String ERROR_WRITE_DIR = "The data cannot be written because the file is a directory";
@@ -36,15 +36,18 @@ public class PersistenceWorker implements Runnable {
 
 	private static final String ERROR_DELETE_UNKNOWN = "The file could not be deleted because of an unknown error";
 
+	private boolean running;
+
 	private final BlockingQueue<PersistenceTask> tasks;
 
 	public PersistenceWorker(BlockingQueue<PersistenceTask> tasks) {
 		this.tasks = tasks;
+		this.running = true;
 	}
 
 	@Override
 	public void run() {
-		while (true) {
+		while (running || !tasks.isEmpty()) {
 			try {
 				PersistenceTask taskWrapper = tasks.take();
 
@@ -64,12 +67,10 @@ public class PersistenceWorker implements Runnable {
 				}
 				LogUtils.i(LOG_TAG, "Task " + taskWrapper.task + " on file " + taskWrapper.file.getAbsolutePath() +" completed with result " + taskWrapper.getResult() + "\t Error message: " + taskWrapper.getErrorMessage() + "\tThe updated cache size is " + Utils.getCacheSize() + " bytes");
 			} catch (InterruptedException e) {
-				LogUtils.i(LOG_TAG, "PersistanceWorker was interrupted", e);
-				throw new RuntimeException(e);
+				break;
 			}
-
-
 		}
+		LogUtils.i(LOG_TAG, "PersistanceWorker was interrupted and finished");
 	}
 
 	private void writeData(PersistenceTask taskWrapper, boolean append) {
@@ -127,10 +128,10 @@ public class PersistenceWorker implements Runnable {
 			deleteFile(file, taskWrapper);
 		else if (file.isDirectory())
 			deleteDirectory(file, taskWrapper);
-		
+
 		if (taskWrapper.getResult() == Result.FAIL)
 			return;
-		
+
 		setTaskSuccess(taskWrapper);
 	}
 
@@ -147,23 +148,23 @@ public class PersistenceWorker implements Runnable {
 		} catch (Exception e) {
 			setTaskFailure(t, e.getMessage());
 		} 
-		
+
 	}
 
 	private void deleteDirectory(File dir, PersistenceTask t) {
 		if (!dir.isDirectory())
 			return;
-		
+
 		for (File file : dir.listFiles()) {
 			if (file.isDirectory())
 				deleteDirectory(file, t);
 			else if (file.isFile())
 				deleteFile(file, t);
-			
+
 			if (t.getResult() == Result.FAIL)
 				return;
 		}
-		
+
 		deleteFile(dir, t);
 	}
 
@@ -199,7 +200,7 @@ public class PersistenceWorker implements Runnable {
 			setTaskFailure(t, ERROR_WRITE_FILE);
 			return;
 		}
-		
+
 		if (!append && file.length() > 0) {
 			LogUtils.i(LOG_TAG, "Cannot write to file " + file.getAbsolutePath());
 			setTaskFailure(t, ERROR_WRITE_NOT_EMPTY);
@@ -214,6 +215,14 @@ public class PersistenceWorker implements Runnable {
 
 	private void setTaskSuccess(PersistenceTask t) {
 		t.setResult(Result.SUCCESS, null);
+	}
+
+	public void induceStop() {
+		this.running = false;
+	}
+
+	public int getNumTasks() {
+		return this.tasks.size();
 	}
 
 }

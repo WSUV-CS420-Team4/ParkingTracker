@@ -270,7 +270,7 @@ public class DataManager implements Closeable {
 			this.dataWorker.induceStop();
 			if (this.dataThread != Thread.currentThread()) {
 				State state = this.dataThread.getState();
-				if (state == State.BLOCKED)
+				if (state == State.BLOCKED || state == State.WAITING)
 					this.dataThread.interrupt();
 			}
 		}
