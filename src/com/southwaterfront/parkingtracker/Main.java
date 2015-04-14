@@ -339,13 +339,7 @@ public class Main extends Activity {
 		buttonData = (Button) findViewById(R.id.buttonMainData);
 		buttonData.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-<<<<<<< HEAD
 				LogUtils.i("Main", "View Data Clicked!");
-				viewData();
-=======
-				Log.i("Main", "View Data Clicked!");
-				//viewData();
->>>>>>> master
 				showViewDataDialog();
 			}
 		});
@@ -353,13 +347,8 @@ public class Main extends Activity {
 		buttonOptions = (Button) findViewById(R.id.buttonMainOptions);
 		buttonOptions.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-<<<<<<< HEAD
 				LogUtils.i("Main", "Options Clicked!");
-				generateFlags();
-=======
-				Log.i("Main", "Options Clicked!");
 				showOptionsDialog();
->>>>>>> master
 			}
 		});
 	}
@@ -677,7 +666,7 @@ public class Main extends Activity {
 		this.OCRResults = OCRResults;
 
 		ocrEngine.setNumberOfResults(OCRResults);
-		Log.i("setOCRResults", "ocrEngine.setNumberOfResults( " + OCRResults + " );");
+		LogUtils.i("setOCRResults", "ocrEngine.setNumberOfResults( " + OCRResults + " );");
 	}
 
 	@Override
