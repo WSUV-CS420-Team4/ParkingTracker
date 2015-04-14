@@ -46,8 +46,9 @@ public class Utils {
 	
 	private static Activity main;
 	
-	public static void resetUtils() {
-		initUtils();
+	private static void checkInit() {
+		if (persistenceThread == null)
+			initUtils();
 	}
 	
 	public static void shutdownThreads() {
@@ -57,6 +58,7 @@ public class Utils {
 			int tasks = worker.getNumTasks();
 			if (tasks == 0 && (state == State.BLOCKED || state == State.WAITING))
 				persistenceThread.interrupt();
+			persistenceThread = null;
 		}
 	}
 	
@@ -81,10 +83,6 @@ public class Utils {
 		main = assets.getMainActivity();
 	}
 	
-	public static void closeUtils () {
-		
-	}
-	
 	/**
 	 * Determines the length of file in bytes. If the {@link File}
 	 * is a file, its size if returned. If it is a directory the it is
@@ -104,6 +102,7 @@ public class Utils {
 	}
 	
 	public static void resetCacheSize() {
+		checkInit();
 		cacheSize = getFileSize(cacheDir);
 	}
 	
@@ -115,6 +114,7 @@ public class Utils {
 	 * more information on how to check the result
 	 */
 	public static AsyncTask asyncFileDelete(File file) {
+		checkInit();
 		PersistenceTask task = new PersistenceTask(null, file, Tasks.DELETE);
 		Utils.persistenceTasks.add(task);
 		return task;
@@ -129,6 +129,7 @@ public class Utils {
 	 * more information on how to check the result
 	 */
 	public static AsyncTask asyncFileWrite(Object data, File file) {
+		checkInit();
 		PersistenceTask task = new PersistenceTask(data, file, Tasks.WRITE);
 		Utils.persistenceTasks.add(task);
 		return task;
@@ -141,6 +142,7 @@ public class Utils {
 	 * @return Updated cache size
 	 */
 	public static synchronized long updateCacheSize(long diff) {
+		checkInit();
 		cacheSize += diff;
 		return cacheSize;
 	}
@@ -151,6 +153,7 @@ public class Utils {
 	 * @return Cache size
 	 */
 	public static long getCacheSize() {
+		checkInit();
 		return Utils.cacheSize;
 	}
 	
@@ -173,6 +176,7 @@ public class Utils {
 	 * @return True if wifi connected, false if not
 	 */
 	public static boolean isWifiConnected() {
+		checkInit();
 		NetworkInfo netInfo = connManager.getActiveNetworkInfo();
 		return netInfo != null && netInfo.getType() == ConnectivityManager.TYPE_WIFI;
 	}
@@ -183,6 +187,7 @@ public class Utils {
 	 * @param message The message to display
 	 */
 	public static void postLongToast(final String message) {
+		checkInit();
 		main.runOnUiThread(new Runnable() {
 
 			@Override
