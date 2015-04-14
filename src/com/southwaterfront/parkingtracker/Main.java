@@ -84,7 +84,7 @@ public class Main extends Activity {
 
 	private ProgressBar progressBar;
 
-	private CharSequence[] flagOptions = { "Handicap Placards", "Residential  Permit", "Employee Permit", "Student Permit", "Carpool Permit", "Other" };
+	private CharSequence[] flagOptions = { "Handicap Placards", "Residential Permit", "Employee Permit", "Student Permit", "Carpool Permit", "Other" };
 	private boolean[] flagSelections;
 
 	private List<Integer> blockArray = new ArrayList<Integer>();

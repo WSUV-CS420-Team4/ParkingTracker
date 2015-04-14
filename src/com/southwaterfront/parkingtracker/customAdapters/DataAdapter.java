@@ -39,11 +39,6 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
 					// Do nothing...
 				} else {
 
-					int length = face.getParkingStalls().get(i).attr.length;
-					for (int z = 0; z < length; z++) {
-						Log.i("IMPORTANT", "attr = \"" + face.getParkingStalls().get(i).attr[z].toString() + "\"");
-					}
-
 					temp.add( new ParkingData(face.block, face.face, i, face.getParkingStalls().get(i).plate, face.getParkingStalls().get(i).attr) );
 					//Log.i("DataAdapter Added", "block: " + face.block + " face: " + face.face + " stall: " + i +
 					//        " plate: " + face.getParkingStalls().get(i).plate + " attr: " + face.getParkingStalls().get(i).attr);
@@ -91,10 +86,15 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
 
 		String flags = "";
 		if ( parkingData.attr != null) {
-			int length = parkingData.attr.length;
-			for (String s : parkingData.attr)
-				flags += s + " " ;
+            for (String s : parkingData.attr)
+				flags += s + "\n" ;
 		}
+
+        if ( flags.endsWith("\n") ) {
+            StringBuilder temp = new StringBuilder(flags);
+            temp.setCharAt((flags.length()-1), ' ');
+            flags = String.valueOf(temp);
+        }
 
 		holder.content.setText(content);
 		holder.flags.setText(flags);
