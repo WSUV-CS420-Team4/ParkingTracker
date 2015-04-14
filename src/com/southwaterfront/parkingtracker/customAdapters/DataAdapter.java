@@ -14,172 +14,13 @@ import android.widget.TextView;
 
 import com.southwaterfront.parkingtracker.R;
 import com.southwaterfront.parkingtracker.data.BlockFace;
-<<<<<<< HEAD
-import com.southwaterfront.parkingtracker.util.LogUtils;
-=======
->>>>>>> master
+
 
 /**
  * Created by Joel on 4/3/2015.
  */
 public class DataAdapter extends ArrayAdapter<BlockFace> {
 
-<<<<<<< HEAD
-    Context context;
-    int layoutResourceId;
-    ParkingData[] data;
-
-    public DataAdapter(Context context, int layoutResourceId, BlockFace[] blockFaceArray) {
-        super(context, layoutResourceId, blockFaceArray);
-        this.layoutResourceId = layoutResourceId;
-        this.context = context;
-        //this.data = data;
-
-        List<ParkingData> temp = new ArrayList<ParkingData>();
-
-        for (BlockFace face : blockFaceArray) {
-            for (int i = 0; i < face.getParkingStalls().size(); i++) {
-                if ( face.getParkingStalls().get(i).plate.equals("") ||  face.getParkingStalls().get(i).plate == null ) {
-                    // Do nothing...
-                } else {
-                    temp.add( new ParkingData(face.block, face.face, i, face.getParkingStalls().get(i).plate, face.getParkingStalls().get(i).attr) );
-                    //LogUtils.i("DataAdapter Added", "block: " + face.block + " face: " + face.face + " stall: " + i +
-                    //        " plate: " + face.getParkingStalls().get(i).plate + " attr: " + face.getParkingStalls().get(i).attr);
-                    //LogUtils.i("DataAdapter Size", "" + temp.size());
-                }
-            }
-        }
-
-        data = new ParkingData[temp.size()];
-        temp.toArray( data );
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View row = convertView;
-        DataHolder holder;
-
-        if(row == null)
-        {
-            LayoutInflater inflater = ((Activity)context).getLayoutInflater();
-            row = inflater.inflate(layoutResourceId, parent, false);
-
-            holder = new DataHolder();
-            holder.title = (TextView)row.findViewById(R.id.textViewDataLayoutTitle);
-            holder.content = (TextView)row.findViewById(R.id.textViewDataLayoutContent);
-
-            row.setTag(holder);
-        }
-        else
-        {
-            holder = (DataHolder)row.getTag();
-        }
-
-        //LogUtils.i("getView position", "" + position);
-        ParkingData parkingData = data[position];
-
-        String title = "Block: " + parkingData.block + " Face: ";
-        if ( parkingData.face != null ) { title += parkingData.face; } else { title += "-"; }
-        title += " Stall: " + (parkingData.stall + 1);
-        holder.title.setText(title);
-
-        String content = "License: ";
-        if ( parkingData.plate != null) { content += parkingData.plate; } else { content += "-"; }
-        if ( parkingData.attr != null) {
-
-            // --------------------------------------------
-            // String Representation // TODO Could use some work...
-            // --------------------------------------------
-            String attr = "\n";
-            String c = "|";
-            int length = parkingData.attr.length;
-            for (int i = 0; i < length; i++) {
-                if ( parkingData.attr[i].toString().equals("") ) {
-                    // Do nothing
-                } else if ( parkingData.attr[i].toString().equals("|") && c.equals("|") ) {
-                    // Do nothing
-                } else if (parkingData.attr[i].toString().equals("|") ) {
-                    c = parkingData.attr[i].toString();
-                    attr += "\n";
-                } else {
-                    c = parkingData.attr[i].toString();
-                    attr += parkingData.attr[i].toString();
-                }
-            }
-            if ( attr.endsWith("other") ) {
-                LogUtils.i("Other", "Ends with \"other\"");
-                attr += "\n";
-            }
-            if ( attr.endsWith("\n") ) {
-                LogUtils.i("Other", "Ends with \\n");
-            }
-            content += attr;
-            // --------------------------------------------
-
-
-            // --------------------------------------------
-            // Boolean Array Representation // TODO Works initially but breaks after loading
-            // --------------------------------------------
-            /*content += " Attr: ";
-            String attr = "{";
-            int length = parkingData.attr.length;
-            for (int i = 0; i < length; i++) {
-                if ( parkingData.attr[i].equals("") ) {
-                    attr += "0";
-                } else {
-                    attr += "1";
-                }
-                if (i != length) {
-                    attr += ",";
-                }
-            }
-            attr += "}";
-            content += attr;*/
-            // --------------------------------------------
-
-        } else { content += " Attr: -"; }
-        holder.content.setText(content);
-
-        return row;
-    }
-
-    @Override
-    public int getCount() {
-        return data.length;
-    }
-
-    static class ParkingData {
-
-        ParkingData() {
-            this.block = 0;
-            this.face = null;
-            this.stall = 0;
-            this.plate = null;
-        }
-
-        ParkingData(int block, String face, int stall, String plate, String[] attr) {
-            this.block = block;
-            this.face = face;
-            this.stall = stall;
-            this.plate = plate;
-            this.attr = attr;
-        }
-
-        int block;
-        String face;
-        int stall;
-        boolean modifiedSince;
-
-        String plate;
-        Date dTStamp;
-        String[] attr;
-    }
-
-    static class DataHolder {
-        TextView title;
-        TextView content;
-    }
-=======
 	Context context;
 	int layoutResourceId;
 	ParkingData[] data;
@@ -199,9 +40,9 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
 				} else {
 
 					temp.add( new ParkingData(face.block, face.face, i, face.getParkingStalls().get(i).plate, face.getParkingStalls().get(i).attr) );
-					//Log.i("DataAdapter Added", "block: " + face.block + " face: " + face.face + " stall: " + i +
+					//LogUtils..i("DataAdapter Added", "block: " + face.block + " face: " + face.face + " stall: " + i +
 					//        " plate: " + face.getParkingStalls().get(i).plate + " attr: " + face.getParkingStalls().get(i).attr);
-					//Log.i("DataAdapter Size", "" + temp.size());
+					//LogUtils.i("DataAdapter Size", "" + temp.size());
 				}
 			}
 		}
@@ -232,7 +73,7 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
 			holder = (DataHolder)row.getTag();
 		}
 
-		//Log.i("getView position", "" + position);
+		//LogUtils.i("getView position", "" + position);
 		ParkingData parkingData = data[position];
 
 		String title = "Block: " + parkingData.block + " Face: ";
@@ -303,5 +144,4 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
 		TextView content;
 		TextView flags;
 	}
->>>>>>> master
 }
