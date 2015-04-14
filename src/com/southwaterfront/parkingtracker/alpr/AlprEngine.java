@@ -143,9 +143,9 @@ public class AlprEngine implements Closeable {
 	 * result from the image
 	 * 
 	 * @param image File containing the image to be processed
-	 * @param rect Rectangle defining processing area in image
+	 * @param resultCallBack Callback to call when done processing
 	 */
-	public void runOcr(File image, AlprCallBack resultCallBack) {
+	public void runAlpr(File image, AlprCallBack resultCallBack) {
 		checkNotClosed();
 		if (image == null || !image.exists() || !image.canRead())
 			throw new IllegalArgumentException("Image file must exist and be readable");

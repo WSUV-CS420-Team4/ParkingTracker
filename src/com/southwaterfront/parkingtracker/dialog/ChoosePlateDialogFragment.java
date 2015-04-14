@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.southwaterfront.parkingtracker.Main;
 import com.southwaterfront.parkingtracker.R;
@@ -96,6 +97,20 @@ public class ChoosePlateDialogFragment extends DialogFragment {
             public void onShow(final DialogInterface dialog) {
                 final Button cancel = ((AlertDialog)dialog).getButton(DialogInterface.BUTTON_NEGATIVE);
                 final Button confirm = ((AlertDialog)dialog).getButton(DialogInterface.BUTTON_POSITIVE);
+
+                // Change OnClickListener
+                confirm.setOnClickListener( new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.i("ChoosePlateDialog", "Confirm Clicked!");
+                        if ( plateNo.getText().toString().equals(null) || plateNo.getText().toString().equals("") ) {
+                            Toast.makeText(getActivity().getBaseContext(), "No License Selected", Toast.LENGTH_LONG).show();
+                        } else {
+                            ((Main) getActivity()).setCurrentResult(plateNo.getText().toString());
+                            ((Main) getActivity()).showLocationSelectDialog();
+                        }
+                    }
+                });
 
                 // Change color of button when pressed
                 cancel.setOnTouchListener(new View.OnTouchListener() {

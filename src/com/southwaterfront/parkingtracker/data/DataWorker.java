@@ -80,7 +80,7 @@ class DataWorker implements Runnable {
 					default:
 						break;
 					}
-					System.gc(); // Break all the rules
+					//System.gc(); // Break all the rules
 					CallBack callBack = task.callBack;
 					if (callBack != null) {
 						callBack.call(task);

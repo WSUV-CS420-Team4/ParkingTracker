@@ -4,13 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -33,6 +34,7 @@ import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
 import com.southwaterfront.parkingtracker.alpr.AlprCallBack;
 import com.southwaterfront.parkingtracker.alpr.AlprEngine;
 import com.southwaterfront.parkingtracker.data.BlockFace;
+import com.southwaterfront.parkingtracker.data.BlockFaceDefinition;
 import com.southwaterfront.parkingtracker.data.CallBack;
 import com.southwaterfront.parkingtracker.data.DataManager;
 import com.southwaterfront.parkingtracker.data.ParkingDataCollector;
@@ -40,6 +42,7 @@ import com.southwaterfront.parkingtracker.data.ParkingStall;
 import com.southwaterfront.parkingtracker.dialog.AddLicenseDialogFragment;
 import com.southwaterfront.parkingtracker.dialog.ChoosePlateDialogFragment;
 import com.southwaterfront.parkingtracker.dialog.LocationSelectDialogFragment;
+import com.southwaterfront.parkingtracker.dialog.OptionsDialogFragment;
 import com.southwaterfront.parkingtracker.dialog.SetFlagsDialogFragment;
 import com.southwaterfront.parkingtracker.dialog.ViewDataDialogFragment;
 import com.southwaterfront.parkingtracker.prefs.ParkingTrackerPreferences;
@@ -74,7 +77,7 @@ public class Main extends Activity {
 	private ArrayAdapter<String> arrayAdapter;
 
 	private FragmentManager fragmentManager;
-	private FragmentTransaction fragmentTransaction;
+	//private FragmentTransaction fragmentTransaction;
 
 	private Button buttonTakePhoto;
 	private Button buttonMap;
@@ -84,7 +87,7 @@ public class Main extends Activity {
 
 	private ProgressBar progressBar;
 
-	private CharSequence[] flagOptions = { "Handicap Placards", "Residential  Permit", "Employee Permit", "Student Permit", "Carpool Permit", "Other" };
+	private CharSequence[] flagOptions = { "Handicap Placards", "Residential Permit", "Employee Permit", "Student Permit", "Carpool Permit", "Other" };
 	private boolean[] flagSelections;
 
 	private List<Integer> blockArray = new ArrayList<Integer>();
@@ -95,6 +98,11 @@ public class Main extends Activity {
 	private int currentBlock;
 	private int currentFace;
 	private int currentStall;
+
+	private int OCRResults;
+	private boolean alprRunning = false;
+
+	private boolean needToShowChoosePlateDialog;
 
 	private File createImageFile() throws IOException {
 		// Create an image file name
@@ -120,8 +128,6 @@ public class Main extends Activity {
 		// Ensure that there's a camera activity to handle the intent
 		if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
 			// Create the File where the photo should go
-			if (photoFile != null)
-				photoFile.delete();
 			photoFile = null;
 			try {
 				photoFile = createImageFile();
@@ -179,23 +185,37 @@ public class Main extends Activity {
 		textViewNotification.setText("Recognizing license plate");
 		progressBar.setVisibility(View.VISIBLE);
 		buttonTakePhoto.setVisibility(View.GONE);
-
-		ocrEngine.runOcr(photoFile, new AlprCallBack() {
-
+		disableButtons();
+		alprRunning = true;
+		ocrEngine.runAlpr(photoFile, new AlprCallBack() {
 			@Override
 			public void call(final String[] result) {
+
 				Main.this.runOnUiThread(new Runnable() {
 
 					@Override
 					public void run() {
-						photoFile.delete();
-						setOcrResult(result);
+						enableButtons();
+						try {
+							setOcrResult(result);
+						} finally {
+							alprRunning = false;
+							photoFile.delete();
+						}
 					}
 
 				});
 			}
 
 		});
+	}
+
+	@Override
+	public void onBackPressed() {
+		if (alprRunning)
+			moveTaskToBack(true);
+		else
+			super.onBackPressed();
 	}
 
 	private void setOcrResult(String[] result) {
@@ -224,9 +244,10 @@ public class Main extends Activity {
 
 			Toast.makeText(Main.this, licensePlates.size() + " Results", Toast.LENGTH_LONG).show();
 		} else {
-			showChoosePlateDialog();
+			//showChoosePlateDialog();
 			//textViewNotification.setText("0 Results");
-			Toast.makeText(Main.this, "0 Results", Toast.LENGTH_SHORT).show();
+			//Toast.makeText(Main.this, "0 Results", Toast.LENGTH_SHORT).show();
+			Toast.makeText(Main.this, "OCR unable to detect license plate", Toast.LENGTH_SHORT).show();
 		}
 	}
 	// -------------------------------------------------------------------------------------------------
@@ -241,6 +262,8 @@ public class Main extends Activity {
 	public void onResume() {
 		super.onResume();
 		isInForeground = true;
+		if (needToShowChoosePlateDialog)
+			showChoosePlateDialog();
 	}
 
 	@Override
@@ -266,6 +289,9 @@ public class Main extends Activity {
 				wifiReceiver = new WifiStateUploadableDataReceiver();
 				registerReceiver(wifiReceiver, wifiFilter);
 				dataCollector = dataManager.getCurrentSession().getDataCollector();
+
+				setupLocationSelect();
+
 				Main.this.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -313,8 +339,13 @@ public class Main extends Activity {
 		buttonData = (Button) findViewById(R.id.buttonMainData);
 		buttonData.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
+<<<<<<< HEAD
 				LogUtils.i("Main", "View Data Clicked!");
 				viewData();
+=======
+				Log.i("Main", "View Data Clicked!");
+				//viewData();
+>>>>>>> master
 				showViewDataDialog();
 			}
 		});
@@ -322,8 +353,13 @@ public class Main extends Activity {
 		buttonOptions = (Button) findViewById(R.id.buttonMainOptions);
 		buttonOptions.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
+<<<<<<< HEAD
 				LogUtils.i("Main", "Options Clicked!");
 				generateFlags();
+=======
+				Log.i("Main", "Options Clicked!");
+				showOptionsDialog();
+>>>>>>> master
 			}
 		});
 	}
@@ -345,13 +381,12 @@ public class Main extends Activity {
 		onCreateAppInit();
 
 		fragmentManager = getFragmentManager();
-		fragmentTransaction = fragmentManager.beginTransaction();
-
-		setupLocationSelect();
+		//fragmentTransaction = fragmentManager.beginTransaction();
 
 		initButtons();
 
 		currentResult = "";
+		OCRResults = 5;
 
 		// Temp ProgressBar init location
 		progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -380,33 +415,44 @@ public class Main extends Activity {
 
 	public void showChoosePlateDialog() {
 		// Create the fragment and show it as a dialog.
-		ChoosePlateDialogFragment newFragment = ChoosePlateDialogFragment.newInstance();
-		newFragment.show(getFragmentManager(), "choosePlate");
+		if (isInForeground) {
+			needToShowChoosePlateDialog = false;
+			ChoosePlateDialogFragment newFragment = ChoosePlateDialogFragment.newInstance();
+			newFragment.show(fragmentManager, "choosePlate");
+		} else {
+			needToShowChoosePlateDialog = true;
+		}
 	}
 
 	public void showSetFlagsDialog() {
 		// Create the fragment and show it as a dialog.
 		SetFlagsDialogFragment newFragment = SetFlagsDialogFragment.newInstance();
-		newFragment.show(getFragmentManager(), "setFlags");
+		newFragment.show(fragmentManager, "setFlags");
 	}
 
 
 	public void showAddLicenseDialog() {
 		// Create the fragment and show it as a dialog.
 		AddLicenseDialogFragment newFragment = AddLicenseDialogFragment.newInstance();
-		newFragment.show(getFragmentManager(), "addLicense");
+		newFragment.show(fragmentManager, "addLicense");
 	}
 
 	public void showLocationSelectDialog() {
 		// Create the fragment and show it as a dialog.
 		LocationSelectDialogFragment newFragment = LocationSelectDialogFragment.newInstance();
-		newFragment.show(getFragmentManager(), "locationSelect");
+		newFragment.show(fragmentManager, "locationSelect");
 	}
 
 	public void showViewDataDialog() {
 		// Create the fragment and show it as a dialog.
 		ViewDataDialogFragment newFragment = ViewDataDialogFragment.newInstance();
-		newFragment.show(getFragmentManager(), "locationSelect");
+		newFragment.show(fragmentManager, "locationSelect");
+	}
+
+	public void showOptionsDialog() {
+		// Create the fragment and show it as a dialog.
+		OptionsDialogFragment newFragment = OptionsDialogFragment.newInstance();
+		newFragment.show(fragmentManager, "options");
 	}
 
 	public ArrayAdapter<String> getArrayAdapter() {
@@ -456,58 +502,47 @@ public class Main extends Activity {
 
 	private String[] generateFlags() {
 
-		String[] flagArray = {"", "", "", "", "", ""};
+		String[] flagArray;
 
 		//Log.i("flagSelections", "size: " + flagSelections.length);
 
-		int length = flagSelections.length;
-		for (int i = 0; i < length; i++) {
+		int length = 0;
+		for (int i = 0; i < flagSelections.length; i++) {
 			if ( flagSelections[i] ) {
-				switch (i) {
-				case 0:
-					flagArray[i] = "handicap";
-					break;
-				case 1:
-					flagArray[i] = "residential";
-					break;
-				case 2:
-					flagArray[i] = "employee";
-					break;
-				case 3:
-					flagArray[i] = "student";
-					break;
-				case 4:
-					flagArray[i] = "carpool";
-					break;
-				case 5:
-					flagArray[i] = "other";
-					break;
-				}
-			} else {
-				flagArray[i] = "";
+				length++;
 			}
-
-			//Log.i("generateFlags", "flag[" + i + "]: " + flagSelections[i]);
+		}
+		if (length == 0)
+			return null;
+		//Log.i("generateFlags", "flag[" + i + "]: " + flagSelections[i]);
+		flagArray = new String[length];
+		length = 0;
+		for (int i = 0; i < flagSelections.length; i++) {
+			if ( flagSelections[i] ) {
+				//flagArray[length++] = (String) flagOptions[length];
+				flagArray[length++] = (String) flagOptions[i];
+			}
 		}
 
 		return flagArray;
 	}
 
+
 	public void addData() {
 
 		// Currently doesn't add correctly
-		// TODO: Still need to add Attr (need to convert Boolean[] to String[] and replace null)
 		dataCollector.setStall(blockArray.get(currentBlock), faceArray.get(currentFace), stallArray.get(currentStall) - 1,
 				new ParkingStall(currentResult, new Date(System.currentTimeMillis()), generateFlags()));
 		LogUtils.i("Main", "Added " + currentResult + " to block " + blockArray.get(currentBlock) +
 				", face " + faceArray.get(currentFace) + ", stall " + stallArray.get(currentStall));
 	}
 
+	/*
 	public void viewData() {
 		// Logs all the stalls currently held in data
 		LogUtils.i("viewData", "data size: " + dataCollector.getBlockFaces().size());
 
-		// TODO: Check stall format 0-14 or 1-15
+		// Check stall format 0-14 or 1-15
 		for (BlockFace face : getData()) {
 			for (int i = 0; i < face.getParkingStalls().size(); i++) {
 				LogUtils.i("stall", "block: " + face.block + " face: " + face.face + " stall: " + (i+1) +
@@ -517,10 +552,10 @@ public class Main extends Activity {
 			// Results without stall data
 			/*for ( ParkingStall stall: face.getParkingStalls()) {
                 Log.i("stall", "block: " + face.block + " face: " + face.face + " plate: " + stall.plate + " attr: " + stall.attr);
-            }*/
+            }
 		}
 	}
-
+	 */
 	public void enableButtons() {
 		buttonTakePhoto.setEnabled(true);
 		buttonMap.setEnabled(true);
@@ -538,67 +573,43 @@ public class Main extends Activity {
 	}
 
 	public void setupLocationSelect() {
-		// TODO remove hard code
-		// assets.getStreetModel();
-
-		blockArray = new ArrayList<Integer>() {{
-			add(1);
-			add(2);
-			add(3);
-			add(4);
-			add(5);
-			add(6);
-			add(7);
-			add(8);
-			add(9);
-			add(10);
-			add(11);
-			add(12);
-			add(13);
-			add(14);
-			add(15);
-			add(16);
-			add(17);
-			add(18);
-			add(19);
-			add(20);
-			add(21);
-			add(22);
-			add(23);
-			add(24);
-		}};
+		List<BlockFaceDefinition> m = assets.getStreetModel();
+		HashSet<Integer> d = new HashSet<Integer>();
+		for (BlockFaceDefinition b : m)
+			d.add(b.block);
+		blockArray = new ArrayList<Integer>(d);
+		Collections.sort(blockArray);
 		currentBlock = 0;
 
-		faceArray = new ArrayList<String>() {{
-			add("A");
-			add("B");
-			add("C");
-			add("D");
-		}};
+		faceArray = new ArrayList<String>();
+		faceArray.add("A");
+		faceArray.add("B");
+		faceArray.add("C");
+		faceArray.add("D");
+
 		currentFace = 0;
 
-		stallArray = new ArrayList<Integer>() {{
-			add(1);
-			add(2);
-			add(3);
-			add(4);
-			add(5);
-			add(6);
-			add(7);
-			add(8);
-			add(9);
-			add(10);
-			add(11);
-			add(12);
-			add(13);
-			add(14);
-			add(15);
-		}};
+		stallArray = new ArrayList<Integer>();
+		stallArray.add(1);
+		stallArray.add(2);
+		stallArray.add(3);
+		stallArray.add(4);
+		stallArray.add(5);
+		stallArray.add(6);
+		stallArray.add(7);
+		stallArray.add(8);
+		stallArray.add(9);
+		stallArray.add(10);
+		stallArray.add(11);
+		stallArray.add(12);
+		stallArray.add(13);
+		stallArray.add(14);
+		stallArray.add(15);
+
 		currentStall = 0;
 	}
 
 	public List<BlockFace> getData() {
-		// TODO: Joel take a look at this plz
 		return new ArrayList<BlockFace>(dataCollector.getBlockFaces());
 	}
 
@@ -656,6 +667,17 @@ public class Main extends Activity {
 
 	private void clearFlagSelections() {
 		flagSelections =  new boolean[ flagOptions.length ];
+	}
+
+	public int getOCRResults() {
+		return OCRResults;
+	}
+
+	public void setOCRResults(int OCRResults) {
+		this.OCRResults = OCRResults;
+
+		ocrEngine.setNumberOfResults(OCRResults);
+		Log.i("setOCRResults", "ocrEngine.setNumberOfResults( " + OCRResults + " );");
 	}
 
 	@Override

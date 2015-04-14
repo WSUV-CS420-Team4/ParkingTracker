@@ -1,5 +1,8 @@
 package com.southwaterfront.parkingtracker.dialog;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -7,32 +10,45 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.southwaterfront.parkingtracker.Main;
 import com.southwaterfront.parkingtracker.R;
-import com.southwaterfront.parkingtracker.customAdapters.DataAdapter;
-import com.southwaterfront.parkingtracker.data.BlockFace;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.southwaterfront.parkingtracker.client.HttpClient;
 
 /**
- * Created by Joel on 4/2/2015.
+ * Created by Joel on 4/13/2015.
  */
-public class ViewDataDialogFragment extends DialogFragment {
+public class OptionsDialogFragment extends DialogFragment {
 
     private View dialogView;
-    private List<BlockFace> data;
 
-    public static ViewDataDialogFragment newInstance() {
-        return new ViewDataDialogFragment();
+    private int numResults;
+
+    private List<Integer> resultArray = new ArrayList<Integer>() {{
+        add(1);
+        add(2);
+        add(3);
+        add(4);
+        add(5);
+        add(6);
+        add(7);
+        add(8);
+        add(9);
+        add(10);
+    }};
+
+    public static OptionsDialogFragment newInstance() {
+        return new OptionsDialogFragment();
     }
 
     @Override
@@ -41,35 +57,84 @@ public class ViewDataDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        dialogView = inflater.inflate(R.layout.view_data, null);
+        dialogView = inflater.inflate(R.layout.options, null);
 
-        final ListView dataList = (ListView) dialogView.findViewById(R.id.listViewViewDataData);
+        final Spinner results = (Spinner) dialogView.findViewById(R.id.spinnerOptionsResults);
+        final Button loginOut = (Button) dialogView.findViewById(R.id.buttonOptionsLoginOut);
 
-        // TODO
-        if ( ((Main) getActivity()).getData() != null) {
-            data  = ((Main) getActivity()).getData();
-        }
-        Collections.sort(data);
-        BlockFace[] temp = new BlockFace[data.size()];
-        data.toArray(temp);
-        DataAdapter dataAdapter = new DataAdapter(getActivity(), R.layout.listview_layout_data, temp);
-
-        dataList.setAdapter(dataAdapter);
+        /*final ListView listView = (ListView) dialogView.findViewById(R.id.listViewChoosePlate);
+        final TextView plateNo = (TextView) dialogView.findViewById(R.id.textViewChoosePlateResult);
+        final Button addLicense = (Button) dialogView.findViewById(R.id.buttonChoosePlateAddLicense);
+        final Button addFlag = (Button) dialogView.findViewById(R.id.buttonChoosePlateAddFlag);*/
 
         builder.setView(dialogView)
                 .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //TODO Confirm
-                        Log.i("ViewDataDialogFragment", "Confirm Clicked!");
+                        Log.i("ChoosePlateDialog", "Confirm Clicked!");
+                        ((Main) getActivity()).setOCRResults(numResults);
                     }
                 })
 
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        ViewDataDialogFragment.this.getDialog().cancel();
+                        OptionsDialogFragment.this.getDialog().cancel();
                     }
                 });
+
+        // ---
+
+        ArrayAdapter<Integer> tempIntAdapter = new ArrayAdapter<Integer>(getActivity(), android.R.layout.simple_spinner_item, resultArray) {
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View v = super.getView(position, convertView, parent);
+
+                ((TextView) v).setTextSize(16);
+                ((TextView) v).setGravity(Gravity.CENTER);
+                ((TextView) v).setPadding(0, 5, 0, 5);
+                //((TextView) v).setPadding(20, 10, 20, 10);
+
+                return v;
+            }
+        };
+
+        tempIntAdapter.setDropDownViewResource(R.layout.options_results);
+
+        results.setAdapter(tempIntAdapter);
+
+        numResults = ((Main) getActivity()).getOCRResults();
+        results.setSelection( ((Main) getActivity()).getOCRResults() - 1 );
+
+        results.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.i("ResultSpinner", "Result: " + parent.getItemAtPosition(position) + " Position: " + position);
+                numResults = (position + 1);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        // ---
+
+        loginOut.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO Login / Logout
+                Log.i("loginOut", "Button Pressed!");
+                if(!HttpClient.isLoggedIn()) {
+                	final LoginDialogFragment loginDialogFragment = new LoginDialogFragment();
+            		loginDialogFragment.show(getActivity().getFragmentManager(), "Login");
+                } else {
+                	HttpClient.logout();
+                }
+            }
+        });
+
+        // ---
 
         AlertDialog dialog = builder.create();
 

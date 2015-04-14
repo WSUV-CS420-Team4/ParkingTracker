@@ -45,13 +45,13 @@ public class HttpClient {
 	private static final HttpRequestFactory requestFactory = transport.createRequestFactory();
 	private static final int UNAUTHORIZED_STATUS_CODE = 401;
 
-	private static final Activity main = AssetManager.getInstance().getMainActivity();
+	//private static final Activity main = AssetManager.getInstance().getMainActivity();
 
 	private static final String ERROR_LOGIN = "Failed to login";
 
 	private static void initBlockingUILogin() throws RequestFailedException {
 		final LoginDialogFragment loginDialogFragment = new LoginDialogFragment();
-		loginDialogFragment.show(main.getFragmentManager(), "Login");
+		loginDialogFragment.show(AssetManager.getInstance().getMainActivity().getFragmentManager(), "Login");
 		boolean loggedIn = false;
 		try {
 			loggedIn = loginDialogFragment.waitOnResult();
@@ -260,5 +260,13 @@ public class HttpClient {
 		private static final long serialVersionUID = -4728904407478563082L;
 
 	}
+	
+	public static boolean isLoggedIn() {
+		return authToken != null;
+	}
 
+	public static void logout() {
+		authToken = null;
+		Utils.asyncFileDelete(authTokenFile);
+	}
 }
