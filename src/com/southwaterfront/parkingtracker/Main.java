@@ -227,7 +227,8 @@ public class Main extends Activity {
 		} else {
 			showChoosePlateDialog();
 			//textViewNotification.setText("0 Results");
-			Toast.makeText(Main.this, "0 Results", Toast.LENGTH_SHORT).show();
+			//Toast.makeText(Main.this, "0 Results", Toast.LENGTH_SHORT).show();
+            Toast.makeText(Main.this, "OCR unable to detect license plate", Toast.LENGTH_SHORT).show();
 		}
 	}
 	// -------------------------------------------------------------------------------------------------
@@ -472,7 +473,9 @@ public class Main extends Activity {
 		length = 0;
 		for (int i = 0; i < flagSelections.length; i++) {
 			if ( flagSelections[i] ) {
-				flagArray[length++] = (String) flagOptions[length];
+				//flagArray[length++] = (String) flagOptions[length];
+                flagArray[length] = (String) flagOptions[length];
+                length++;
 			}
 		}
 

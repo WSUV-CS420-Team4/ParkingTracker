@@ -66,6 +66,8 @@ public class LocationSelectDialogFragment extends DialogFragment {
                         Log.i("LocationSelectDialog", "Confirm Clicked!");
                         // Add the newly recorded license data to Main.java's data
                         ((Main) getActivity()).addData();
+
+                        ((ChoosePlateDialogFragment)getFragmentManager().findFragmentByTag("choosePlate")).dismiss();
                     }
                 })
 
