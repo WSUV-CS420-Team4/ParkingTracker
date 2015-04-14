@@ -1,8 +1,11 @@
 package com.southwaterfront.parkingtracker.customAdapters;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,10 +14,6 @@ import android.widget.TextView;
 
 import com.southwaterfront.parkingtracker.R;
 import com.southwaterfront.parkingtracker.data.BlockFace;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by Joel on 4/3/2015.
@@ -86,15 +85,15 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
 
 		String flags = "";
 		if ( parkingData.attr != null) {
-            for (String s : parkingData.attr)
+			for (String s : parkingData.attr)
 				flags += s + "\n" ;
 		}
 
-        if ( flags.endsWith("\n") ) {
-            StringBuilder temp = new StringBuilder(flags);
-            temp.setCharAt((flags.length()-1), ' ');
-            flags = String.valueOf(temp);
-        }
+		if ( flags.endsWith("\n") ) {
+			StringBuilder temp = new StringBuilder(flags);
+			temp.setCharAt((flags.length()-1), ' ');
+			flags = String.valueOf(temp);
+		}
 
 		holder.content.setText(content);
 		holder.flags.setText(flags);
@@ -121,8 +120,12 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
 			this.face = face;
 			this.stall = stall;
 			this.plate = plate;
-			this.attr = new String[attr.length];
-			System.arraycopy(attr, 0, this.attr, 0, attr.length);
+			if (attr != null) { 
+				this.attr = new String[attr.length];
+				System.arraycopy(attr, 0, this.attr, 0, attr.length);
+			} else {
+				this.attr = null;
+			}
 		}
 
 		int block;

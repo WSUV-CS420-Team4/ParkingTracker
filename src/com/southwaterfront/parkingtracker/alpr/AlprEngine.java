@@ -10,7 +10,6 @@ import org.openalpr.Alpr;
 import android.util.Log;
 
 import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
-import com.southwaterfront.parkingtracker.data.DataManager;
 import com.southwaterfront.parkingtracker.jsonify.AlprParser;
 
 /**
@@ -59,14 +58,12 @@ public class AlprEngine implements Closeable {
 		//private static final String resultPlateNotFound = "License Plate not recognized";
 		private final Alpr alpr;
 		private final BlockingQueue<TaskWrapper> images;
-		private final DataManager dataManager;
 
 		public AlprWorker(Alpr alpr, BlockingQueue<TaskWrapper> i) {
 			if (i == null || alpr == null)
 				throw new IllegalArgumentException("Arguments cannot be null");
 			this.alpr = alpr;
 			this.images = i;
-			this.dataManager = DataManager.getInstance();
 		}
 
 		@Override

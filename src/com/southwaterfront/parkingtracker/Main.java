@@ -12,7 +12,6 @@ import java.util.List;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -78,7 +77,7 @@ public class Main extends Activity {
 	private ArrayAdapter<String> arrayAdapter;
 
 	private FragmentManager fragmentManager;
-	private FragmentTransaction fragmentTransaction;
+	//private FragmentTransaction fragmentTransaction;
 
 	private Button buttonTakePhoto;
 	private Button buttonMap;
@@ -102,6 +101,8 @@ public class Main extends Activity {
 
 	private int OCRResults;
 	private boolean alprRunning = false;
+
+	private boolean needToShowChoosePlateDialog;
 
 	private File createImageFile() throws IOException {
 		// Create an image file name
@@ -243,7 +244,7 @@ public class Main extends Activity {
 
 			Toast.makeText(Main.this, licensePlates.size() + " Results", Toast.LENGTH_LONG).show();
 		} else {
-			showChoosePlateDialog();
+			//showChoosePlateDialog();
 			//textViewNotification.setText("0 Results");
 			//Toast.makeText(Main.this, "0 Results", Toast.LENGTH_SHORT).show();
 			Toast.makeText(Main.this, "OCR unable to detect license plate", Toast.LENGTH_SHORT).show();
@@ -261,6 +262,8 @@ public class Main extends Activity {
 	public void onResume() {
 		super.onResume();
 		isInForeground = true;
+		if (needToShowChoosePlateDialog)
+			showChoosePlateDialog();
 	}
 
 	@Override
@@ -368,7 +371,7 @@ public class Main extends Activity {
 		onCreateAppInit();
 
 		fragmentManager = getFragmentManager();
-		fragmentTransaction = fragmentManager.beginTransaction();
+		//fragmentTransaction = fragmentManager.beginTransaction();
 
 		initButtons();
 
@@ -402,39 +405,44 @@ public class Main extends Activity {
 
 	public void showChoosePlateDialog() {
 		// Create the fragment and show it as a dialog.
-		ChoosePlateDialogFragment newFragment = ChoosePlateDialogFragment.newInstance();
-		newFragment.show(getFragmentManager(), "choosePlate");
+		if (isInForeground) {
+			needToShowChoosePlateDialog = false;
+			ChoosePlateDialogFragment newFragment = ChoosePlateDialogFragment.newInstance();
+			newFragment.show(fragmentManager, "choosePlate");
+		} else {
+			needToShowChoosePlateDialog = true;
+		}
 	}
 
 	public void showSetFlagsDialog() {
 		// Create the fragment and show it as a dialog.
 		SetFlagsDialogFragment newFragment = SetFlagsDialogFragment.newInstance();
-		newFragment.show(getFragmentManager(), "setFlags");
+		newFragment.show(fragmentManager, "setFlags");
 	}
 
 
 	public void showAddLicenseDialog() {
 		// Create the fragment and show it as a dialog.
 		AddLicenseDialogFragment newFragment = AddLicenseDialogFragment.newInstance();
-		newFragment.show(getFragmentManager(), "addLicense");
+		newFragment.show(fragmentManager, "addLicense");
 	}
 
 	public void showLocationSelectDialog() {
 		// Create the fragment and show it as a dialog.
 		LocationSelectDialogFragment newFragment = LocationSelectDialogFragment.newInstance();
-		newFragment.show(getFragmentManager(), "locationSelect");
+		newFragment.show(fragmentManager, "locationSelect");
 	}
 
 	public void showViewDataDialog() {
 		// Create the fragment and show it as a dialog.
 		ViewDataDialogFragment newFragment = ViewDataDialogFragment.newInstance();
-		newFragment.show(getFragmentManager(), "locationSelect");
+		newFragment.show(fragmentManager, "locationSelect");
 	}
 
 	public void showOptionsDialog() {
 		// Create the fragment and show it as a dialog.
 		OptionsDialogFragment newFragment = OptionsDialogFragment.newInstance();
-		newFragment.show(getFragmentManager(), "options");
+		newFragment.show(fragmentManager, "options");
 	}
 
 	public ArrayAdapter<String> getArrayAdapter() {
