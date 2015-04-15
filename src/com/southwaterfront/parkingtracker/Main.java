@@ -2,6 +2,7 @@ package com.southwaterfront.parkingtracker;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -103,6 +104,8 @@ public class Main extends Activity {
 	private boolean alprRunning = false;
 
 	private boolean needToShowChoosePlateDialog;
+	
+	private Thread initThread;
 
 	private File createImageFile() throws IOException {
 		// Create an image file name
@@ -181,7 +184,6 @@ public class Main extends Activity {
 
 		Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
 		imageView.setImageBitmap(bitmap);*/
-
 		textViewNotification.setText("Recognizing license plate");
 		progressBar.setVisibility(View.VISIBLE);
 		buttonTakePhoto.setVisibility(View.GONE);
@@ -275,6 +277,29 @@ public class Main extends Activity {
 	}
 
 	private void onCreateAppInit() {
+		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+			
+			@Override
+			public void uncaughtException(final Thread thread, final Throwable ex) {
+					Main.this.runOnUiThread(new Runnable() {
+
+						@Override
+						public void run() {
+							String s;
+							if (thread == initThread)
+								s = "Initialization error, it is likely this app cannot run on your phone because it does not meet the required architecture";
+							else
+								s = "Oops, an error occured, please restart the app and try again";
+							Toast t = Toast.makeText(Main.this, s, Toast.LENGTH_LONG);
+							t.show();
+							Main.this.finish();
+						}
+						
+					});
+				
+			}
+		});
+		
 		Runnable r = new Runnable() {
 
 			public void run() {
@@ -288,7 +313,6 @@ public class Main extends Activity {
 				wifiReceiver = new WifiStateUploadableDataReceiver();
 				registerReceiver(wifiReceiver, wifiFilter);
 				dataCollector = dataManager.getCurrentSession().getDataCollector();
-
 				setupLocationSelect();
 
 				Main.this.runOnUiThread(new Runnable() {
@@ -300,7 +324,7 @@ public class Main extends Activity {
 				});
 			}
 		};
-		Thread initThread = new Thread(r);
+		initThread = new Thread(r);
 		initThread.start();
 		LogUtils.i(LOG_TAG, "App initialized successfully");
 	}
