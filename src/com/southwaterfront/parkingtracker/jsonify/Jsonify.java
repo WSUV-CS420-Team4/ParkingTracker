@@ -22,7 +22,8 @@ public final class Jsonify {
 	
 	private static final String LOG_TAG = "Jsonify";
 
-	public static final String STRING_DELIMITER = "-";
+	public static final String STRING_DELIMITER = "|";
+	public static final String STRING_DELIMITER_REGEX = "[|]";
 	public static final String BLOCKFACES_ARRAY_ID = "blockfaces";
 	public static final String BLOCK_ID = "Block";
 	public static final String FACE_ID = "Face";

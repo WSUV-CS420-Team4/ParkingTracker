@@ -60,7 +60,7 @@ public class BlockFaceParser {
 					continue;
 				}
 				if (attr != null)
-					attrs = attr.split(Jsonify.STRING_DELIMITER);
+					attrs = attr.split(Jsonify.STRING_DELIMITER_REGEX);
 				b.setStall(new ParkingStall(plate, d, attrs), i);
 			}
 		}
