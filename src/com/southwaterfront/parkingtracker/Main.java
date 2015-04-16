@@ -588,21 +588,34 @@ public class Main extends Activity {
 	public void setupLocationSelect() {
 		List<BlockFaceDefinition> m = assets.getStreetModel();
 		HashSet<Integer> d = new HashSet<Integer>();
-		for (BlockFaceDefinition b : m)
+		HashSet<String> f = new HashSet<String>();
+		int max = 0;
+		for (BlockFaceDefinition b : m) {
 			d.add(b.block);
+			f.add(b.face);
+			if (b.numStalls > max)
+				max = b.numStalls;
+		}
 		blockArray = new ArrayList<Integer>(d);
 		Collections.sort(blockArray);
 		currentBlock = 0;
 
-		faceArray = new ArrayList<String>();
+		faceArray = new ArrayList<String>(f);
+		Collections.sort(faceArray);
+		/*
 		faceArray.add("A");
 		faceArray.add("B");
 		faceArray.add("C");
 		faceArray.add("D");
+		*/
 
 		currentFace = 0;
 
 		stallArray = new ArrayList<Integer>();
+		for (int i = 1; i <= max + 2; i++) {
+			stallArray.add(i);
+		}
+		/*
 		stallArray.add(1);
 		stallArray.add(2);
 		stallArray.add(3);
@@ -618,7 +631,7 @@ public class Main extends Activity {
 		stallArray.add(13);
 		stallArray.add(14);
 		stallArray.add(15);
-
+*/
 		currentStall = 0;
 	}
 
