@@ -277,6 +277,7 @@ public class Main extends Activity {
 	}
 
 	private void onCreateAppInit() {
+		/*
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 
 			@Override
@@ -293,13 +294,14 @@ public class Main extends Activity {
 						Toast t = Toast.makeText(Main.this, s, Toast.LENGTH_LONG);
 						t.show();
 						Main.this.finish();
+						if (thread != initThread)
+							throw new RuntimeException("Rethrowing from uncaught exception handler", ex);
 					}
 
 				});
-
 			}
 		});
-
+*/
 		Runnable r = new Runnable() {
 
 			public void run() {

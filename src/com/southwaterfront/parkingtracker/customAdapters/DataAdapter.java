@@ -31,7 +31,7 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
 		this.context = context;
 		//this.data = data;
 
-		//ArrayList<ParkingData> temp = new ArrayList<ParkingData>();
+		data = new ArrayList<ParkingData>();
 
 		for (BlockFace face : blockFaceArray) {
 			for (int i = 0; i < face.getParkingStalls().size(); i++) {
