@@ -88,14 +88,19 @@ public final class BlockFace implements Comparable<BlockFace> {
 		for (int i = this.stalls.size(); i <= position; i++)
 			this.stalls.add(ParkingStall.EmptyStall);
 		
-		this.stalls.set(position, stall);
+		ParkingStall prev = this.stalls.set(position, stall);
 		if (stall != ParkingStall.EmptyStall)
 			nonEmptyStalls++;
+		else {
+			if (prev != ParkingStall.EmptyStall)
+				nonEmptyStalls--;
+		}
 		this.modifiedSince = true;
 	}
 
 	/**
-	 * Remove an object from stalls list
+	 * Remove an object from stalls list, literally will make
+	 * the list of parking stalls shorter
 	 * 
 	 * @param obj Object to remove
 	 * @return True if object removed, false otherwise

@@ -65,6 +65,25 @@ public class ParkingDataCollector {
 	}
 	
 	/**
+	 * Used to reset a stall to empty
+	 * 
+	 * @param block Block number
+	 * @param face Face name
+	 * @param stallNumber Stall position on block face
+	 * @return True if stall set, false if no such block face exists
+	 */
+	public boolean removeStall(int block, String face, int stallNumber) {
+		if (block < 0 || face == null || stallNumber < 0)
+			throw new IllegalArgumentException("Arguments cannot be null");
+		BlockFace f = getBlockFace(block, face);
+		if (f != null) {
+			f.setStall(ParkingStall.EmptyStall, stallNumber);
+			return true;
+		}
+		return false;
+	}
+	
+	/**
 	 * Convenience method to set parking stall data
 	 * 
 	 * @param block Block number
