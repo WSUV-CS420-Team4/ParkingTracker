@@ -7,19 +7,22 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.southwaterfront.parkingtracker.Main;
 import com.southwaterfront.parkingtracker.R;
 import com.southwaterfront.parkingtracker.customAdapters.DataAdapter;
 import com.southwaterfront.parkingtracker.data.BlockFace;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,10 +32,46 @@ import java.util.List;
 public class ViewDataDialogFragment extends DialogFragment {
 
     private View dialogView;
+    private DataAdapter dataAdapter;
     private List<BlockFace> data;
 
     public static ViewDataDialogFragment newInstance() {
         return new ViewDataDialogFragment();
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
+        // Creation/inflate menu here
+
+        super.onCreateContextMenu(menu, view, menuInfo);
+        final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+
+        menu.setHeaderTitle( "" );
+        menu.add(Menu.NONE, 1, 1, "Edit");
+        menu.add(Menu.NONE, 2, 2, "Delete");
+        Toast.makeText(getActivity(),"id: " + info.id , Toast.LENGTH_SHORT).show();
+
+        MenuItem.OnMenuItemClickListener listener = new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                onContextItemSelected(item);
+
+                switch (item.getItemId()) {
+                    case 1:
+                        // Edit
+                    case 2:
+                        // Delete
+                        dataAdapter.remove(info.position);
+                        dataAdapter.notifyDataSetChanged();
+                        // TODO delete from actual data (not just adapter)
+                }
+
+                return true;
+            }
+        };
+
+        for (int i = 0, n = menu.size(); i < n; i++)
+            menu.getItem(i).setOnMenuItemClickListener(listener);
     }
 
     @Override
@@ -49,12 +88,16 @@ public class ViewDataDialogFragment extends DialogFragment {
         if ( ((Main) getActivity()).getData() != null) {
             data  = ((Main) getActivity()).getData();
         }
+
         Collections.sort(data);
         BlockFace[] temp = new BlockFace[data.size()];
         data.toArray(temp);
-        DataAdapter dataAdapter = new DataAdapter(getActivity(), R.layout.listview_layout_data, temp);
+
+        dataAdapter = new DataAdapter(getActivity(), R.layout.listview_layout_data, temp);
 
         dataList.setAdapter(dataAdapter);
+        registerForContextMenu(dataList);
+
 
         builder.setView(dialogView)
                 .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
@@ -76,14 +119,14 @@ public class ViewDataDialogFragment extends DialogFragment {
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(final DialogInterface dialog) {
-                final Button cancel = ((AlertDialog)dialog).getButton(DialogInterface.BUTTON_NEGATIVE);
-                final Button confirm = ((AlertDialog)dialog).getButton(DialogInterface.BUTTON_POSITIVE);
+                final Button cancel = ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEGATIVE);
+                final Button confirm = ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE);
 
                 // Change color of button when pressed
                 cancel.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
-                        switch(event.getAction() & MotionEvent.ACTION_MASK) {
+                        switch (event.getAction() & MotionEvent.ACTION_MASK) {
                             case MotionEvent.ACTION_DOWN:
                                 cancel.setBackgroundDrawable(getResources().getDrawable(R.drawable.background_darker));
                                 break;
@@ -125,4 +168,5 @@ public class ViewDataDialogFragment extends DialogFragment {
 
         return dialog;
     }
+
 }

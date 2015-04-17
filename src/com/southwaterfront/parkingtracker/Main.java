@@ -104,7 +104,7 @@ public class Main extends Activity {
 	private boolean alprRunning = false;
 
 	private boolean needToShowChoosePlateDialog;
-	
+
 	private Thread initThread;
 
 	private File createImageFile() throws IOException {
@@ -278,28 +278,28 @@ public class Main extends Activity {
 
 	private void onCreateAppInit() {
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-			
+
 			@Override
 			public void uncaughtException(final Thread thread, final Throwable ex) {
-					Main.this.runOnUiThread(new Runnable() {
+				Main.this.runOnUiThread(new Runnable() {
 
-						@Override
-						public void run() {
-							String s;
-							if (thread == initThread)
-								s = "Initialization error, it is likely this app cannot run on your phone because it does not meet the required architecture";
-							else
-								s = "Oops, an error occured, please restart the app and try again";
-							Toast t = Toast.makeText(Main.this, s, Toast.LENGTH_LONG);
-							t.show();
-							Main.this.finish();
-						}
-						
-					});
-				
+					@Override
+					public void run() {
+						String s;
+						if (thread == initThread)
+							s = "Initialization error, it is likely this app cannot run on your phone because it does not meet the required architecture";
+						else
+							s = "Oops, an error occured, please restart the app and try again";
+						Toast t = Toast.makeText(Main.this, s, Toast.LENGTH_LONG);
+						t.show();
+						Main.this.finish();
+					}
+
+				});
+
 			}
 		});
-		
+
 		Runnable r = new Runnable() {
 
 			public void run() {
@@ -355,6 +355,7 @@ public class Main extends Activity {
 		buttonMap.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				LogUtils.i("Main", "Map Clicked!");
+				showChoosePlateDialog();
 			}
 		});
 
@@ -543,12 +544,15 @@ public class Main extends Activity {
 
 	public boolean addData() {
 
-		// Currently doesn't add correctly
 		boolean result = dataCollector.setStall(blockArray.get(currentBlock), faceArray.get(currentFace), stallArray.get(currentStall) - 1,
 				new ParkingStall(currentResult, new Date(System.currentTimeMillis()), generateFlags()));
 		LogUtils.i("Main", "Added " + currentResult + " to block " + blockArray.get(currentBlock) +
 				", face " + faceArray.get(currentFace) + ", stall " + stallArray.get(currentStall));
 		return result;
+	}
+
+	public void removeData() {
+		//TODO
 	}
 
 	/*
@@ -608,7 +612,7 @@ public class Main extends Activity {
 		faceArray.add("B");
 		faceArray.add("C");
 		faceArray.add("D");
-		*/
+		 */
 
 		currentFace = 0;
 
@@ -632,7 +636,7 @@ public class Main extends Activity {
 		stallArray.add(13);
 		stallArray.add(14);
 		stallArray.add(15);
-*/
+		 */
 		currentStall = 0;
 	}
 
