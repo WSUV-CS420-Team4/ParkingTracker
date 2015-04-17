@@ -23,7 +23,7 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
 
 	Context context;
 	int layoutResourceId;
-	ParkingData[] data;
+	public ArrayList<ParkingData> data;
 
 	public DataAdapter(Context context, int layoutResourceId, BlockFace[] blockFaceArray) {
 		super(context, layoutResourceId, blockFaceArray);
@@ -31,7 +31,7 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
 		this.context = context;
 		//this.data = data;
 
-		List<ParkingData> temp = new ArrayList<ParkingData>();
+		//ArrayList<ParkingData> temp = new ArrayList<ParkingData>();
 
 		for (BlockFace face : blockFaceArray) {
 			for (int i = 0; i < face.getParkingStalls().size(); i++) {
@@ -39,7 +39,7 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
 					// Do nothing...
 				} else {
 
-					temp.add( new ParkingData(face.block, face.face, i, face.getParkingStalls().get(i).plate, face.getParkingStalls().get(i).attr) );
+					data.add( new ParkingData(face.block, face.face, i, face.getParkingStalls().get(i).plate, face.getParkingStalls().get(i).attr) );
 					//LogUtils..i("DataAdapter Added", "block: " + face.block + " face: " + face.face + " stall: " + i +
 					//        " plate: " + face.getParkingStalls().get(i).plate + " attr: " + face.getParkingStalls().get(i).attr);
 					//LogUtils.i("DataAdapter Size", "" + temp.size());
@@ -47,8 +47,8 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
 			}
 		}
 
-		data = new ParkingData[temp.size()];
-		temp.toArray( data );
+		//data = new ParkingData[temp.size()];
+		//temp.toArray( data );
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
 		}
 
 		//LogUtils.i("getView position", "" + position);
-		ParkingData parkingData = data[position];
+		ParkingData parkingData = data.get(position);
 
 		String title = "Block: " + parkingData.block + " Face: ";
 		if ( parkingData.face != null ) { title += parkingData.face; } else { title += "-"; }
@@ -104,10 +104,14 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
 
 	@Override
 	public int getCount() {
-		return data.length;
+		return data.size();
 	}
 
-	static class ParkingData {
+	public void remove(int i) {
+		data.remove(i);
+	}
+
+	public static class ParkingData {
 
 		ParkingData() {
 			this.block = 0;
@@ -137,6 +141,26 @@ public class DataAdapter extends ArrayAdapter<BlockFace> {
 		String plate;
 		Date dTStamp;
 		String[] attr;
+
+		public int getBlock() {
+			return block;
+		}
+
+		public String getFace() {
+			return face;
+		}
+
+		public int getStall() {
+			return stall;
+		}
+
+		public String getPlate() {
+			return plate;
+		}
+
+		public String[] getAttr() {
+			return attr;
+		}
 	}
 
 	static class DataHolder {

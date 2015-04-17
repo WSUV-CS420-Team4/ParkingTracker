@@ -355,6 +355,7 @@ public class Main extends Activity {
 		buttonMap.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				LogUtils.i("Main", "Map Clicked!");
+				showChoosePlateDialog();
 			}
 		});
 
@@ -543,11 +544,14 @@ public class Main extends Activity {
 
 	public void addData() {
 
-		// Currently doesn't add correctly
 		dataCollector.setStall(blockArray.get(currentBlock), faceArray.get(currentFace), stallArray.get(currentStall) - 1,
 				new ParkingStall(currentResult, new Date(System.currentTimeMillis()), generateFlags()));
 		LogUtils.i("Main", "Added " + currentResult + " to block " + blockArray.get(currentBlock) +
 				", face " + faceArray.get(currentFace) + ", stall " + stallArray.get(currentStall));
+	}
+
+	public void removeData() {
+		//TODO
 	}
 
 	/*
