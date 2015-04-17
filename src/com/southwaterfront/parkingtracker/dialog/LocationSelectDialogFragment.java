@@ -1,5 +1,8 @@
 package com.southwaterfront.parkingtracker.dialog;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -15,12 +18,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 
-import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
 import com.southwaterfront.parkingtracker.Main;
 import com.southwaterfront.parkingtracker.R;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Joel on 3/5/2015.
@@ -65,7 +64,7 @@ public class LocationSelectDialogFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         Log.i("LocationSelectDialog", "Confirm Clicked!");
                         // Add the newly recorded license data to Main.java's data
-                        ((Main) getActivity()).addData();
+                        boolean added = ((Main) getActivity()).addData();
 
                         ((ChoosePlateDialogFragment)getFragmentManager().findFragmentByTag("choosePlate")).dismiss();
                     }

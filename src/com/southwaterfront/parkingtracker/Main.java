@@ -541,13 +541,14 @@ public class Main extends Activity {
 	}
 
 
-	public void addData() {
+	public boolean addData() {
 
 		// Currently doesn't add correctly
-		dataCollector.setStall(blockArray.get(currentBlock), faceArray.get(currentFace), stallArray.get(currentStall) - 1,
+		boolean result = dataCollector.setStall(blockArray.get(currentBlock), faceArray.get(currentFace), stallArray.get(currentStall) - 1,
 				new ParkingStall(currentResult, new Date(System.currentTimeMillis()), generateFlags()));
 		LogUtils.i("Main", "Added " + currentResult + " to block " + blockArray.get(currentBlock) +
 				", face " + faceArray.get(currentFace) + ", stall " + stallArray.get(currentStall));
+		return result;
 	}
 
 	/*
