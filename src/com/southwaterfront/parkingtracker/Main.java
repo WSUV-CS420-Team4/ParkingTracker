@@ -353,10 +353,13 @@ public class Main extends Activity {
 			}
 		});
 
+		// TODO Refactor name now that button adds a plate instead of showing map
 		buttonMap = (Button) findViewById(R.id.buttonMainMap);
 		buttonMap.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				LogUtils.i("Main", "Map Clicked!");
+				licensePlates.clear();
+				clearFlagSelections();
 				showChoosePlateDialog();
 			}
 		});
@@ -553,8 +556,9 @@ public class Main extends Activity {
 		return result;
 	}
 
-	public void removeData() {
+	public void removeData(int block, String face, int stall) {
 		//TODO
+		dataCollector.removeStall(block, face, stall);
 	}
 
 	/*

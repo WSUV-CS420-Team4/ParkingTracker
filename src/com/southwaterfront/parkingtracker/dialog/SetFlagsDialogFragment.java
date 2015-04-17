@@ -14,6 +14,8 @@ import android.widget.Toast;
 import com.southwaterfront.parkingtracker.Main;
 import com.southwaterfront.parkingtracker.R;
 
+import java.util.Arrays;
+
 /**
  * Created by Joel on 3/4/2015.
  */
@@ -33,13 +35,16 @@ public class SetFlagsDialogFragment extends DialogFragment {
         if ( ((Main) getActivity()).getFlagSelections() != null) {
             selections = new boolean[ ((Main) getActivity()).getFlagSelections().length ];
             System.arraycopy(((Main) getActivity()).getFlagSelections(), 0, selections, 0, ((Main) getActivity()).getFlagSelections().length);
+        } else {
+            selections = new boolean[ ((Main) getActivity()).getFlagOptions().length ];
+            Arrays.fill(selections, Boolean.FALSE);
         }
 
         builder.setTitle("Add Flags")
                 .setMultiChoiceItems(((Main) getActivity()).getFlagOptions(), selections, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-
+                        //Toast.makeText(getActivity().getApplicationContext(), "Set " + which + " flag " + isChecked, Toast.LENGTH_SHORT).show();
                     }
                 })
 

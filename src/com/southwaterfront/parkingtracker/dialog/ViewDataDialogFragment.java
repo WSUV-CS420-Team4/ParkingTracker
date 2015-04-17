@@ -16,7 +16,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.southwaterfront.parkingtracker.Main;
 import com.southwaterfront.parkingtracker.R;
@@ -41,7 +40,6 @@ public class ViewDataDialogFragment extends DialogFragment {
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
-        // Creation/inflate menu here
 
         super.onCreateContextMenu(menu, view, menuInfo);
         final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
@@ -49,21 +47,32 @@ public class ViewDataDialogFragment extends DialogFragment {
         menu.setHeaderTitle( "" );
         menu.add(Menu.NONE, 1, 1, "Edit");
         menu.add(Menu.NONE, 2, 2, "Delete");
-        Toast.makeText(getActivity(),"id: " + info.id , Toast.LENGTH_SHORT).show();
+
+        Log.i("LongClick", "Location: " + dataAdapter.data.get(info.position).getBlock() + " "
+                + dataAdapter.data.get(info.position).getFace() + " "
+                + dataAdapter.data.get(info.position).getStall());
 
         MenuItem.OnMenuItemClickListener listener = new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 onContextItemSelected(item);
 
+                Log.i("LongClick", "Select: " + item.getItemId());
+
                 switch (item.getItemId()) {
                     case 1:
                         // Edit
+                        break;
                     case 2:
                         // Delete
+                        ((Main) getActivity()).removeData( dataAdapter.data.get(info.position).getBlock(),
+                                dataAdapter.data.get(info.position).getFace(),
+                               dataAdapter.data.get(info.position).getStall());
+
+                        // Remove from adapter
                         dataAdapter.remove(info.position);
                         dataAdapter.notifyDataSetChanged();
-                        // TODO delete from actual data (not just adapter)
+                        break;
                 }
 
                 return true;
@@ -100,30 +109,29 @@ public class ViewDataDialogFragment extends DialogFragment {
 
 
         builder.setView(dialogView)
-                .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Back", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //TODO Confirm
                         Log.i("ViewDataDialogFragment", "Confirm Clicked!");
                     }
-                })
+                });
 
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                /*.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         ViewDataDialogFragment.this.getDialog().cancel();
                     }
-                });
+                });*/
 
         AlertDialog dialog = builder.create();
 
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(final DialogInterface dialog) {
-                final Button cancel = ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEGATIVE);
+                //final Button cancel = ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEGATIVE);
                 final Button confirm = ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE);
 
                 // Change color of button when pressed
-                cancel.setOnTouchListener(new View.OnTouchListener() {
+                /*cancel.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
                         switch (event.getAction() & MotionEvent.ACTION_MASK) {
@@ -136,7 +144,7 @@ public class ViewDataDialogFragment extends DialogFragment {
                         }
                         return false;
                     }
-                });
+                });*/
 
                 // Change color of button when pressed
                 confirm.setOnTouchListener(new View.OnTouchListener() {
@@ -155,9 +163,9 @@ public class ViewDataDialogFragment extends DialogFragment {
                 });
 
                 // Set button background to match dialog
-                cancel.setBackgroundDrawable(getResources().getDrawable(R.drawable.background_dark));
+                /*cancel.setBackgroundDrawable(getResources().getDrawable(R.drawable.background_dark));
                 cancel.setTextColor(Color.WHITE);
-                cancel.invalidate();
+                cancel.invalidate();*/
 
                 // Set button background to match dialog
                 confirm.setBackgroundDrawable(getResources().getDrawable(R.drawable.background_dark));
