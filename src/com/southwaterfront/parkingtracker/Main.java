@@ -258,6 +258,7 @@ public class Main extends Activity {
 	public void onStart() {
 		super.onStart();
 		textViewNotification = (TextView) findViewById(R.id.textViewMainNotification);
+		textViewNotification.setText("Initializing..");
 	}
 
 	@Override
@@ -320,6 +321,7 @@ public class Main extends Activity {
 				Main.this.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
+						textViewNotification.setText("");
 						enableButtons();
 					}
 
