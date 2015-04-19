@@ -106,6 +106,7 @@ public class Main extends Activity {
 	private boolean needToShowChoosePlateDialog;
 
 	private Thread initThread;
+	private boolean initialized;
 
 	private File createImageFile() throws IOException {
 		// Create an image file name
@@ -258,7 +259,8 @@ public class Main extends Activity {
 	public void onStart() {
 		super.onStart();
 		textViewNotification = (TextView) findViewById(R.id.textViewMainNotification);
-		textViewNotification.setText("Initializing..");
+		if (!initialized)
+			textViewNotification.setText("Initializing..");
 	}
 
 	@Override
@@ -303,6 +305,7 @@ public class Main extends Activity {
 			}
 		});
 */
+		initialized = false;
 		Runnable r = new Runnable() {
 
 			public void run() {
@@ -317,7 +320,7 @@ public class Main extends Activity {
 				registerReceiver(wifiReceiver, wifiFilter);
 				dataCollector = dataManager.getCurrentSession().getDataCollector();
 				setupLocationSelect();
-
+				initialized = true;
 				Main.this.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
