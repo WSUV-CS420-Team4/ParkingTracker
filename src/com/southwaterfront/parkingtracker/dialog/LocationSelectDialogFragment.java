@@ -21,9 +21,6 @@ import android.widget.Spinner;
 import com.southwaterfront.parkingtracker.Main;
 import com.southwaterfront.parkingtracker.R;
 
-/**
- * Created by Joel on 3/5/2015.
- */
 public class LocationSelectDialogFragment extends DialogFragment {
 
     private List<Integer> blockArray;

@@ -15,9 +15,6 @@ import android.widget.TextView;
 
 import com.southwaterfront.parkingtracker.R;
 
-/**
- * Created by Joel on 3/4/2015.
- */
 public class AddLicenseDialogFragment extends DialogFragment {
 
     public static AddLicenseDialogFragment newInstance() {

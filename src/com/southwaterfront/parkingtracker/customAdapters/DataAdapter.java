@@ -15,10 +15,6 @@ import android.widget.TextView;
 import com.southwaterfront.parkingtracker.R;
 import com.southwaterfront.parkingtracker.data.BlockFace;
 
-
-/**
- * Created by Joel on 4/3/2015.
- */
 public class DataAdapter extends ArrayAdapter<BlockFace> {
 
 	Context context;

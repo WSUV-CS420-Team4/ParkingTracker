@@ -27,9 +27,6 @@ import com.southwaterfront.parkingtracker.AssetManager.AssetManager;
 import com.southwaterfront.parkingtracker.client.HttpClient;
 import com.southwaterfront.parkingtracker.client.HttpClient.RequestFailedException;
 
-/**
- * Created by Joel on 3/3/2015.
- */
 public class LoginDialogFragment extends DialogFragment {
 
 	private static final String LOG_TAG = LoginDialogFragment.class.getSimpleName();

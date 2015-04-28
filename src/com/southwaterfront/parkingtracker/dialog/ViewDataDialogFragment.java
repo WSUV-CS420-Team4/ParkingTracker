@@ -25,9 +25,6 @@ import com.southwaterfront.parkingtracker.data.BlockFace;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Created by Joel on 4/2/2015.
- */
 public class ViewDataDialogFragment extends DialogFragment {
 
     private View dialogView;

@@ -16,9 +16,6 @@ import com.southwaterfront.parkingtracker.R;
 
 import java.util.Arrays;
 
-/**
- * Created by Joel on 3/4/2015.
- */
 public class SetFlagsDialogFragment extends DialogFragment {
 
     public static SetFlagsDialogFragment newInstance() {

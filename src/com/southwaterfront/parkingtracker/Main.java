@@ -558,6 +558,15 @@ public class Main extends Activity {
 				new ParkingStall(currentResult, new Date(System.currentTimeMillis()), generateFlags()));
 		LogUtils.i("Main", "Added " + currentResult + " to block " + blockArray.get(currentBlock) +
 				", face " + faceArray.get(currentFace) + ", stall " + stallArray.get(currentStall));
+
+		// If the added plate is using the last stall, add a new stall to stallArray
+		if ( (currentStall+1) == stallArray.get(stallArray.size()-1) ) {
+			stallArray.add(stallArray.size(), (currentStall+2));
+		}
+
+		// Increment the stall number so the user doesn't have to after selecting the next plate
+		currentStall++;
+
 		return result;
 	}
 

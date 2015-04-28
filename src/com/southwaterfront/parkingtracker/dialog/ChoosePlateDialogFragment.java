@@ -19,9 +19,6 @@ import android.widget.Toast;
 import com.southwaterfront.parkingtracker.Main;
 import com.southwaterfront.parkingtracker.R;
 
-/**
- * ChoosePlateDialogFragment
- */
 public class ChoosePlateDialogFragment extends DialogFragment {
 
     private View dialogView;

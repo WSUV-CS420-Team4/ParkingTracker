@@ -25,9 +25,6 @@ import com.southwaterfront.parkingtracker.Main;
 import com.southwaterfront.parkingtracker.R;
 import com.southwaterfront.parkingtracker.client.HttpClient;
 
-/**
- * Created by Joel on 4/13/2015.
- */
 public class OptionsDialogFragment extends DialogFragment {
 
     private View dialogView;
