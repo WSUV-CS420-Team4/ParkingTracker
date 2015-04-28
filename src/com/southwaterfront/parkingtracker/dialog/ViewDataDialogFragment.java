@@ -45,7 +45,7 @@ public class ViewDataDialogFragment extends DialogFragment {
         final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
 
         menu.setHeaderTitle( "" );
-        menu.add(Menu.NONE, 1, 1, "Edit");
+        //menu.add(Menu.NONE, 1, 1, "Edit");
         menu.add(Menu.NONE, 2, 2, "Delete");
 
         Log.i("LongClick", "Location: " + dataAdapter.data.get(info.position).getBlock() + " "

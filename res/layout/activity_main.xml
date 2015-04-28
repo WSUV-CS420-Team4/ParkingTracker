@@ -71,7 +71,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_weight="1"
             android:textSize="40dp"
-            android:background="@drawable/button_light"
+            android:background="@drawable/button_large"
             android:textColor="#ffffff"
             android:visibility="visible"
             android:enabled="false" />
@@ -90,7 +90,7 @@
                 android:text="Add Plate"
                 android:id="@+id/buttonMainMap"
                 android:layout_weight="1"
-                android:background="@drawable/button_dark"
+                android:background="@drawable/button_small"
                 android:textColor="#ffffff"
                 android:enabled="false" />
 
@@ -101,7 +101,7 @@
                 android:text="Sync"
                 android:id="@+id/buttonMainSync"
                 android:layout_weight="1"
-                android:background="@drawable/button_dark"
+                android:background="@drawable/button_small"
                 android:textColor="#ffffff"
                 android:enabled="false" />
         </LinearLayout>
@@ -120,7 +120,7 @@
                 android:text="View Data"
                 android:id="@+id/buttonMainData"
                 android:layout_weight="1"
-                android:background="@drawable/button_dark"
+                android:background="@drawable/button_small"
                 android:textColor="#ffffff"
                 android:enabled="false" />
 
@@ -131,7 +131,7 @@
                 android:text="Options"
                 android:id="@+id/buttonMainOptions"
                 android:layout_weight="1"
-                android:background="@drawable/button_dark"
+                android:background="@drawable/button_small"
                 android:textColor="#ffffff"
                 android:enabled="false" />
         </LinearLayout>
