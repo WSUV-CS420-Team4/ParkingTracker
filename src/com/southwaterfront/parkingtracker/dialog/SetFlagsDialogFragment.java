@@ -30,6 +30,7 @@ public class SetFlagsDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
+        //AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.SetFlagTheme); // Custom AlertDialog
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         if ( ((Main) getActivity()).getFlagSelections() != null) {
@@ -48,6 +49,12 @@ public class SetFlagsDialogFragment extends DialogFragment {
                     }
                 })
 
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        SetFlagsDialogFragment.this.getDialog().cancel();
+                    }
+                })
+
                 .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -63,17 +70,11 @@ public class SetFlagsDialogFragment extends DialogFragment {
                             Toast.makeText(getActivity().getApplicationContext(), "Set " + temp + " flags", Toast.LENGTH_SHORT).show();
                         }
                     }
-                })
-
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        SetFlagsDialogFragment.this.getDialog().cancel();
-                    }
                 });
 
         AlertDialog dialog = builder.create();
 
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+        /*dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(final DialogInterface dialog) {
                 final Button cancel = ((AlertDialog)dialog).getButton(DialogInterface.BUTTON_NEGATIVE);
@@ -125,7 +126,7 @@ public class SetFlagsDialogFragment extends DialogFragment {
                     confirm.invalidate();
                 }
             }
-        });
+        });*/
 
 
 

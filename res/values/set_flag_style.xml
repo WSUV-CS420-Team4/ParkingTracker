@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="SetFlagTheme" parent="@style/Theme_Flag_Dialog_Alert">
+    </style>
+
+    <!-- Don't use AlertDialog_flag. Causes dialog to have giant font and dialog size -->
+    <style name="AlertDialog_Flag">
+        <item name="android:topDark">@drawable/background_dark</item>
+        <item name="android:centerDark">@drawable/background_dark</item>
+    </style>
+
+    <style name="Theme_Flag_Dialog_Alert" parent="@android:style/Theme.Holo.Light.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowTitleStyle">@style/DialogWindowTitle_Flag</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+        <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="DialogWindowTitle_Flag">
+        <item name="android:maxLines">1</item>
+        <item name="android:scrollHorizontally">true</item>
+        <item name="android:textAppearance">@android:style/TextAppearance.Holo.DialogWindowTitle</item>
+        <item name="android:windowBackground">@drawable/background_dark</item>
+    </style>
+
+</resources>
