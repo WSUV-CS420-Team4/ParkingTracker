@@ -20,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.southwaterfront.parkingtracker.Main;
 import com.southwaterfront.parkingtracker.R;
@@ -127,6 +128,7 @@ public class OptionsDialogFragment extends DialogFragment {
             		loginDialogFragment.show(getActivity().getFragmentManager(), "Login");
                 } else {
                 	HttpClient.logout();
+                    Toast.makeText(getActivity().getBaseContext(), "You have successfully logged out", Toast.LENGTH_LONG).show();
                 }
             }
         });

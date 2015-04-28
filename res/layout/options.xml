@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="Options"
-            android:id="@+id/textViewViewDataTitle"
+            android:id="@+id/textViewOptionsTitle"
             android:gravity="center_horizontal"
             android:textColor="#B2CE35" />
 
