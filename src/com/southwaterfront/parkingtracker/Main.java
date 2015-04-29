@@ -2,7 +2,6 @@ package com.southwaterfront.parkingtracker;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.Thread.UncaughtExceptionHandler;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -67,7 +66,7 @@ public class Main extends Activity {
 	private AssetManager assets;
 	private DataManager dataManager;
 	private ParkingDataCollector dataCollector;
-	private AlprEngine ocrEngine;
+	private volatile AlprEngine alprEngine;
 	private TextView textViewNotification;
 	private AlertDialog.Builder wifiAlert;
 	private WifiStateUploadableDataReceiver wifiReceiver;
@@ -190,7 +189,9 @@ public class Main extends Activity {
 		buttonTakePhoto.setVisibility(View.GONE);
 		disableButtons();
 		alprRunning = true;
-		ocrEngine.runAlpr(photoFile, new AlprCallBack() {
+		if(alprEngine == null)
+			LogUtils.i(LOG_TAG, "Why is this null?");
+		alprEngine.runAlpr(photoFile, new AlprCallBack() {
 			@Override
 			public void call(final String[] result) {
 
@@ -313,7 +314,7 @@ public class Main extends Activity {
 				assets = AssetManager.getInstance();
 				assets.assetSanityCheck();
 				dataManager = DataManager.getInstance();
-				ocrEngine = AlprEngine.getInstance();
+				alprEngine = AlprEngine.getInstance();
 				wifiFilter = new IntentFilter();
 				wifiFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 				wifiReceiver = new WifiStateUploadableDataReceiver();
@@ -326,6 +327,7 @@ public class Main extends Activity {
 					public void run() {
 						textViewNotification.setText("");
 						enableButtons();
+						LogUtils.i(LOG_TAG, "App initialized successfully, AlprEngine is " + alprEngine);
 					}
 
 				});
@@ -333,7 +335,7 @@ public class Main extends Activity {
 		};
 		initThread = new Thread(r);
 		initThread.start();
-		LogUtils.i(LOG_TAG, "App initialized successfully");
+		
 	}
 
 	private void initButtons() {
@@ -398,6 +400,9 @@ public class Main extends Activity {
 		//set content view AFTER ABOVE sequence (to avoid crash)
 		this.setContentView(R.layout.activity_main); // Probably could just remove title bar before first set contentView
 
+		initButtons();
+		disableButtons();
+		
 		/**
 		 * Leave this method call
 		 */
@@ -405,8 +410,6 @@ public class Main extends Activity {
 
 		fragmentManager = getFragmentManager();
 		//fragmentTransaction = fragmentManager.beginTransaction();
-
-		initButtons();
 
 		currentResult = "";
 		OCRResults = 5;
@@ -495,7 +498,7 @@ public class Main extends Activity {
 	private void onDestroyAppClose() {
 		this.unregisterReceiver(this.wifiReceiver);
 		dataManager.close();
-		ocrEngine.close();
+		alprEngine.close();
 		Utils.shutdownThreads();
 	}
 
@@ -727,7 +730,7 @@ public class Main extends Activity {
 	public void setOCRResults(int OCRResults) {
 		this.OCRResults = OCRResults;
 
-		ocrEngine.setNumberOfResults(OCRResults);
+		alprEngine.setNumberOfResults(OCRResults);
 		LogUtils.i("setOCRResults", "ocrEngine.setNumberOfResults( " + OCRResults + " );");
 	}
 
