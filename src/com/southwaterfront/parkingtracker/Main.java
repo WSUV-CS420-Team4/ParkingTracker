@@ -305,7 +305,7 @@ public class Main extends Activity {
 				});
 			}
 		});
-*/
+		 */
 		initialized = false;
 		Runnable r = new Runnable() {
 
@@ -335,7 +335,7 @@ public class Main extends Activity {
 		};
 		initThread = new Thread(r);
 		initThread.start();
-		
+
 	}
 
 	private void initButtons() {
@@ -402,7 +402,7 @@ public class Main extends Activity {
 
 		initButtons();
 		disableButtons();
-		
+
 		/**
 		 * Leave this method call
 		 */
@@ -496,7 +496,8 @@ public class Main extends Activity {
 	}
 
 	private void onDestroyAppClose() {
-		this.unregisterReceiver(this.wifiReceiver);
+		if (this.wifiReceiver != null) // Can be null if back pressed before initialization happens
+			this.unregisterReceiver(this.wifiReceiver);
 		dataManager.close();
 		alprEngine.close();
 		Utils.shutdownThreads();
