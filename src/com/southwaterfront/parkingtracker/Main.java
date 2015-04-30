@@ -19,6 +19,7 @@ import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -72,6 +73,7 @@ public class Main extends Activity {
 	private WifiStateUploadableDataReceiver wifiReceiver;
 	private IntentFilter wifiFilter;
 	private File photoFile;
+	private Handler handler = new Handler();
 
 	private List<String> licensePlates = new ArrayList<String>();
 	private ArrayAdapter<String> arrayAdapter;
@@ -498,8 +500,10 @@ public class Main extends Activity {
 	private void onDestroyAppClose() {
 		if (this.wifiReceiver != null) // Can be null if back pressed before initialization happens
 			this.unregisterReceiver(this.wifiReceiver);
-		dataManager.close();
-		alprEngine.close();
+		if (dataManager != null)
+			dataManager.close();
+		if (alprEngine != null)
+			alprEngine.close();
 		Utils.shutdownThreads();
 	}
 
@@ -517,6 +521,24 @@ public class Main extends Activity {
 						if (task.getResult() == Result.SUCCESS) {
 							dataCollector = dataManager.getCurrentSession().getDataCollector();
 							view.setText("Successfully uploaded data");
+							final TextView v = view;
+							handler.postDelayed(new Runnable() {
+
+								@Override
+								public void run() {
+									Main.this.runOnUiThread(new Runnable() {
+
+										@Override
+										public void run() {
+											v.setText("");
+											
+										}
+										
+									});
+									
+								}
+								
+							}, 3000);
 						} else
 							view.setText(task.getErrorMessage());
 					}
