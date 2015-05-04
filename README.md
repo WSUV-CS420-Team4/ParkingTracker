@@ -21,7 +21,7 @@ Sponsor: [South Waterfront](http://www.southwaterfront.com/)
 
 ## Current Status
 
-The automatic license plate reader engine is up and running, and the UI and data collection are being developed.
+Tested and released to South Waterfront
 
 ## Build/Install
 
@@ -36,7 +36,3 @@ and set an API target, preferably 14 or up
 ## TODO
 
 - Complete Known Bugs / Caveats List
-- App Settings
-- Web App Login
-- Special Case Parking Exceptions
-- Interface V2
