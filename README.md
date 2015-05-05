@@ -1,6 +1,6 @@
 ![South Waterfront](http://www.southwaterfront.com/images/swcr-logo.png)
 
-# Parking Tracker Web Application
+# Parking Tracker Android Application
 
 [Web](https://github.com/WSUV-CS420-Team4/ParkingTrackerWeb)
 
